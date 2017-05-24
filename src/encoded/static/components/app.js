@@ -14,26 +14,24 @@ import Home from './home';
 import { newsHead } from './page';
 
 const portal = {
-    portal_title: 'ENCODE',
+    portal_title: 'T2D-ATLAS',
     global_sections: [
         {
             id: 'data',
             title: 'Data',
             children: [
-                { id: 'assaymatrix', title: 'Matrix', url: '/matrix/?type=Experiment' },
-                { id: 'assaysearch', title: 'Search', url: '/search/?type=Experiment' },
+                { id: 'assaysearch', title: 'Search Experiments', url: '/search/?type=Experiment' },
                 { id: 'region-search', title: 'Search by region', url: '/region-search/' },
-                { id: 'reference-epigenomes', title: 'Reference epigenomes', url: '/search/?type=ReferenceEpigenome' },
-                { id: 'publications', title: 'Publications', url: '/publications/' },
+		{ id: 'assaymatrix', title: 'Matrix', url: '/matrix/?type=Experiment' },
             ],
         },
         {
             id: 'encyclopedia',
             title: 'Encyclopedia',
             children: [
-                { id: 'aboutannotations', title: 'About', url: '/data/annotations/' },
+		{ id: 'annotationsearch', title: 'Search Annotations', url: '/search/?type=Annotation&encyclopedia_version=3' },
                 { id: 'annotationmatrix', title: 'Matrix', url: '/matrix/?type=Annotation&encyclopedia_version=3' },
-                { id: 'annotationsearch', title: 'Search', url: '/search/?type=Annotation&encyclopedia_version=3' },
+                { id: 'aboutannotations', title: 'About', url: '/data/annotations/' },
             ],
         },
         {

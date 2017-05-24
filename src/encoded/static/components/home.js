@@ -6,9 +6,6 @@ import { FetchedData, FetchedItems, Param } from './fetched';
 import { Panel, PanelBody } from '../libs/bootstrap/panel';
 
 
-const newsUri = '/search/?type=Page&news=true&status=released';
-
-
 // Convert the selected organisms and assays into an encoded query.
 function generateQuery(selectedOrganisms, selectedAssayCategory) {
     // Make the base query.
@@ -24,9 +21,6 @@ function generateQuery(selectedOrganisms, selectedAssayCategory) {
         const organismSpec = selectedAssayCategory === 'COMPPRED' ? 'organism.scientific_name=' : 'replicates.library.biosample.donor.organism.scientific_name=';
         const queryStrings = {
             HUMAN: `${organismSpec}Homo+sapiens`, // human
-            MOUSE: `${organismSpec}Mus+musculus`, // mouse
-            WORM: `${organismSpec}Caenorhabditis+elegans`, // worm
-            FLY: `${organismSpec}Drosophila+melanogaster&${organismSpec}Drosophila+pseudoobscura&${organismSpec}Drosophila+simulans&${organismSpec}Drosophila+mojavensis&${organismSpec}Drosophila+ananassae&${organismSpec}Drosophila+virilis&${organismSpec}Drosophila+yakuba`,
         };
         const organismQueries = selectedOrganisms.map(organism => queryStrings[organism]);
         query += `&${organismQueries.join('&')}`;
@@ -97,23 +91,9 @@ export default class Home extends React.Component {
                     <div className="col-xs-12">
                         <Panel>
                             <AssayClicking assayCategory={this.state.assayCategory} handleAssayCategoryClick={this.handleAssayCategoryClick} />
-                            <div className="organism-tabs">
-                                <TabClicking organisms={this.state.organisms} handleTabClick={this.handleTabClick} />
-                            </div>
                             <div className="graphs">
                                 <div className="row">
                                     <HomepageChartLoader organisms={this.state.organisms} assayCategory={this.state.assayCategory} query={currentQuery} />
-                                </div>
-                            </div>
-                            <div className="social">
-                                <div className="social-news">
-                                    <div className="news-header">
-                                        <h2>News <a href="/news/" title="More ENCODE news" className="twitter-ref">More ENCODE news</a></h2>
-                                    </div>
-                                    <NewsLoader newsLoaded={this.newsLoaded} />
-                                </div>
-                                <div className="social-twitter">
-                                    <TwitterWidget height={this.state.socialHeight} />
                                 </div>
                             </div>
                         </Panel>
@@ -128,9 +108,6 @@ export default class Home extends React.Component {
 // Given retrieved data, draw all home-page charts.
 const ChartGallery = props => (
     <PanelBody>
-        <div className="view-all">
-            <a href={`/matrix/${props.query}`} className="view-all-button btn btn-info btn-sm" role="button">View Assay Matrix</a>
-        </div>
         <div className="chart-gallery">
             <div className="chart-single">
                 <HomepageChart {...props} />
@@ -193,33 +170,14 @@ class AssayClicking extends React.Component {
             <div ref="graphdisplay">
                 <div className="overall-classic">
 
-                    <h1>ENCODE: Encyclopedia of DNA Elements</h1>
-
-                    <div className="site-banner">
-                        <div className="site-banner-img">
-                            <img src="static/img/classic-image.jpg" alt="ENCODE representational diagram with embedded assay selection buttons" />
-
-                            <svg id="site-banner-overlay" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2260 1450" className="classic-svg">
-                                <BannerOverlayButton item={assayList[0]} x="101.03" y="645.8" width="257.47" height="230.95" selected={assayCategory === assayList[0]} clickHandler={this.sortByAssay} />
-                                <BannerOverlayButton item={assayList[1]} x="386.6" y="645.8" width="276.06" height="230.95" selected={assayCategory === assayList[1]} clickHandler={this.sortByAssay} />
-                                <BannerOverlayButton item={assayList[2]} x="688.7" y="645.8" width="237.33" height="230.95" selected={assayCategory === assayList[2]} clickHandler={this.sortByAssay} />
-                                <BannerOverlayButton item={assayList[3]} x="950.83" y="645.8" width="294.65" height="230.95" selected={assayCategory === assayList[3]} clickHandler={this.sortByAssay} />
-                                <BannerOverlayButton item={assayList[4]} x="1273.07" y="645.8" width="373.37" height="230.95" selected={assayCategory === assayList[4]} clickHandler={this.sortByAssay} />
-                                <BannerOverlayButton item={assayList[5]} x="1674.06" y="645.8" width="236.05" height="230.95" selected={assayCategory === assayList[5]} clickHandler={this.sortByAssay} />
-                                <BannerOverlayButton item={assayList[6]} x="1937.74" y="645.8" width="227.38" height="230.95" selected={assayCategory === assayList[6]} clickHandler={this.sortByAssay} />
-                            </svg>
-                        </div>
+                    <h1>Type 2 Diabetes Epigenome Atlas</h1>
 
                         <div className="site-banner-intro">
                             <div className="site-banner-intro-content">
-                                <p>The ENCODE (Encyclopedia of DNA Elements) Consortium is an international collaboration of research groups funded by the National Human Genome Research Institute (NHGRI). The goal of ENCODE is to build a comprehensive parts list of functional elements in the human genome, including elements that act at the protein and RNA levels, and regulatory elements that control cells and circumstances in which a gene is active.</p>
-                                <div className="getting-started-button">
-                                    <a href="/matrix/?type=Experiment&status=released" className="btn btn-info" role="button">Get Started</a>
-                                </div>
+				<p>The Type 2 Diabetes Epigenome Atlas collects and provides data on the human epigenome to facilitate genetic and genomic studies of type 2 diabetes and its complications.  This resource is funded by the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK), and is supported by an international collaboration of researchers.</p>
                             </div>
                         </div>
                     </div>
-                </div>
             </div>
         );
     }
@@ -266,9 +224,6 @@ class TabClicking extends React.Component {
             <div ref="tabdisplay">
                 <div className="organism-selector">
                     <OrganismSelector organism="Human" selected={organisms.indexOf('HUMAN') !== -1} clickHandler={handleTabClick} />
-                    <OrganismSelector organism="Mouse" selected={organisms.indexOf('MOUSE') !== -1} clickHandler={handleTabClick} />
-                    <OrganismSelector organism="Worm" selected={organisms.indexOf('WORM') !== -1} clickHandler={handleTabClick} />
-                    <OrganismSelector organism="Fly" selected={organisms.indexOf('FLY') !== -1} clickHandler={handleTabClick} />
                 </div>
             </div>
         );
@@ -1052,6 +1007,3 @@ class TwitterWidget extends React.Component {
     }
 }
 
-TwitterWidget.propTypes = {
-    height: PropTypes.number.isRequired, // Number of pixels tall to make widget
-};
