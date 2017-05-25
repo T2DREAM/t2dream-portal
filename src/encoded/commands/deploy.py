@@ -190,12 +190,13 @@ def create_ec2_instances(client, image_id, count, instance_type, security_groups
         MinCount=count,
         MaxCount=count,
         InstanceType=instance_type,
-        SecurityGroups=security_groups,
+       # SecurityGroups=security_groups,
         UserData=user_data,
         BlockDeviceMappings=bdm,
         InstanceInitiatedShutdownBehavior='terminate',
         IamInstanceProfile={
-            "Name": iam_role,
+	     "Arn": "arn:aws:iam::116837888204:instance-profile/encoded-instance"
+    #        "InstanceProfileName": iam_role,
         }
     )
     return reservations
@@ -275,7 +276,7 @@ def run(wale_s3_prefix, image_id, instance_type, elasticsearch, spot_instance, s
         if cluster_name:
             data_insert['CLUSTER_NAME'] = cluster_name
         user_data = user_data % data_insert
-        security_groups = ['ssh-http-https']
+        security_groups = 'ssh,http,https'
         iam_role = 'encoded-instance'
         count = 1
     else:
@@ -319,12 +320,12 @@ def run(wale_s3_prefix, image_id, instance_type, elasticsearch, spot_instance, s
             tmp_name = name
 
         if not spot_instance:
-            print('%s.%s.encodedcc.org' % (instance.id, domain))  # Instance:i-34edd56f
+            print('%s.%s' % (instance.id, domain))  # Instance:i-34edd56f
             instance.wait_until_exists()
             tag_ec2_instance(instance, tmp_name, branch, commit, username, elasticsearch, cluster_name)
-            print('ssh %s.%s.encodedcc.org' % (tmp_name, domain))
+            print('ssh %s.%s' % (tmp_name, domain))
             if domain == 'instance':
-                print('https://%s.demo.encodedcc.org' % tmp_name)
+                print('https://%s.demo.' % tmp_name)
 
     if spot_instance:
         tag_spot_instance(instances, tmp_name, branch, commit, username, elasticsearch, client.spotClient, cluster_name)
@@ -344,7 +345,8 @@ def main():
     )
     parser.add_argument('-b', '--branch', default=None, help="Git branch or tag")
     parser.add_argument('-n', '--name', type=hostname, help="Instance name")
-    parser.add_argument('--wale-s3-prefix', default='s3://encoded-backups-prod/production')
+   # parser.add_argument('--wale-s3-prefix', default='s3://encoded-backups-prod/production')
+    parser.add_argument('--wale-s3-prefix', default='s3://t2depi/')
     parser.add_argument('--spot-instance', action='store_true', help="Launch as spot instance")
     parser.add_argument('--spot-price', default='0.70', help="Set price or keep default price of 0.70")
     parser.add_argument('--check-price', action='store_true', help="Check price on spot instances")
