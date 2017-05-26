@@ -211,7 +211,7 @@ runcmd:
 - a2disconf localized-error-pages
 - a2disconf other-vhosts-access-log
 - a2disconf serve-cgi-bin
-- if test "%(ROLE)s" = "demo"
+- if test "%(ROLE)s" = "demox"
 - then
 -   sudo -i -u encoded bin/batchupgrade production.ini --app-name app
 - fi
