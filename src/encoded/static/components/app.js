@@ -282,7 +282,7 @@ class App extends React.Component {
         const logoUrl = url.format(logoHrefInfo);
 
         const lock_ = require('auth0-lock');
-        this.lock = new lock_.default('WIOr638GdDdEGPJmABPhVzMn6SYUIdIH', 'encode.auth0.com', {
+        this.lock = new lock_.default('0Ht3cCS1Rr5dlptrK1w3PU7O0r2p0fB4', 't2depi.auth0.com', {
             auth: {
                 redirect: false,
             },
@@ -291,7 +291,7 @@ class App extends React.Component {
             },
             socialButtonStyle: 'big',
             languageDictionary: {
-                title: 'Log in to ENCODE',
+                title: 'Log in',
             },
             allowedConnections: ['github', 'google-oauth2', 'facebook', 'linkedin'],
         });
