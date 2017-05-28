@@ -199,6 +199,8 @@ runcmd:
 - sudo -u encoded bin/index-annotations production.ini --app-name app
 - ln -s /srv/encoded/etc/encoded-apache.conf /etc/apache2/sites-available/encoded.conf
 - ln -s /srv/encoded/etc/logging-apache.conf /etc/apache2/conf-available/logging.conf
+- sudo mkdir /home/ubuntu/.aws
+- cp /srv/encoded/.aws/* /home/ubuntu/.aws
 - a2enmod headers
 - a2enmod proxy_http
 - a2enmod rewrite
