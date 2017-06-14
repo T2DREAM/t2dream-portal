@@ -170,11 +170,11 @@ class AssayClicking extends React.Component {
             <div ref="graphdisplay">
                 <div className="overall-classic">
 
-                    <h1>Type 2 Diabetes Epigenome Atlas</h1>
+                    <h1>T2DREAM - Type 2 Diabetes Regulatory Annotation Map</h1>
 
                         <div className="site-banner-intro">
                             <div className="site-banner-intro-content">
-				<p>The Type 2 Diabetes Epigenome Atlas collects and provides data on the human epigenome to facilitate genetic and genomic studies of type 2 diabetes and its complications.  This resource is funded by the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK), and is supported by an international collaboration of researchers.</p>
+				<p>The T2DREAM project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
                             </div>
                         </div>
                     </div>

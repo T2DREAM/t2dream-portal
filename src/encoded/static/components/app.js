@@ -14,7 +14,7 @@ import Home from './home';
 import { newsHead } from './page';
 
 const portal = {
-    portal_title: 'T2D-ATLAS',
+    portal_title: 'T2DREAM',
     global_sections: [
         {
             id: 'data',
@@ -74,8 +74,6 @@ const portal = {
 const projectList = [
     'ENCODE',
     'Roadmap',
-    'modENCODE',
-    'modERN',
     'GGR',
 ];
 const biosampleTypeList = [
@@ -947,8 +945,8 @@ class App extends React.Component {
 
         // Google does not update the content of 301 redirected pages
         let base;
-        if (({ 'http://www.encodeproject.org/': 1, 'http://encodeproject.org/': 1 })[canonical]) {
-            base = 'https://www.encodeproject.org/';
+        if (({ 'http://www.t2dream.org/': 1, 'http://t2dream.org/': 1 })[canonical]) {
+            base = 'https://www.t2dream.org/';
             canonical = base;
             this.constructor.historyEnabled = false;
         }
