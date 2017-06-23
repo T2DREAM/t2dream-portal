@@ -38,7 +38,7 @@ var Footer = createReactClass({
                                     <li><a href="">Terms of Use</a></li>
                                     <li id="user-actions-footer">{userActionRender}</li>
                                 </ul>
-                                <p className="copy-notice">&copy;{new Date().getFullYear()} University of California.</p>
+                                <p className="copy-notice">&copy;{new Date().getFullYear()} Regents of the University of California.</p>
                             </div>
 
                             <div className="col-sm-6 col-sm-pull-6">
