@@ -185,7 +185,7 @@ module.exports.statusOrder = [
     'not reviewed'
 ];
 
-module.exports.productionHost = {'www.encodeproject.org':1, 'encodeproject.org':1, 'www.encodedcc.org':1};
+module.exports.productionHost = {'t2depigenome.org':1, 'www.t2depigenome.org':1, 't2dream.org':1, 'www.t2dream.org':1};
 
 var encodeVersionMap = module.exports.encodeVersionMap = {
     "ENCODE2": "2",
