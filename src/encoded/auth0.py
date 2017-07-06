@@ -69,7 +69,7 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         
         try:
             user_url = "https://{domain}/userinfo?access_token={access_token}" \
-                .format(domain='encode.auth0.com', access_token=access_token)
+                .format(domain='t2depi.auth0.com', access_token=access_token)
 
             user_info = requests.get(user_url).json()
         except Exception as e:
