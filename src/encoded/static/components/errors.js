@@ -56,7 +56,7 @@ var HTTPForbidden = module.exports.HTTPForbidden = createReactClass({
                     <div className="col-sm-12">
                         <h1>Not available</h1>
                         {logged_in ? <p>Your account is not allowed to view this page.</p> : <p>Please sign in to view this page.</p>}
-                        {logged_in ? null : <p>Or <a href='mailto:encode-help@lists.stanford.edu'>Request an account.</a></p>}
+                        {logged_in ? null : <p>Or <a href='mailto:t2dream-l@mailman.ucsd.edu'>Request an account.</a></p>}
                     </div>
                 </div>
             </div>

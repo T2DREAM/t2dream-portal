@@ -79,6 +79,7 @@
                 "ENCODE3",
                 "ENCODE4",
                 "GGR",
+		"AMP",
                 "Roadmap",
                 "modENCODE",
                 "modERN",
@@ -93,6 +94,7 @@
                 "ENCODE",
                 "GGR",
                 "Roadmap",
+		"AMP",
                 "modENCODE",
                 "modERN",
                 "community"
@@ -106,6 +108,7 @@
                 "ENCODE3",
                 "ENCODE4",
                 "GGR",
+		"AMP",
                 "REMC",
                 "community"
             ]

@@ -346,7 +346,7 @@ def main():
     parser.add_argument('-b', '--branch', default=None, help="Git branch or tag")
     parser.add_argument('-n', '--name', type=hostname, help="Instance name")
    # parser.add_argument('--wale-s3-prefix', default='s3://encoded-backups-prod/production')
-    parser.add_argument('--wale-s3-prefix', default='s3://t2depi/')
+    parser.add_argument('--wale-s3-prefix', default='s3://t2depi-backups/production')
     parser.add_argument('--spot-instance', action='store_true', help="Launch as spot instance")
     parser.add_argument('--spot-price', default='0.70', help="Set price or keep default price of 0.70")
     parser.add_argument('--check-price', action='store_true', help="Check price on spot instances")
