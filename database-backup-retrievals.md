@@ -4,6 +4,7 @@ Purpose: Wal-e for continous archiving PostgreSQL WAL files and base backups.
 
 **Step 1**
 Create t2depi-backups bucket. Properties under Versioning Menu **Enable Versioning**
+
 TBD - create backup bucket in different region, in case there is a failure in primary database region??
 
 **Step 2**
