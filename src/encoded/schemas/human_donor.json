@@ -176,8 +176,12 @@
             "linkTo": "HumanDonor"
         },
         "organism": {
-            "default": "7745b647-ff15-4ff3-9ced-b897d4e2983c",
-            "linkEnum": ["7745b647-ff15-4ff3-9ced-b897d4e2983c"]
+            "default": "2e5a2453-8f03-45ee-82e4-9b7e6c963f43",
+            "linkEnum": ["2e5a2453-8f03-45ee-82e4-9b7e6c963f43",
+                         "5eb4aef8-3832-4c4f-a48f-1b81e91bdda2",
+                         "e354514c-8bc0-4891-9db7-8737e59ade65",
+                         "2d5232ea-cb63-4520-a6de-a30a6a2f83ec",
+                         "bdd6cef3-d9bd-4d90-8057-99ab7d55ffe1"]
         },
         "status": {
             "enum" : [
