@@ -270,6 +270,7 @@ module.exports.parseAndLogError = function (cause, response) {
 
 module.exports.dbxref_prefix_map = {
     "UniProtKB": "http://www.uniprot.org/uniprot/",
+    "ENCODE-project": "https://www.encodeproject.org/experiments/",
     "HGNC": "http://www.genecards.org/cgi-bin/carddisp.pl?gene=",
     // ENSEMBL link only works for human
     "ENSEMBL": "http://www.ensembl.org/Homo_sapiens/Gene/Summary?g=",
