@@ -22,7 +22,7 @@ def includeme(config):
     unique_key='lab:name',
     properties={
         'title': 'Labs',
-        'description': 'Listing of ENCODE DCC labs',
+        'description': 'Listing of labs',
     })
 class Lab(Item):
     item_type = 'lab'
