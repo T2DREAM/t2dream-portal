@@ -276,6 +276,7 @@ module.exports.dbxref_prefix_map = {
     "ENSEMBL": "http://www.ensembl.org/Homo_sapiens/Gene/Summary?g=",
     "GeneID": "https://www.ncbi.nlm.nih.gov/gene/",
     "GEO": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=",
+    "EBI": "https://www.ebi.ac.uk/arrayexpress/experiments/",
     "GEOSAMN": "https://www.ncbi.nlm.nih.gov/biosample/",
     "IHEC": "http://www.ebi.ac.uk/vg/epirr/view/",
     "Caltech": "http://jumpgate.caltech.edu/library/",
