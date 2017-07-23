@@ -29,14 +29,14 @@ const portal = {
             id: 'annotations',
             title: 'Annotations',
             children: [
-		{ id: 'annotationsearch', title: 'Search Annotations', url: '/search/?type=Annotation&encyclopedia_version=3' },
-                { id: 'annotationmatrix', title: 'Matrix', url: '/matrix/?type=Annotation&encyclopedia_version=3' },
+		{ id: 'annotationsearch', title: 'Search Annotations', url: '/search/?type=Annotation' },
+                { id: 'annotationmatrix', title: 'Matrix', url: '/matrix/?type=Annotation' },
                 { id: 'aboutannotations', title: 'About', url: '/data/annotations/' },
             ],
         },
         {
             id: 'materialsmethods',
-            title: 'Materials & Methods',
+            title: 'Materials',
             children: [
                 { id: 'antibodies', title: 'Antibodies', url: '/search/?type=AntibodyLot' },
                 { id: 'biosamples', title: 'Biosamples', url: '/search/?type=Biosample' },
