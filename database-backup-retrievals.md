@@ -149,7 +149,7 @@ FD 00000040
 
 In the backup-fetch replace LATEST argument with the base backup name from backup-list to roll back to previous backup versions.
 
-
+**Very Important: Reboot the server!**
 
 
 
