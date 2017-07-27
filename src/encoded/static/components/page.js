@@ -105,7 +105,7 @@ var NewsShareList = createReactClass({
         var post = this.props.post;
         return (
             <div className="news-share-list">
-                <a className="share-twitter" href={'http://twitter.com/intent/tweet?url=' + this.context.location_href + '&text=' + post.title + '&via=EncodeDCC'} target="_blank" title="Share this page on Twitter in a new window" aria-label="Share on Twitter">
+                <a className="share-twitter" href={'http://twitter.com/intent/tweet?url=' + this.context.location_href + '&text=' + post.title} target="_blank" title="Share this page on Twitter in a new window" aria-label="Share on Twitter">
                     <span className="sr-only">Twitter</span>
                 </a>
                 <a className="share-facebook" href={'https://www.facebook.com/sharer/sharer.php?u=' + this.context.location_href + '&t=' + post.title} target="_blank" title="Share this page on Facebook in a new window" aria-label="Share on Facebook">
@@ -130,7 +130,7 @@ var newsHead = module.exports.newsHead = function(props, siteUrl) {
             <meta property="og:type" content="article" />,
             <meta property="og:title" content={context.title} />,
             <meta property="og:description" content={context.news_excerpt} />,
-            <meta property="og:image" content={siteUrl + '/static/img/encode-logo-small-2x.png'} />
+            <meta property="og:image" content={siteUrl + '/static/img/logo.png'} />
         ];
     }
     return null;

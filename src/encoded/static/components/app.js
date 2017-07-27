@@ -21,7 +21,7 @@ const portal = {
             title: 'Data',
             children: [
                 { id: 'assaysearch', title: 'Search Experiments', url: '/search/?type=Experiment' },
-                { id: 'region-search', title: 'Search by region', url: '/region-search/' },
+                //{ id: 'region-search', title: 'Search by region', url: '/region-search/' },
 		{ id: 'assaymatrix', title: 'Matrix', url: '/matrix/?type=Experiment' },
             ],
         },
@@ -275,7 +275,7 @@ class App extends React.Component {
             hostname: hrefInfo.hostname,
             port: hrefInfo.port,
             protocol: hrefInfo.protocol,
-            pathname: '/static/img/encode-logo-small-2x.png',
+            pathname: '/static/img/logo.png',
         };
         const logoUrl = url.format(logoHrefInfo);
 
@@ -289,9 +289,9 @@ class App extends React.Component {
             },
             socialButtonStyle: 'big',
             languageDictionary: {
-                title: 'Log in',
+                title: 'Log in to T2DREAM',
             },
-            allowedConnections: ['github', 'google-oauth2', 'facebook', 'linkedin'],
+            allowedConnections: ['google-oauth2', 'facebook', 'twitter','linkedin'],
         });
         this.lock.on('authenticated', this.handleAuth0Login);
 
