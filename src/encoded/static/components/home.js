@@ -108,17 +108,7 @@ export default class Home extends React.Component {
 // Given retrieved data, draw all home-page charts.
 const ChartGallery = props => (
     <PanelBody>
-        <div className="chart-gallery">
-            <div className="chart-single">
-                <HomepageChart {...props} />
-            </div>
-            <div className="chart-single">
-                <HomepageChart2 {...props} />
-            </div>
-            <div className="chart-single">
-                <HomepageChart3 {...props} />
-            </div>
-        </div>
+    
     </PanelBody>
 );
 
