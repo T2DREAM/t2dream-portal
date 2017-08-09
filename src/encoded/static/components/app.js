@@ -17,51 +17,33 @@ const portal = {
     portal_title: 'T2DREAM',
     global_sections: [
         {
+            id: 'about',
+            title: 'About',
+            children: [
+                { id: 'projectoverview', title: 'Project overview', url: '/about/contributors/' },
+                { id: 'policies', title: 'Policies', url: '/2017-08-03-policy/' },
+                { id: 'news', title: 'News', url: '/search/?type=Page&news=true&status=released' },
+                { id: 'acknowledgements', title: 'Acknowledgements', url: '/acknowledgements/' },
+                { id: 'contact', title: 'Contact', url: '/help/contacts/' },
+
+            ],
+        },
+        {
             id: 'data',
             title: 'Data',
             children: [
-                { id: 'assaysearch', title: 'Search Experiments', url: '/search/?type=Experiment' },
-                //{ id: 'region-search', title: 'Search by region', url: '/region-search/' },
-		{ id: 'assaymatrix', title: 'Matrix', url: '/matrix/?type=Experiment' },
+	        { id: 'experiment', title: 'Experiments', url: '/matrix/?type=Experiment'},
+                { id: 'annotations', title: 'Annotations', url: '/matrix/?type=Annotation'},
+
             ],
         },
-        {
-            id: 'annotations',
-            title: 'Annotations',
-            children: [
-		{ id: 'annotationsearch', title: 'Search Annotations', url: '/search/?type=Annotation' },
-                { id: 'annotationmatrix', title: 'Matrix', url: '/matrix/?type=Annotation' },
-                { id: 'aboutannotations', title: 'About', url: '/data/annotations/' },
-            ],
-        },
-        {
-            id: 'materialsmethods',
-            title: 'Materials',
-            children: [
-                { id: 'antibodies', title: 'Antibodies', url: '/search/?type=AntibodyLot' },
-                { id: 'biosamples', title: 'Biosamples', url: '/search/?type=Biosample' },
-                // { id: 'references', title: 'Genome references', url: '/data-standards/reference-sequences/' },
-                { id: 'sep-mm-1' },
-                // { id: 'datastandards', title: 'Standards and guidelines', url: '/data-standards/' },
-                { id: 'ontologies', title: 'Ontologies', url: '/help/getting-started/#Ontologies' },
-                // { id: 'fileformats', title: 'File formats', url: '/help/file-formats/' },
-                // { id: 'softwaretools', title: 'Software tools', url: '/software/' },
-                // { id: 'pipelines', title: 'Pipelines', url: '/pipelines/' },
-                // { id: 'datause', title: 'Release policy', url: '/about/data-use-policy/' },
-                // { id: 'dataaccess', title: 'Data access', url: '/about/data-access/' },
-            ],
-        },
+       
         {
             id: 'help',
             title: 'Help',
             children: [
                 { id: 'gettingstarted', title: 'Getting started', url: '/help/getting-started/' },
                 { id: 'restapi', title: 'REST API', url: '/help/rest-api/' },
-                { id: 'projectoverview', title: 'Project overview', url: '/about/contributors/' },
-                // { id: 'tutorials', title: 'Tutorials', url: '/tutorials/' },
-                { id: 'news', title: 'News', url: '/search/?type=Page&news=true&status=released' },
-                { id: 'acknowledgements', title: 'Acknowledgements', url: '/acknowledgements/' },
-                { id: 'contact', title: 'Contact', url: '/help/contacts/' },
             ],
         },
     ],
@@ -284,14 +266,15 @@ class App extends React.Component {
             auth: {
                 redirect: false,
             },
+	    //TBD replace with T2DREAM logo
             theme: {
                 logo: logoUrl,
             },
             socialButtonStyle: 'big',
             languageDictionary: {
-                title: 'Log in to T2DREAM',
+                title: 'Log in',
             },
-            allowedConnections: ['google-oauth2', 'facebook', 'twitter','linkedin'],
+            allowedConnections: ['github', 'google-oauth2', 'facebook', 'linkedin', 'twitter'],
         });
         this.lock.on('authenticated', this.handleAuth0Login);
 

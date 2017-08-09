@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+var url = require('url');
 import moment from 'moment';
 import { FetchedData, FetchedItems, Param } from './fetched';
 import { Panel, PanelBody } from '../libs/bootstrap/panel';
 
+const newsUri = '/search/?type=Page&news=true&status=released';
 
 // Convert the selected organisms and assays into an encoded query.
 function generateQuery(selectedOrganisms, selectedAssayCategory) {
@@ -96,6 +98,17 @@ export default class Home extends React.Component {
                                     <HomepageChartLoader organisms={this.state.organisms} assayCategory={this.state.assayCategory} query={currentQuery} />
                                 </div>
                             </div>
+                            
+                                 <div className="social">
+                                <div className="social-news">
+                                  <div className="news-header">
+                                        <h3>News <a href="/news/" title="T2DREAM news" className="search-ref">View all news...</a></h3>
+                                    </div>
+                                    <NewsLoader newsLoaded={this.newsLoaded} />
+
+                                </div>
+                                     
+                            </div>
                         </Panel>
                     </div>
                 </div>
@@ -159,15 +172,28 @@ class AssayClicking extends React.Component {
         return (
             <div ref="graphdisplay">
                 <div className="overall-classic">
-
-                    <h1>T2DREAM - Type 2 Diabetes Regulatory Annotation Map</h1>
-
-                        <div className="site-banner-intro">
+                 <div className="site-banner">
+                  <div className="site-banner-intro">
+		  <div className="site-banner-header">
+		  <img src="/static/img/logo.png" alt="logo"/>
+                   <h1>T2DREAM</h1>
+                  </div> 
+		  <div className= "site-banner-title">
+		        <p></p>
+		         <h4>Type 2 Diabetes Regulatory Annotation Map</h4> 
+		 </div>
                             <div className="site-banner-intro-content">
 				<p>The T2DREAM project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
                             </div>
                         </div>
+		       <div className="site-banner-search">
+		       
+                                      <h4 className="search-header">Explore experiments and annotations</h4>
+                                      <SearchEngine />
+		                       <h5>examples:<a href="http://www.t2dream-demo.org/search/?searchTerm=islets"> islets</a>, <a href="http://www.t2dream-demo.org/search/?searchTerm=pancreas">  pancreas</a>, <a href="http://www.t2dream-demo.org/search/?searchTerm=ATAC-seq">  ATAC-seq</a></h5>  
+		       </div>
                     </div>
+            </div>
             </div>
         );
     }
@@ -912,7 +938,7 @@ class News extends React.Component {
                             <h4>{moment.utc(item.date_created).format('MMMM D, YYYY')}</h4>
                             <div className="news-excerpt">{item.news_excerpt}</div>
                             <div className="news-listing-readmore">
-                                <a className="btn btn-info btn-sm" href={item['@id']} title={`View news post for ${item.title}`} key={item['@id']}>Read more</a>
+                                <a href={item['@id']} title={`View news post for ${item.title}`} key={item['@id']}>Read more</a>
                             </div>
                         </div>,
                     )}
@@ -941,7 +967,43 @@ class NewsLoader extends React.Component {
 NewsLoader.propTypes = {
     newsLoaded: PropTypes.func.isRequired, // Called parent once the news is loaded
 };
+class SearchEngine extends React.Component {
+render()
+{
+return <Search />
+}
+}
 
+SearchEngine.contextTypes = {
+    location_href: PropTypes.string,
+};
+
+const Search = (props, context) => {
+    const id = url.parse(context.location_href, true);
+    const searchTerm = id.query.searchTerm || '';
+    return (
+        <form className="home-form" action="/search/">
+            <div className="search-wrapper">
+                <span>
+                <input
+                    className="form-control search-query"
+                    id="home-search"
+                    type="text"
+                    placeholder="Enter Search..."
+                    name="searchTerm"
+                    defaultValue={searchTerm}
+                    key={searchTerm}
+                />
+            <input type="submit" value="Search" className="search-btn btn btn-sm btn-info pull-right" />
+            </span>
+            </div>
+        </form>
+    );
+};
+
+Search.contextTypes = {
+    location_href: PropTypes.string,
+};
 
 class TwitterWidget extends React.Component {
     constructor(props) {
@@ -978,7 +1040,7 @@ class TwitterWidget extends React.Component {
         return (
             <div ref="twitterwidget">
                 <div className="twitter-header">
-                    <h2>Twitter <a href="https://twitter.com/EncodeDCC" title="ENCODE DCC Twitter page in a new window or tab" target="_blank" rel="noopener noreferrer"className="twitter-ref">@EncodeDCC</a></h2>
+                    <h3>Twitter <a href="https://twitter.com/EncodeDCC" title="ENCODE DCC Twitter page in a new window or tab" target="_blank" rel="noopener noreferrer"className="twitter-ref">@EncodeDCC</a></h3>
                 </div>
                 {this.props.height ?
                     <a

@@ -32,11 +32,10 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
 	}
 }
 
-// Navbar search
-#navbar-search {
-	width: 180px;
-	border-radius: 14px;
-	height: 27px;
+// home search
+#home-search {
+	max-width: 310px;
+	max-height: 30px;
 	padding: 3px 26px 4px 14px;
 	padding-top: 3px;
 	padding-bottom: 4px;
@@ -47,29 +46,29 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
 	transition: width 0.3s ease-out;
 
 	&:focus {
-		width: 230px;
 		transition: width 0.3s ease-out;
 	}
 }
 
 .form-inline,
-.navbar-form {
+.home-form {
 	.form-control {
-		display: inline-block;
+		display: inline;
 	}
+        vertical-align: middle;
+        padding-left: 15px;
+        padding-right: 35px;
+	padding-top: 10px;	
 }
 
 .search-wrapper {
-	position: 0;
-
+	display:inline;
 	&:after {
 		font-family: "FontAwesome";
-		content: "\f002";
 		position: relative;
 		top: 0;
 		left: -24px;
 		color: gray;	
-
 		@media(min-width: $screen-sm-min) {
 			top: 2px;
 		}

@@ -48,7 +48,6 @@ var Navigation = module.exports = createReactClass({
                         <GlobalSections />
                         <UserActions />
                         {this.props.isHomePage ? null : <ContextActions />}
-                        <Search />
                     </Navbar>
                 </div>
                 {this.state.testWarning ?
@@ -140,24 +139,6 @@ var ContextActions = createReactClass({
     }
 });
 
-var Search = createReactClass({
-    contextTypes: {
-        location_href: PropTypes.string
-    },
-
-    render: function() {
-        var id = url.parse(this.context.location_href, true);
-        var searchTerm = id.query['searchTerm'] || '';
-        return (
-            <form className="navbar-form navbar-right" action="/search/">
-                <div className="search-wrapper">
-                    <input className="form-control search-query" id="navbar-search" type="text" placeholder="Search..." 
-                        ref="searchTerm" name="searchTerm" defaultValue={searchTerm} key={searchTerm} />
-                </div>
-            </form>
-        );  
-    }
-});
 
 
 var UserActions = createReactClass({
