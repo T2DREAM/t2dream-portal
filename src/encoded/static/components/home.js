@@ -190,7 +190,7 @@ class AssayClicking extends React.Component {
 		       
                                       <h4 className="search-header">Explore experiments and annotations</h4>
                                       <SearchEngine />
-		                       <h5>examples:<a href="http://www.t2dream-demo.org/search/?searchTerm=islets"> islets</a>, <a href="http://www.t2dream-demo.org/search/?searchTerm=pancreas">  pancreas</a>, <a href="http://www.t2dream-demo.org/search/?searchTerm=ATAC-seq">  ATAC-seq</a></h5>  
+		                       <h5 className="search-example">examples:<a href="http://www.t2dream-demo.org/search/?searchTerm=islets"> islets</a>, <a href="http://www.t2dream-demo.org/search/?searchTerm=pancreas">  pancreas</a>, <a href="http://www.t2dream-demo.org/search/?searchTerm=ATAC-seq">  ATAC-seq</a></h5>  
 		       </div>
                     </div>
             </div>
@@ -994,7 +994,7 @@ const Search = (props, context) => {
                     defaultValue={searchTerm}
                     key={searchTerm}
                 />
-            <input type="submit" value="Search" className="search-btn btn btn-sm btn-info pull-right" />
+            <input type="submit" value="GO" className="submit_3 pull-right" />
             </span>
             </div>
         </form>

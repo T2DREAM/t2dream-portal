@@ -34,7 +34,7 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
 
 // home search
 #home-search {
-	max-width: 310px;
+	max-width: 75%;
 	max-height: 30px;
 	padding: 3px 26px 4px 14px;
 	padding-top: 3px;
@@ -159,4 +159,36 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
 		border: 0;
 		background: none;
 	}
+}
+
+/*** SEARCH BUTTON ***/
+.submit_3{
+background: #63abed;/* Fallback color for non-css3 browsers */
+border: 0;
+color: #eee;
+cursor: pointer;
+float: right;
+font: 75% 'Raleway', sans-serif;
+font-weight: bold;
+height: 30px;
+margin: 4px 4px 0;
+text-shadow: 0 -1px 0 rgba(0,0,0,.3);
+width: 18%;
+outline: none;
+
+/* Rounded Corners */
+border-radius: 20px;
+-webkit-border-radius: 30px;
+-moz-border-radius: 30px;
+
+}
+
+/*** SEARCH BUTTON HOVER ***/
+.submit_3:hover {
+background: #5ba5ea; /* Fallback color for non-css3 browsers */
+
+}
+.submit_3:active {
+background: #5ba5ea; /* Fallback color for non-css3 browsers */
+
 }
