@@ -10,6 +10,7 @@ $inputFocusBorderColor: darken(#fff, 26%) !default;
 }
 
 .form-control {
+        max-width: 100%;
 	padding: 4px 6px;
 }
 
@@ -192,3 +193,35 @@ background: #5ba5ea; /* Fallback color for non-css3 browsers */
 background: #5ba5ea; /* Fallback color for non-css3 browsers */
 
 }
+
+.submit_4{
+background: #63abed;/* Fallback color for non-css3 browsers */
+border: 0;
+color: #eee;
+cursor: pointer;
+float: right;
+font: 75% 'Raleway', sans-serif;
+font-weight: bold;
+height: 30px;
+margin: 4px 4px 0;
+text-shadow: 0 -1px 0 rgba(0,0,0,.3);
+width: 85px;
+outline: none;
+
+/* Rounded Corners */
+border-radius: 20px;
+-webkit-border-radius: 30px;
+-moz-border-radius: 30px;
+
+}
+
+/*** SEARCH BUTTON HOVER ***/
+.submit_4:hover {
+background: #5ba5ea; /* Fallback color for non-css3 browsers */
+
+}
+.submit_4:active {
+background: #5ba5ea; /* Fallback color for non-css3 browsers */
+
+}
+

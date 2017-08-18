@@ -34,7 +34,7 @@ const portal = {
             children: [
 	        { id: 'experiment', title: 'Experiments', url: '/matrix/?type=Experiment'},
                 { id: 'annotations', title: 'Annotations', url: '/matrix/?type=Annotation'},
-
+                {id: 'region', title: 'Region Search', url: 'region-search'}
             ],
         },
        

@@ -55,6 +55,15 @@
             font-size: 3.5rem;
         }
     }
+    h3 {
+        margin: 0;
+        padding: 5px 10px;
+        font-weight: 300;
+        font-size: 1.5rem;
+         margin-top: 30px;
+        color: #ff0dbf;
+    }
+
 }
 
 // Overrride styling within the Search widget iframe. Hopefully Twitter never changes the name of
@@ -388,7 +397,7 @@
 }
 
 .search-example {
-        margin-left: 15px;
+	margin-left: 15px;
 }
 
 .search-ref {
