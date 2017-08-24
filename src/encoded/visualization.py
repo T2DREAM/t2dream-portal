@@ -126,8 +126,8 @@ TRACKDB_TXT = 'trackDb.txt'
 BIGWIG_FILE_TYPES = ['bigWig']
 BIGBED_FILE_TYPES = ['bigBed']
 
-VISIBLE_DATASET_STATUSES = ["released"]
-VISIBLE_FILE_STATUSES = ["released"]
+VISIBLE_DATASET_STATUSES = ["proposed"]
+VISIBLE_FILE_STATUSES = ["uploading"]
 VISIBLE_DATASET_TYPES = ["Experiment", "Annotation"]
 VISIBLE_DATASET_TYPES_LC = ["experiment", "annotation"]
 

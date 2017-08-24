@@ -34,12 +34,12 @@ log = logging.getLogger(__name__)
 # hashmap of assays and corresponding file types that are being indexed
 _INDEXED_DATA = {
     'ChIP-seq': {
-        'output_type': ['optimal idr thresholded peaks'],
+        'output_type': ['bed narrowPeaks'],
     },
     'DNase-seq': {
         'file_type': ['bed narrowPeak']
     },
-    'eCLIP': {
+    'ATAC-seq': {
         'file_type': ['bed narrowPeak']
     }
 }
@@ -112,7 +112,7 @@ def get_assay_term_name(accession, request):
 
 
 def all_bed_file_uuids(request):
-    stmt = text("select distinct(resources.rid) from resources, propsheets where resources.rid = propsheets.rid and resources.item_type='file' and propsheets.properties->>'file_format' = 'bed' and properties->>'status' = 'released';")
+    stmt = text("select distinct(resources.rid) from resources, propsheets where resources.rid = propsheets.rid and resources.item_type='file' and propsheets.properties->>'file_format' = 'bed' and properties->>'status' = 'uploading';")
     connection = request.registry[DBSESSION].connection()
     uuids = connection.execute(stmt)
     return [str(item[0]) for item in uuids]
@@ -142,7 +142,7 @@ def index_peaks(uuid, request):
     if 'File' not in context['@type'] or 'dataset' not in context:
         return
 
-    if 'status' not in context or context['status'] != 'released':
+    if 'status' not in context or context['status'] != 'uploading':
         return
 
     # Index human data for now
