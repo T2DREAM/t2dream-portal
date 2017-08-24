@@ -142,7 +142,7 @@ def index_peaks(uuid, request):
     if 'File' not in context['@type'] or 'dataset' not in context:
         return
 
-    if 'status' not in context or context['status'] != 'uploading':
+    if 'status' not in context or context['status'] != 'proposed':
         return
 
     # Index human data for now
