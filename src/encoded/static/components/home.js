@@ -185,18 +185,13 @@ class AssayClicking extends React.Component {
                             <div className="site-banner-intro-content">
 				<p>The T2DREAM project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
                             </div>
-                            <h3> 403 <a href="/search/?type=Experiment"> </a> Experiments, 330 Biosamples, 4 Annotations</h3>
-                        </div>
+                            </div>
 		       <div className="site-banner-search">
 		       
                                       <h4 className="search-header">Explore Experiments: </h4>
                                       <SearchEngine />
-		                      <h5 className="search-example">examples:<a href="http://www.t2dream-demo.org/matrix/?type=Experiment&searchTerm=islets"> islets</a>, <a href="http://www.t2dream-demo.org/matrix/?type=Experiment&searchTerm=pancreas">  pancreas</a>,
-<a href="http://www.t2dream-demo.org/matrix/?type=Experiment&searchTerm=ATAC-seq">  ATAC-seq</a></h5>
                                       <h4 className="search-header">Explore annotations:</h4>
                                       <SearchEngine1 />
-                                      <h5 className="search-example">examples:<a href="http://www.t2dream-demo.org/matrix/?type=Annotation&searchTerm=islets"> islets</a>, <a href="http://www.t2dream-demo.org/matrix/?type=Annotation&organ_slims=pancreas">  pancreas</a>
-, <a href="http://www.t2dream-demo.org/search/?type=Annotation&annotation_type=chromatin+state">  chromatin state</a></h5>
                                       <AdvSearch />
 		       </div>
                     </div>
@@ -997,7 +992,7 @@ const Search = (props, context) => {
                     className="form-control search-query"
                     id="home-search"
                     type="text"
-                    placeholder="Enter Search..."
+                    placeholder="Enter search (e.g., islets, ATAC-seq)"
                     name="searchTerm"
                     defaultValue={searchTerm}
                     key={searchTerm}
@@ -1036,7 +1031,7 @@ const Search1 = (props, context) => {
                     className="form-control search-query"
                     id="home-search"
                     type="text"
-                    placeholder="Enter Search..."
+                    placeholder="Enter search (e.g., adipose, chromatin state)"
                     name="searchTerm"
                     defaultValue={searchTerm1}
                     key={searchTerm1}

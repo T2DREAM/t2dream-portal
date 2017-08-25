@@ -239,14 +239,14 @@
                             "required": ["file_size"],
                             "properties": {
                                 "status": {
-                                    "enum": ["in progress",  "revoked", "archived", "released"]
+                                    "enum": ["in progress",  "revoked", "archived"]
                                 }
                             }
                         },
                         {
                             "properties": {
                                 "status": {
-                                    "enum": ["uploading", "upload failed", "deleted", "replaced", "content error"]
+                                    "enum": ["released", "uploading", "upload failed", "deleted", "replaced", "content error"]
                                 }
                             }
                         }

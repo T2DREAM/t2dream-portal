@@ -105,11 +105,11 @@
 
 
     @media screen and (min-width: $screen-md-min) {
-        flex: 0 50%;
+        flex: 0 55%;
     }
 
     @media screen and (min-width: $screen-lg-min) {
-        flex: 0 1 50%;
+        flex: 0 1 55%;
     }
 
 
@@ -122,14 +122,14 @@
     line-height: 1.8;
 
     @media screen and (min-width: $screen-md-min) {
-        flex: 0 1 50%;
+        flex: 0 1 45%;
         font-size: 1.1rem;
         line-height: 1.6;
         border-left: 1px solid #ffffff;
     }
 
     @media screen and (min-width: $screen-lg-min) {
-        flex: 0 1 50%;
+        flex: 0 1 45%;
         font-size: 1.2rem;
         line-height: 1.8;
     }
