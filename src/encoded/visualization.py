@@ -126,8 +126,8 @@ TRACKDB_TXT = 'trackDb.txt'
 BIGWIG_FILE_TYPES = ['bigWig']
 BIGBED_FILE_TYPES = ['bigBed']
 
-VISIBLE_DATASET_STATUSES = ["proposed"]
-VISIBLE_FILE_STATUSES = ["uploading"]
+VISIBLE_DATASET_STATUSES = ["released"]
+VISIBLE_FILE_STATUSES = ["released"]
 VISIBLE_DATASET_TYPES = ["Experiment", "Annotation"]
 VISIBLE_DATASET_TYPES_LC = ["experiment", "annotation"]
 
@@ -1131,7 +1131,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
 
     # second pass once all rep_techs are known
     if host is None:
-        host = "https://www.encodeproject.org"
+        host = "www.t2dream-demo.org"
     for view_tag in composite["view"].get("group_order", []):
         view = composite["view"]["groups"][view_tag]
         output_types = view.get("output_type", [])
@@ -1868,7 +1868,7 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
             #           (len(results),(time.time() - PROFILE_START_TIME)))
         host=request.host_url
         if host is None or host.find("localhost") > -1:
-            host = "https://www.encodeproject.org"
+            host = "www.t2dream-demo.org"
 
         acc_composite = make_acc_composite(dataset, assembly, host=host, hide=hide)
         if USE_CACHE:

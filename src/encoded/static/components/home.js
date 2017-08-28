@@ -185,7 +185,7 @@ class AssayClicking extends React.Component {
                             <div className="site-banner-intro-content">
 				<p>The T2DREAM project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
                             </div>
-                            </div>
+                        </div>
 		       <div className="site-banner-search">
 		       
                                       <h4 className="search-header">Explore Experiments: </h4>
@@ -1227,9 +1227,10 @@ class AdvSearch extends React.Component {
                         <input type="hidden" name="annotation" value={this.state.terms.annotation} />
 
                               <div className="form-group">
-                              <h4> Search region: </h4>
+                              <h4> Search variants and regions: </h4>
                                <div className="input-group input-group-region-input">
-                                <input id="annotation" ref={(input) => { this.annotation = input; }} defaultValue={region} name="region" placeholder="Enter Search..." type="text" className="form-control" onChange={this.handleChange} />
+                                <input id="annotation" ref={(input) => { this.annotation = input; }} defaultValue={region} name="region" placeholder="Enter Search (e.g. rs7903146, TCF7L2)
+" type="text" className="form-control" onChange={this.handleChange} />
                                 {(this.state.showAutoSuggest && this.state.searchTerm) ?
                                     <FetchedData loadingComplete>
                                         <Param name="auto" url={`/suggest/?genome=${this.state.genome}&q=${this.state.searchTerm}`} type="json" />

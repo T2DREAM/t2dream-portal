@@ -133,7 +133,8 @@ var AdvSearch = createReactClass({
                         <div className="form-group">
                             <label>Enter any one of human Gene name, Symbol, Synonyms, Gene ID, HGNC ID, coordinates, rsid, Ensemble ID</label>
                             <div className="input-group input-group-region-input">
-                                <input ref="annotation" defaultValue={region} name="region" type="text" className="form-control" onChange={this.handleChange} />
+                                <input ref="annotation" defaultValue={region} name="region" type="text" placeholder="Enter Search (e.g. rs7903146, TCF7L2)     
+" className="form-control" onChange={this.handleChange} />
                                 {(this.state.showAutoSuggest && this.state.searchTerm) ?
                                     <FetchedData loadingComplete={true}>
                                         <Param name="auto" url={'/suggest/?genome=' + this.state.genome + '&q=' + this.state.searchTerm  } type="json" />
@@ -203,7 +204,7 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 
         return (
             <div>
-                <h2>Region search</h2>
+                <h2>Search variants and regions</h2>
                 <AdvSearch {...this.props} />
                     {context['notification'] === 'Success' ?
                         <div className="panel data-display main-panel">
