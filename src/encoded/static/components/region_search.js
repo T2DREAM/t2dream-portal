@@ -233,17 +233,7 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
                                                 </span>
                                             }
 
-                                            {context['download_elements'] ?
-                                                <DropdownButton title='Download Elements' label="downloadelements" wrapperClasses="results-table-button">
-                                                    <DropdownMenu>
-                                                        {context['download_elements'].map(link =>
-                                                            <a key={link} data-bypass="true" target="_blank" private-browsing="true" href={link}>
-                                                                {link.split('.').pop()}
-                                                            </a>
-                                                        )}
-                                                    </DropdownMenu>
-                                                </DropdownButton>
-                                            : null}
+                                           
 
                                             {visualizeKeys ?
                                                 <DropdownButton disabled={visualize_disabled} title={visualize_disabled ? 'Filter to ' + visualizeLimit + ' to visualize' : 'Visualize'} label="batchhubs" wrapperClasses="results-table-button">
