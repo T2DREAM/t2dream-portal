@@ -1,10 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-var url = require('url');
+import url from 'url';
 import moment from 'moment';
 import { FetchedData, FetchedItems, Param } from './fetched';
 import { Panel, PanelBody } from '../libs/bootstrap/panel';
+import DropdownButton from '../libs/bootstrap/button';
+import { DropdownMenu } from '../libs/bootstrap/dropdown-menu';
+import { FacetList, Listing } from './search';
+import * as globals from './globals';
 
 const newsUri = '/search/?type=Page&news=true&status=released';
 
@@ -1223,7 +1227,7 @@ class AdvSearch extends React.Component {
         const region = id.query.region || '';
 
         return (
-                    <form className="home-form" ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1">
+                    <form className="home-form" ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1" action="/region-search/">
                         <input type="hidden" name="annotation" value={this.state.terms.annotation} />
 
                               <div className="form-group">
@@ -1252,7 +1256,6 @@ class AdvSearch extends React.Component {
     }
 }
 
-
 AdvSearch.propTypes = {
     context: PropTypes.object.isRequired,
 };
@@ -1274,7 +1277,6 @@ AdvSearch.contextTypes = {
     onAutocompleteHiddenChange: PropTypes.func,
     location_href: PropTypes.string,
 };
-
 
 class TwitterWidget extends React.Component {
     constructor(props) {
