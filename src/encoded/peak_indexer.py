@@ -112,7 +112,7 @@ def get_assay_term_name(accession, request):
 
 
 def all_bed_file_uuids(request):
-    stmt = text("select distinct(resources.rid) from resources, propsheets where resources.rid = propsheets.rid and resources.item_type='file' and propsheets.properties->>'file_format' = 'bed' and properties->>'status' = 'uploading';")
+    stmt = text("select distinct(resources.rid) from resources, propsheets where resources.rid = propsheets.rid and resources.item_type='file' and propsheets.properties->>'file_format' = 'bed' and properties->>'status' = 'released';")
     connection = request.registry[DBSESSION].connection()
     uuids = connection.execute(stmt)
     return [str(item[0]) for item in uuids]
@@ -142,7 +142,7 @@ def index_peaks(uuid, request):
     if 'File' not in context['@type'] or 'dataset' not in context:
         return
 
-    if 'status' not in context or context['status'] != 'proposed':
+    if 'status' not in context or context['status'] != 'released':
         return
 
     # Index human data for now
