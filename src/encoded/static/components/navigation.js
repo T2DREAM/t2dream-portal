@@ -50,16 +50,6 @@ var Navigation = module.exports = createReactClass({
                         {this.props.isHomePage ? null : <ContextActions />}
                     </Navbar>
                 </div>
-                {this.state.testWarning ?
-                    <div className="test-warning">
-                        <div className="container">
-                            <p>
-                                The data displayed on this page is not official and only for testing purposes.
-                                <a href="#" className="test-warning-close icon icon-times-circle-o" onClick={this.handleClick}></a>
-                            </p>
-                        </div>
-                    </div>
-                : null}
             </div>
         );
     }
