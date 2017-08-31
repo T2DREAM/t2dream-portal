@@ -21,7 +21,7 @@ const portal = {
             title: 'About',
             children: [
                 { id: 'projectoverview', title: 'Project overview', url: '/about/contributors/' },
-                { id: 'policies', title: 'Policies', url: '/2017-08-03-policy/' },
+                { id: 'policies', title: 'Policies', url: '/policy/' },
                 { id: 'news', title: 'News', url: '/search/?type=Page&news=true&status=released' },
                 { id: 'acknowledgements', title: 'Acknowledgements', url: '/acknowledgements/' },
                 { id: 'contact', title: 'Contact', url: '/help/contacts/' },
