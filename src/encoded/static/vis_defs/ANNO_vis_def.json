@@ -2,8 +2,8 @@
     "ANNO": {
         "rule": "'{@id}'.startswith('/annotations/')",
         "assay_composite": {
-            "longLabel":  "Collection of ENCODE annotations",
-            "shortLabel": "ENCODE annotations"
+            "longLabel":  "Collection of T2DREAM annotations",
+            "shortLabel": "T2DREAM annotations"
         },
         "longLabel":  "Encyclopedia annotation of {annotation_type} for {biosample_term_name|multiple} - {accession}",
         "shortLabel": "{annotation_type} of {biosample_term_name|multiple} {accession}",

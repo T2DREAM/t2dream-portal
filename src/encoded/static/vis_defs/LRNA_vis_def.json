@@ -1,8 +1,8 @@
 {
     "LRNA": {
         "assay_composite": {
-            "longLabel":  "Collection of ENCODE long-RNA-seq experiments",
-            "shortLabel": "ENCODE long-RNA-seq"
+            "longLabel":  "Collection of T2DREAM long-RNA-seq experiments",
+            "shortLabel": "T2DREAM long-RNA-seq"
         },
         "longLabel":  "{assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{assay_title} of {biosample_term_name} {accession}",

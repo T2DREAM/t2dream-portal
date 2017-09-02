@@ -2,8 +2,8 @@
     "WGBS": {
         "rule": "'{assay_term_name}' in ['whole-genome shotgun bisulfite sequencing','shotgun bisulfite-seq assay','RRBS']",
         "assay_composite": {
-            "longLabel":  "Collection of ENCODE WGBS experiments",
-            "shortLabel": "ENCODE WGBS"
+            "longLabel":  "Collection of T2DREAM WGBS experiments",
+            "shortLabel": "T2DREAM WGBS"
         },
         "longLabel":  "{assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{assay_title} of {biosample_term_name} {accession}",

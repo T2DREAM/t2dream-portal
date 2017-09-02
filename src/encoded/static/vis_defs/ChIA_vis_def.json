@@ -2,8 +2,8 @@
     "ChIA": {
         "rule": "'{assay_term_name}' == 'ChIA-PET'",
         "assay_composite": {
-            "longLabel":  "Collection of ENCODE ChIA-PET experiments",
-            "shortLabel": "ENCODE ChIA-PET"
+            "longLabel":  "Collection of T2DREAM ChIA-PET experiments",
+            "shortLabel": "T2DREAM ChIA-PET"
         },
         "longLabel":  "{target} {assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{target} {assay_title} of {biosample_term_name} {accession}",

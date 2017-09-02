@@ -2,8 +2,8 @@
     "HiC": {
         "rule": "'{assay_term_name}' == 'HiC'",
         "assay_composite": {
-            "longLabel":  "Collection of ENCODE Hi-C experiments",
-            "shortLabel": "ENCODE HI-C"
+            "longLabel":  "Collection of T2DREAM Hi-C experiments",
+            "shortLabel": "T2DREAM HI-C"
         },
         "longLabel":  "{assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{assay_title} of {biosample_term_name} {accession}",
