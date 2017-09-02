@@ -1214,7 +1214,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
                         membership[group_tag] = subgroup["tag"]
                         if "url" in subgroup:
                             metadata_pairs[group_title] = ( \
-                                '"<a href=\'%s/%s/\' TARGET=\'_blank\' title=\'%s details at the ENCODE portal\'>%s</a>"' %
+                                '"<a href=\'%s/%s/\' TARGET=\'_blank\' title=\'%s details at the T2DREAM portal\'>%s</a>"' %
                                 (host, subgroup["url"], group_title, subgroup["title"]))
                         elif group_title == "Biosample":
                             bs_value = sanitize_label(dataset.get("biosample_summary", ""))
@@ -1224,7 +1224,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
                             if len(biosamples) > 0:
                                 for bs_acc in sorted(biosamples.keys()):
                                     bs_value += ( \
-                                        " <a href=\'%s%s\' TARGET=\'_blank\' title=\' %s details at the ENCODE portal\'>%s</a>" %
+                                        " <a href=\'%s%s\' TARGET=\'_blank\' title=\' %s details at the T2DREAM portal\'>%s</a>" %
                                         (host, biosamples[bs_acc]["@id"], group_title,
                                                   bs_acc))
                             metadata_pairs[group_title] = '"%s"' % (bs_value)
@@ -2273,8 +2273,8 @@ def generate_batch_hubs(context, request):
 
         # Should generate a HTML page for requests other than trackDb.txt
         if txt != TRACKDB_TXT:
-            data_policy = ('<br /><a href="http://encodeproject.org/ENCODE/terms.html">'
-                           'ENCODE data use policy</p>')
+            data_policy = ('<br /><a href="http://www.t2dream-demo.org/policy">'
+                           'T2DREAM data use policy</p>')
             return generate_html(context, request) + data_policy
 
         return generate_batch_trackDb(request)
@@ -2364,8 +2364,8 @@ def hub(context, request):
     elif url_end.endswith(TRACKDB_TXT):
         text = generate_trackDb(request, embedded, url_end.split('/')[0])
     else:
-        data_policy = ('<br /><a href="http://encodeproject.org/ENCODE/terms.html">'
-                       'ENCODE data use policy</p>')
+        data_policy = ('<br /><a href="http://www.t2dream-demo.org/policy">'
+                       'T2DREAM data use policy</p>')
         text = generate_html(context, request) + data_policy
         content_mime = 'text/html'
 
