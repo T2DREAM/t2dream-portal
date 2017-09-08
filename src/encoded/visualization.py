@@ -45,6 +45,7 @@ _ASSEMBLY_MAPPER_FULL = {
                         'common_name':      'human',
                         'ucsc_assembly':    'hg38',
                         'ensembl_host':     'www.ensembl.org',
+                        'quickview':        True,
                         'comment':          'Ensembl works'
     },
     'GRCh38-minimal': { 'species':          'Homo sapiens',     'assembly_reference': 'GRCh38',
@@ -56,47 +57,55 @@ _ASSEMBLY_MAPPER_FULL = {
                         'common_name':      'human',
                         'ucsc_assembly':    'hg19',
                         'NA_ensembl_host':  'grch37.ensembl.org',
+                        'quickview':        True,
                         'comment':          'Ensembl DOES NOT WORK'
     },
     'mm10': {           'species':          'Mus musculus',     'assembly_reference': 'GRCm38',
                         'common_name':      'mouse',
                         'ucsc_assembly':    'mm10',
                         'ensembl_host':     'www.ensembl.org',
+                        'quickview':        True,
                         'comment':          'Ensembl works'
     },
     'mm10-minimal': {   'species':          'Mus musculus',     'assembly_reference': 'GRCm38',
                         'common_name':      'mouse',
                         'ucsc_assembly':    'mm10',
                         'ensembl_host':     'www.ensembl.org',
+                        'quickview':        True,
                         'comment':          'Should this be removed?'
     },
     'mm9': {            'species':          'Mus musculus',     'assembly_reference': 'NCBI37',
                         'common_name':      'mouse',
                         'ucsc_assembly':    'mm9',
                         'NA_ensembl_host':  'may2012.archive.ensembl.org',
+                        'quickview':        True,
                         'comment':          'Ensembl DOES NOT WORK'
     },
     'dm6': {    'species':          'Drosophila melanogaster',  'assembly_reference': 'BDGP6',
                 'common_name':      'fruit fly',
                 'ucsc_assembly':    'dm6',
                 'NA_ensembl_host':  'www.ensembl.org',
+                'quickview':        True,
                 'comment':          'Ensembl DOES NOT WORK'
     },
     'dm3': {    'species':          'Drosophila melanogaster',  'assembly_reference': 'BDGP5',
                 'common_name':      'fruit fly',
                 'ucsc_assembly':    'dm3',
                 'NA_ensembl_host':  'dec2014.archive.ensembl.org',
+                'quickview':        True,
                 'comment':          'Ensembl DOES NOT WORK'
     },
     'ce11': {   'species':          'Caenorhabditis elegans',   'assembly_reference': 'WBcel235',
                 'common_name':      'worm',
                 'ucsc_assembly':    'ce11',
                 'NA_ensembl_host':  'www.ensembl.org',
+                'quickview':        True,
                 'comment':          'Ensembl DOES NOT WORK'
     },
     'ce10': {   'species':          'Caenorhabditis elegans',   'assembly_reference': 'WS220',
                 'common_name':      'worm',
                 'ucsc_assembly':    'ce10',
+                'quickview':        True,
                 'comment':          'Never Ensembl'
     },
     'ce6': {    'species':          'Caenorhabditis elegans',   'assembly_reference': 'WS190',
@@ -127,9 +136,11 @@ BIGWIG_FILE_TYPES = ['bigWig']
 BIGBED_FILE_TYPES = ['bigBed']
 
 VISIBLE_DATASET_STATUSES = ["released"]
+QUICKVIEW_STATUSES_BLOCKED = ["proposed", "started", "deleted", "revoked", "replaced"]
 VISIBLE_FILE_STATUSES = ["released"]
 VISIBLE_DATASET_TYPES = ["Experiment", "Annotation"]
 VISIBLE_DATASET_TYPES_LC = ["experiment", "annotation"]
+
 
 # ASSEMBLY_MAPPINGS is needed to ensure that mm10 and mm10-minimal will
 #                   get combined into the same trackHub.txt
@@ -183,6 +194,7 @@ SUPPORTED_MASK_TOKENS = [
                                                 # variable and seems to not be being applied
                                                 # # correctly in the html generation
     "{lab.title}",                              # In metadata
+    "{award.rfa}",                              # To distinguish vis_defs based upon award
     # TODO "{software? or pipeline?}",  # Cricket: "I am stumbling over the fact that we
     #                                   #    can't distinguish tophat and star produced files"
     # TODO "{phase}",                   # Cricket: "If we get to the point of being fancy
@@ -220,7 +232,9 @@ def lookup_token(token, dataset, a_file=None):
     if token in SIMPLE_DATASET_TOKENS:
         term = dataset.get(token[1:-1])
         if term is None:
-            term = "Unknown " + token[1:-1].split('_')[0].capitalize()
+            return "Unknown " + token[1:-1].split('_')[0].capitalize()
+        elif isinstance(term,list) and len(term) > 3:
+            return "Collection of %d %ss" % (len(term),token[1:-1].split('_')[0].capitalize())
         return term
     elif token == "{experiment.accession}":
         return dataset['accession']
@@ -269,6 +283,8 @@ def lookup_token(token, dataset, a_file=None):
         return term
     elif token == "{lab.title}":
         return dataset['lab'].get('title', 'unknown')
+    elif token == "{award.rfa}":
+        return dataset['award'].get('rfa', 'unknown')
     elif token == "{biosample_term_name|multiple}":
         return dataset.get("biosample_term_name", "multiple biosamples")
     # TODO: rna_species
@@ -551,6 +567,7 @@ OUTPUT_TYPE_8CHARS = {
     "methylation state at CHH":             "mth CHH",
     "enrichment":                           "enrich",
     "replication timing profile":           "repli tm",
+    "relative replication signal":          "relrepsg",
     "variant calls":                        "vars",
     "filtered SNPs":                        "f SNPs",
     "filtered indels":                      "f indel",
@@ -732,7 +749,7 @@ def sanitize_label(s):
     '''Encodes the string to swap special characters and leaves spaces alone.'''
     new_s = ""      # longLabel and shorLabel can have spaces and some special characters
     for c in s:
-        new_s += sanitize_char(c, [' ', '_', '.', '-', '(', ')', '+'], htmlize=True)
+        new_s += sanitize_char(c, [' ', '_', '.', '-', '(', ')', '+'], htmlize=False)
     return new_s
 
 
@@ -1007,8 +1024,8 @@ def biosamples_for_file(a_file, dataset):
     '''Returns a dict of biosamples for file.'''
     biosamples = {}
     replicates = dataset.get("replicates")
-    if replicates is None:
-        return[]
+    if replicates is None or not isinstance(replicates[0],dict):
+        return []
 
     for bio_rep in a_file.get("biological_replicates", []):
         for replicate in replicates:
@@ -1075,8 +1092,12 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
         output_types = view.get("output_type", [])
         file_format_types = view.get("file_format_type", [])
         file_format = view["type"].split()[0]
-        if file_format == "bigBed" and "scoreFilter" in view:
-            view["type"] = "bigBed 6 +"  # scoreFilter implies score so 6 +
+        if file_format == "bigBed":
+            format_type = view.get('file_format_type','')
+            if format_type == 'bedMethyl' or "itemRgb" in view:
+                view["type"] = "bigBed 9 +"  # itemRgb implies at least 9 +
+            elif format_type in ['broadPeak','narrowPeak'] or "scoreFilter" in view:
+                view["type"] = "bigBed 6 +"  # scoreFilter implies score so 6 +
         # log.debug("%d files looking for type %s" % (len(dataset["files"]),view["type"]))
         for a_file in dataset["files"]:
             if a_file['status'] not in VISIBLE_FILE_STATUSES:
@@ -1131,7 +1152,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
 
     # second pass once all rep_techs are known
     if host is None:
-        host = "www.t2dream-demo.org"
+        host = "https://www.encodeproject.org"
     for view_tag in composite["view"].get("group_order", []):
         view = composite["view"]["groups"][view_tag]
         output_types = view.get("output_type", [])
@@ -1152,6 +1173,9 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             if "tracks" not in view:
                 view["tracks"] = []
             track = {}
+            files_dataset = dataset
+            if 'dataset' in a_file and isinstance(a_file['dataset'],dict):
+                files_dataset = a_file['dataset']
             track["name"] = a_file['accession']
             track["type"] = view["type"]
             track["bigDataUrl"] = "%s?proxy=true" % a_file["href"]
@@ -1160,7 +1184,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
                 longLabel = ("{assay_title} of {biosample_term_name} {output_type} "
                              "{biological_replicate_number}")
             longLabel += " {experiment.accession} - {file.accession}"  # Always add the accessions
-            track["longLabel"] = sanitize_label(convert_mask(longLabel, dataset, a_file))
+            track["longLabel"] = sanitize_label(convert_mask(longLabel, files_dataset, a_file))
             # Specialized addendum comments because subtle details alway get in the way of elegance.
             addendum = ""
             submitted_name = a_file.get('submitted_file_name', "none")
@@ -1185,7 +1209,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             # Expecting short label to change when making assay based composites
             shortLabel = vis_defs.get('file_defs', {}).get('shortLabel',
                                                            "{replicate} {output_type_short_label}")
-            track["shortLabel"] = sanitize_label(convert_mask(shortLabel, dataset, a_file))
+            track["shortLabel"] = sanitize_label(convert_mask(shortLabel, files_dataset, a_file))
 
             # How about subgroups!
             membership = {}
@@ -1214,17 +1238,17 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
                         membership[group_tag] = subgroup["tag"]
                         if "url" in subgroup:
                             metadata_pairs[group_title] = ( \
-                                '"<a href=\'%s/%s/\' TARGET=\'_blank\' title=\'%s details at the T2DREAM portal\'>%s</a>"' %
+                                '"<a href=\'%s/%s/\' TARGET=\'_blank\' title=\'%s details at the ENCODE portal\'>%s</a>"' %
                                 (host, subgroup["url"], group_title, subgroup["title"]))
                         elif group_title == "Biosample":
-                            bs_value = sanitize_label(dataset.get("biosample_summary", ""))
+                            bs_value = sanitize_label(files_dataset.get("biosample_summary", ""))
                             if len(bs_value) == 0:
                                 bs_value = subgroup["title"]
-                            biosamples = biosamples_for_file(a_file, dataset)
+                            biosamples = biosamples_for_file(a_file, files_dataset)
                             if len(biosamples) > 0:
                                 for bs_acc in sorted(biosamples.keys()):
                                     bs_value += ( \
-                                        " <a href=\'%s%s\' TARGET=\'_blank\' title=\' %s details at the T2DREAM portal\'>%s</a>" %
+                                        " <a href=\'%s%s\' TARGET=\'_blank\' title=\' %s details at the ENCODE portal\'>%s</a>" %
                                         (host, biosamples[bs_acc]["@id"], group_title,
                                                   bs_acc))
                             metadata_pairs[group_title] = '"%s"' % (bs_value)
@@ -1633,7 +1657,7 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
     if request:
         host = request.host_url
     else:
-        host = "https://www.t2dream.org"
+        host = "https://www.encodeproject.org"
     # {
     # "hub_description": { ... },  similar to hub.txt/genome.txt
     # "datasets": { ... },         one per experiment, contains "browser" objects, one per track
@@ -1645,14 +1669,14 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
     #     "taxon_id": ...,           Species taxonomy id. (e.g. human = 9606, Mus mus. 10090)
     #     "assembly": "...",         UCSC: hg19, hg38
     #     "publishing_group": "...", ENCODE
-    #     "email": "...",            t2dream-l@mailman.ucsd.edu
+    #     "email": "...",            encode-help@lists.stanford.edu
     #     "date": "...",             ISO 8601 format: YYYY-MM-DD
     #     "description": "...",      (optional)
     #     "description_url": "...",  (optional) If single composite: html  (e.g. ANNO.html)
     # }
     hub_description = {}
-    hub_description["publishing_group"] = "T2DREAM"
-    hub_description["email"] = "t2dream-l@mailman.ucsd.edu"
+    hub_description["publishing_group"] = "ENCODE"
+    hub_description["email"] = "encode-help@lists.stanford.edu"
     hub_description["date"] = time.strftime('%Y-%m-%d', time.gmtime())
     # hub_description["description"] = "...",      (optional)
     # hub_description["description_url"] = "...",  (optional)
@@ -1868,7 +1892,7 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
             #           (len(results),(time.time() - PROFILE_START_TIME)))
         host=request.host_url
         if host is None or host.find("localhost") > -1:
-            host = "www.t2dream-demo.org"
+            host = "https://www.encodeproject.org"
 
         acc_composite = make_acc_composite(dataset, assembly, host=host, hide=hide)
         if USE_CACHE:
@@ -1879,6 +1903,58 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
             del dataset
 
     return (found_or_made, acc_composite)
+
+def generate_set_trackDb(request, acc, dataset, ucsc_assembly, hide=False, regen=False):
+    '''Handles 'Series' and 'FileSet' dataset types similar to search results.'''
+
+    sub_accessions = []
+    if 'FileSet' in dataset['@type'] and 'files' in dataset:
+        files = dataset['files']
+        if len(files) > 0 and not isinstance(files[0],str):
+            sub_accessions = [ file['dataset']['accession'] for file in files ]
+    elif 'Series' in dataset['@type'] and 'related_datasets' in dataset:
+        # Note that 'Series' don't actually reach here yet because they are rejected higher up for having no files.
+        related_datasets = dataset['related_datasets']
+        sub_accessions = [ related['accession'] for related in related_datasets ]
+
+    sub_accessions = set(sub_accessions) # Only unique accessions need apply
+    #log.warn("trackDb series: found %d sub_accessions  %.3f secs" % (len(sub_accessions), (time.time() - PROFILE_START_TIME)))
+
+    acc_composites = {}
+    made = 0
+    found = 0
+    for sub_acc in sub_accessions:
+        (found_or_made, acc_composite) = find_or_make_acc_composite(request, ucsc_assembly, sub_acc,
+                                                                    None, hide=hide, regen=regen)
+        if found_or_made == "made":
+            made += 1
+        else:
+            found += 1
+        acc_composites[sub_acc] = acc_composite
+
+    blob = ""
+    set_composites = remodel_acc_to_set_composites(acc_composites, hide_after=100)
+    for set_key in set_composites.keys():
+        set_composite = set_composites[set_key]
+        if set_composite:
+            set_composite['longLabel']  = "%s %s" % (acc, set_composite['longLabel'])
+            if set_composite['shortLabel'].startswith('ENCODE '):
+                set_composite['shortLabel'] = "ENCODE %s %s" % (acc,set_composite['shortLabel'].split(None,1)[1])
+            else:
+                set_composite['shortLabel'] = "%s %s" % (acc,set_composite['shortLabel'])
+
+    if request.url.endswith(".json"):
+        blob = json.dumps(set_composites, indent=4, sort_keys=True)
+    else:
+        for composite_tag in sorted(set_composites.keys()):
+            blob += ucsc_trackDb_composite_blob(set_composites[composite_tag],composite_tag)
+    if regen:  # Want to see message if regen was requested
+        log.info("acc_composites: %s generated, %d found, %d set(s). len(txt):%s  %.3f secs" %
+                (made, found, len(set_composites), len(blob), (time.time() - PROFILE_START_TIME)))
+    else:
+        log.debug("acc_composites: %s generated, %d found, %d set(s). len(txt):%s  %.3f secs" %
+                (made, found, len(set_composites), len(blob), (time.time() - PROFILE_START_TIME)))
+    return blob
 
 
 def generate_trackDb(request, dataset, assembly, hide=False, regen=False):
@@ -1897,6 +1973,12 @@ def generate_trackDb(request, dataset, assembly, hide=False, regen=False):
 
     acc = dataset['accession']
     ucsc_assembly = _ASSEMBLY_MAPPER.get(assembly, assembly)
+
+    # If we could detect this as a series dataset, then we could treat this as a batch_trackDb
+    if set(['Experiment', 'Annotation']).isdisjoint(dataset['@type']) and \
+          not set(['Series', 'FileSet']).isdisjoint(dataset['@type']):
+        return generate_set_trackDb(request, acc, dataset, ucsc_assembly, hide=hide, regen=regen)
+
     (found_or_made, acc_composite) = find_or_make_acc_composite(request, ucsc_assembly,
                                                                 dataset["accession"], dataset,
                                                                 hide=hide, regen=regen)
@@ -2156,19 +2238,66 @@ def get_hub(label, comment=None, name=None):
     if name is None:
         name = sanitize_name(label.split()[0])
     if comment is None:
-        comment = "Generated by the team"
+        comment = "Generated by the ENCODE portal"
     hub = OrderedDict([
-        ('email', 't2dream-l@mailman.ucsd.edu'),
+        ('email', 'encode-help@lists.stanford.edu'),
         ('genomesFile', 'genomes.txt'),
-        ('longLabel', 'T2DREAM'),
+        ('longLabel', 'ENCODE Data Coordination Center Data Hub'),
         ('shortLabel', 'Hub (' + label + ')'),
-        ('hub', 'T2DREAM_' + name),
+        ('hub', 'ENCODE_DCC_' + name),
         ('#', comment)
     ])
     return render(hub)
 
 
-def vis_format_external_url(browser, hub_url, assembly, position=None):
+def browsers_available(assemblies, status, files, types, item_type=None):
+    '''Retrurns list of browsers this object visualizable on.'''
+    if "Dataset" not in types:
+        return []
+    if item_type is None:
+        visualizabe_types = set(VISIBLE_DATASET_TYPES)
+        if visualizabe_types.isdisjoint(types):
+            return []
+    elif item_type not in VISIBLE_DATASET_TYPES_LC:
+            return []
+
+    if not files:
+        return []
+
+    browsers = set()
+    for assembly in assemblies:
+        mapped_assembly = _ASSEMBLY_MAPPER_FULL[assembly]
+        if not mapped_assembly:
+            continue
+        if 'ucsc_assembly' in mapped_assembly:
+            browsers.add('ucsc')
+        if 'ensembl_host' in mapped_assembly:
+            browsers.add('ensembl')
+        if 'quickview' in mapped_assembly:
+            browsers.add('quickview')
+
+    if status not in VISIBLE_DATASET_STATUSES:
+        if status not in QUICKVIEW_STATUSES_BLOCKED:
+            return ["quickview"]
+        return []
+
+    return list(browsers)
+
+
+def object_is_visualizable(obj,assembly=None):
+    '''Retrurns list of browsers this object visualizable on.'''
+
+    if 'accession' not in obj:
+        return []
+    if assembly is not None:
+        assemblies = [ assembly ]
+    else:
+        assemblies = obj.get('assembly',[])
+
+    return browsers_available(assemblies,obj.get('status'),obj.get('files'),obj['@type'])
+
+
+def vis_format_url(browser, path, assembly, position=None):
     '''Given a url to hub.txt, returns the url to an external browser or None.'''
     mapped_assembly = _ASSEMBLY_MAPPER_FULL[assembly]
     if not mapped_assembly:
@@ -2177,7 +2306,7 @@ def vis_format_external_url(browser, hub_url, assembly, position=None):
         ucsc_assembly = mapped_assembly.get('ucsc_assembly')
         if ucsc_assembly is not None:
             external_url = 'http://genome.ucsc.edu/cgi-bin/hgTracks?hubClear='
-            external_url += hub_url + '&db=' + ucsc_assembly
+            external_url += path + '&db=' + ucsc_assembly
             if position is not None:
                 external_url += '&position={}'.format(position)
             return external_url
@@ -2185,9 +2314,9 @@ def vis_format_external_url(browser, hub_url, assembly, position=None):
         ensembl_host = mapped_assembly.get('ensembl_host')
         if ensembl_host is not None:
             external_url = 'http://' + ensembl_host + '/Trackhub?url='
-            external_url += hub_url + ';species=' + mapped_assembly.get('species').replace(' ','_')
+            external_url += path + ';species=' + mapped_assembly.get('species').replace(' ','_')
             ### TODO: remove redirect=no when Ensembl fixes their mirrors
-            external_url += ';redirect=no'
+            #external_url += ';redirect=no'
             ### TODO: remove redirect=no when Ensembl fixes their mirrors
 
             if position is not None:
@@ -2203,6 +2332,10 @@ def vis_format_external_url(browser, hub_url, assembly, position=None):
             # BDGP5:    http://dec2014.archive.ensembl.org/Trackhub?url=https://www.encodeproject.org/experiments/ENCSR040UNE@@hub/hub.txt;species=Drosophila_melanogaster
             # ce11/WBcel235: http://www.ensembl.org/Trackhub?url=https://www.encodeproject.org/experiments/ENCSR475TDY@@hub/hub.txt;species=Caenorhabditis_elegans
             return external_url
+    elif browser == "quickview":
+        file_formats = '&file_format=bigBed&file_format=bigWig'
+        file_inclusions = '&status=released&status=in+progress'
+        return ('/search/?type=File&assembly=%s&dataset=%s%s%s#browser' % (assembly,path,file_formats,file_inclusions))
     #else:
         # ERROR: not supported at this time
     return None
@@ -2273,8 +2406,8 @@ def generate_batch_hubs(context, request):
 
         # Should generate a HTML page for requests other than trackDb.txt
         if txt != TRACKDB_TXT:
-            data_policy = ('<br /><a href="http://www.t2dream-demo.org/policy">'
-                           'T2DREAM data use policy</p>')
+            data_policy = ('<br /><a href="http://encodeproject.org/ENCODE/terms.html">'
+                           'ENCODE data use policy</p>')
             return generate_html(context, request) + data_policy
 
         return generate_batch_trackDb(request)
@@ -2364,8 +2497,8 @@ def hub(context, request):
     elif url_end.endswith(TRACKDB_TXT):
         text = generate_trackDb(request, embedded, url_end.split('/')[0])
     else:
-        data_policy = ('<br /><a href="http://www.t2dream-demo.org/policy">'
-                       'T2DREAM data use policy</p>')
+        data_policy = ('<br /><a href="http://encodeproject.org/ENCODE/terms.html">'
+                       'ENCODE data use policy</p>')
         text = generate_html(context, request) + data_policy
         content_mime = 'text/html'
 
