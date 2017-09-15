@@ -264,7 +264,7 @@ def region_search(context, request):
     result = {
         '@id': '/epigenomic-search/' + ('?' + request.query_string.split('&referrer')[0] if request.query_string else ''),
         '@type': ['epigenomic-search'],
-        'title': 'Search by region',
+        'title': 'Search by annotation',
         'facets': [],
         '@graph': [],
         'columns': OrderedDict(),
