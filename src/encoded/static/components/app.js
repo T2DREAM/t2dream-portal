@@ -41,6 +41,7 @@ const portal = {
             title: 'Tools',
             children: [
                 {id: 'region', title: 'Region Search', url: '/region-search/'},
+                {id: 'epigenome', title: 'Epigenomic Search', url: '/epigenomic-search/'},
             ],
         },
        
