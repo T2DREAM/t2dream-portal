@@ -33,9 +33,6 @@ log = logging.getLogger(__name__)
 
 # hashmap of assays and corresponding file types that are being indexed
 _INDEXED_DATA = {
-    'ChIP-seq': {
-        'output_type': ['peaks'],
-    },
     'DNase-seq': {
         'file_type': ['bed narrowPeak']
     },
