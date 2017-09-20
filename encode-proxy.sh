@@ -29,6 +29,6 @@ tar -zxf ssl.tgz --directory /etc/nginx/ssl
 openssl dhparam 2048 -out /etc/nginx/ssl/dhparam.pem
 chmod 600 /etc/nginx/ssl/dhparam.pem
 
-curl -o /etc/nginx/nginx.conf https://raw.githubusercontent.com/ENCODE-DCC/encoded/master/encode-proxy-nginx.conf
+curl -o /etc/nginx/nginx.conf https://raw.githubusercontent.com/T2DREAM/t2dream-portal/master/encode-proxy-nginx.conf
 
 service nginx restart
