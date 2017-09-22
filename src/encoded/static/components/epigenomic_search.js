@@ -131,9 +131,9 @@ var AdvSearch = createReactClass({
                     <form id="panel1" className="adv-search-form" ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1">
                         <input type="hidden" name="annotation" value={this.state.terms['annotation']} />
                         <div className="form-group">
-                            <label>Enter Coordinates</label>
+                            <label>Enter Coordinates or rsid</label>
                             <div className="input-group input-group-region-input">
-                                <input ref="annotation" defaultValue={region} name="region" type="text" placeholder="Enter Search (e.g. chr8:118184783-118184783)" className="form-control" onChange={this.handleChange} />
+                                <input ref="annotation" defaultValue={region} name="region" type="text" placeholder="Enter Search (e.g. chr8:118184783-118184783, rs13266634)" className="form-control" onChange={this.handleChange} />
                                 {(this.state.showAutoSuggest && this.state.searchTerm) ?
                                     <FetchedData loadingComplete={true}>
                                         <Param name="auto" url={'/suggest/?genome=' + this.state.genome + '&q=' + this.state.searchTerm  } type="json" />
