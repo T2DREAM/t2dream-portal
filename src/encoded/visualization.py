@@ -467,10 +467,10 @@ def lookup_vis_defs(vis_type):
 
 
 PENNANTS = {
-    "NHGRI":     ("https://www.encodeproject.org/static/img/pennant-nhgri.png "
-                  "https://www.encodeproject.org/ "
+    "T2DREAM":     ("http://www.t2dream-demo.org/static/img/logo.png "
+                  "t2dream-demo.org/ "
                   "\"This trackhub was automatically generated from the files and metadata found "
-                  "at the ENCODE portal\""),
+                  "at the T2DREAM portal\""),
     "ENCODE":    ("https://www.encodeproject.org/static/img/pennant-encode.png "
                   "https://www.encodeproject.org/ "
                   "\"This trackhub was automatically generated from the ENCODE files and metadata "
@@ -501,8 +501,8 @@ PENNANTS = {
 
 def find_pennent(dataset):
     '''Returns an appropriate pennantIcon given dataset's award'''
-    project = dataset.get("award", {}).get("project", "NHGRI")
-    return PENNANTS.get(project, PENNANTS.get("NHGRI"))
+    project = dataset.get("award", {}).get("project", "T2DREAM")
+    return PENNANTS.get(project, PENNANTS.get("T2DREAM"))
 
 
 SUPPORTED_SUBGROUPS = ["Biosample", "Targets", "Assay", "Replicates", "Views", EXP_GROUP]
@@ -1061,7 +1061,7 @@ def replicates_pair(a_file):
     return (rep_key, rep_val)
 
 
-def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, host=None):
+def acc_composite_extend_with_tracks(composite, vis_dmefs, dataset, assembly, host= None):
     '''Extends live experiment composite object with track definitions'''
     tracks = []
     rep_techs = {}
@@ -1131,7 +1131,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
 
     # second pass once all rep_techs are known
     if host is None:
-        host = "www.t2dream-demo.org"
+        host = "t2dream-demo.org"
     for view_tag in composite["view"].get("group_order", []):
         view = composite["view"]["groups"][view_tag]
         output_types = view.get("output_type", [])
@@ -1154,7 +1154,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             track = {}
             track["name"] = a_file['accession']
             track["type"] = view["type"]
-            track["bigDataUrl"] = "%s?proxy=true" % a_file["href"]
+            track["bigDataUrl"] = a_file["href"]
             longLabel = vis_defs.get('file_defs', {}).get('longLabel')
             if longLabel is None:
                 longLabel = ("{assay_title} of {biosample_term_name} {output_type} "
@@ -1431,12 +1431,12 @@ def remodel_acc_to_set_composites(acc_composites, hide_after=None):
             set_composite = set_composites[vis_type]
             set_composite['composite_type'] = 'set'
 
-            if set_composite.get("project", "unknown") != "NHGRI":
+            if set_composite.get("project", "unknown") != "T2DREAM":
                 acc_pennant = acc_composite["pennantIcon"]
                 set_pennant = set_composite["pennantIcon"]
                 if acc_pennant != set_pennant:
-                    set_composite["project"] = "NHGRI"
-                    set_composite["pennantIcon"] = PENNANTS["NHGRI"]
+                    set_composite["project"] = "T2DREAM"
+                    set_composite["pennantIcon"] = PENNANTS["T2DREAM"]
 
             # combine views
             set_views = set_composite.get("view", [])
@@ -1631,9 +1631,9 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
         return {}
 
     if request:
-        host = request.host_url
+        host = "t2dream-demo.org"
     else:
-        host = "https://www.t2dream.org"
+        host = "t2dream-demo.org"
     # {
     # "hub_description": { ... },  similar to hub.txt/genome.txt
     # "datasets": { ... },         one per experiment, contains "browser" objects, one per track
@@ -1866,9 +1866,9 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
             dataset = request.embed("/datasets/" + acc + '/', as_user=True)
             # log.debug("find_or_make_acc_composite len(results) = %d   %.3f secs" %
             #           (len(results),(time.time() - PROFILE_START_TIME)))
-        host=request.host_url
-        if host is None or host.find("localhost") > -1:
-            host = "www.t2dream-demo.org"
+        host="t2dream-demo.org"
+        if host is None or host.find("t2dream-demo.org") > -1:
+            host = "t2dream-demo.org"
 
         acc_composite = make_acc_composite(dataset, assembly, host=host, hide=hide)
         if USE_CACHE:
