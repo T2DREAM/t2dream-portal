@@ -1061,7 +1061,7 @@ def replicates_pair(a_file):
     return (rep_key, rep_val)
 
 
-def acc_composite_extend_with_tracks(composite, vis_dmefs, dataset, assembly, host= None):
+def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, host= None):
     '''Extends live experiment composite object with track definitions'''
     tracks = []
     rep_techs = {}
