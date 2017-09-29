@@ -1154,7 +1154,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             track = {}
             track["name"] = a_file['accession']
             track["type"] = view["type"]
-            track["bigDataUrl"] = a_file["href"]
+            track["bigDataUrl"] = "%s?proxy=true" % a_file["href"]
             longLabel = vis_defs.get('file_defs', {}).get('longLabel')
             if longLabel is None:
                 longLabel = ("{assay_title} of {biosample_term_name} {output_type} "
@@ -1173,7 +1173,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
 
             metadata_pairs = {}
             metadata_pairs['file&#32;download'] = ( \
-                '"<a href=\'%s%s\' title=\'Download this file from the ENCODE portal\'>%s</a>"' %
+                '"<a href=\'%s%s\' title=\'Download this file from the T2DREAM portal\'>%s</a>"' %
                 (host, a_file["href"], a_file["accession"]))
             lab = convert_mask("{lab.title}", dataset)
             if len(lab) > 0 and not lab.startswith('unknown'):
