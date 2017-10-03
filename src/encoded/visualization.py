@@ -1131,7 +1131,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
 
     # second pass once all rep_techs are known
     if host is None:
-        host = "t2dream-demo.org"
+        host = "http://www.t2dream-demo.org"
     for view_tag in composite["view"].get("group_order", []):
         view = composite["view"]["groups"][view_tag]
         output_types = view.get("output_type", [])
@@ -1154,7 +1154,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             track = {}
             track["name"] = a_file['accession']
             track["type"] = view["type"]
-            track["bigDataUrl"] = "%s?proxy=true" % a_file["href"]
+            track["bigDataUrl"] = a_file["href"]
             longLabel = vis_defs.get('file_defs', {}).get('longLabel')
             if longLabel is None:
                 longLabel = ("{assay_title} of {biosample_term_name} {output_type} "
@@ -1631,9 +1631,9 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
         return {}
 
     if request:
-        host = "t2dream-demo.org"
+        host = request.host_url
     else:
-        host = "t2dream-demo.org"
+        host = "http://www.t2dream-demo.org"
     # {
     # "hub_description": { ... },  similar to hub.txt/genome.txt
     # "datasets": { ... },         one per experiment, contains "browser" objects, one per track
@@ -1813,7 +1813,7 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
             for track in tracks:
                 ihec_track = {}
                 # ["bigDataUrl","longLabel","shortLabel","type","color","altColor"]
-                ihec_track["big_data_url"] = host + track["bigDataUrl"]  # contains ?proxy=true
+                ihec_track["big_data_url"] = track["bigDataUrl"] #no proxy required
                 ihec_track["description_url"] = '%s/%s/' % (host, acc)
                 if request:
                     url = '/'.join(request.url.split('/')[0:-1])
@@ -1866,9 +1866,9 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
             dataset = request.embed("/datasets/" + acc + '/', as_user=True)
             # log.debug("find_or_make_acc_composite len(results) = %d   %.3f secs" %
             #           (len(results),(time.time() - PROFILE_START_TIME)))
-        host="t2dream-demo.org"
-        if host is None or host.find("t2dream-demo.org") > -1:
-            host = "t2dream-demo.org"
+        host=request.host_url
+        if host is None or host.find("localhost") > -1:
+            host = "http://www.t2dream-demo.org"
 
         acc_composite = make_acc_composite(dataset, assembly, host=host, hide=hide)
         if USE_CACHE:
