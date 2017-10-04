@@ -9,17 +9,17 @@ import os
 from urllib.parse import (
     parse_qs,
     urlencode,
+    urlparse,
 )
 from snovault.elasticsearch.interfaces import ELASTIC_SEARCH
 import time
 from pkg_resources import resource_filename
-
+#from types.file import download
 # Note: Required for Bek's cache priming solution.
 from pyramid.events import subscriber
 from .peak_indexer import AfterIndexedExperimentsAndDatasets
-
 import logging
-
+import boto
 log = logging.getLogger(__name__)
 # log.setLevel(logging.DEBUG)
 log.setLevel(logging.INFO)
@@ -109,6 +109,7 @@ _ASSEMBLY_MAPPER_FULL = {
                     'comment':      'Never visualized'
     },
 }
+
 
 def includeme(config):
     config.add_route('batch_hub', '/batch_hub/{search_params}/{txt}')
@@ -1152,9 +1153,12 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             if "tracks" not in view:
                 view["tracks"] = []
             track = {}
+            conn = boto.connect_s3()
+            method = request.method
+            location = conn.generate_url(36*60*60, method, external['bucket'], external['key'])
             track["name"] = a_file['accession']
             track["type"] = view["type"]
-            track["bigDataUrl"] = a_file["href"]
+            track["bigDataUrl"] = location
             longLabel = vis_defs.get('file_defs', {}).get('longLabel')
             if longLabel is None:
                 longLabel = ("{assay_title} of {biosample_term_name} {output_type} "
