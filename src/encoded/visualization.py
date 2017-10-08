@@ -11,6 +11,10 @@ from urllib.parse import (
     urlencode,
     urlparse,
 )
+import subprocess
+import requests
+import shlex
+import sys
 from snovault.elasticsearch.interfaces import ELASTIC_SEARCH
 import time
 from pkg_resources import resource_filename
@@ -1153,15 +1157,16 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             if "tracks" not in view:
                 view["tracks"] = []
             track = {}
-            conn = boto.connect_s3()
-            method = request.method
-            location = conn.generate_url(36*60*60, method, external['bucket'], external['key'])
             track["name"] = a_file['accession']
             track["type"] = view["type"]
-            track["bigDataUrl"] = location
+            typetrack = view["type"]
+            s3path = subprocess.check_output('aws s3 ls s3://t2depi-files-dev/2017 --recursive | grep {}.{}  | cut -c 32-' .format(a_file['accession'],view["type"]),shell=True)
+            s3path1 = s3path.decode('ascii')
+            s3path_final = s3path1.strip()
+            track["bigDataUrl"] = 'https://s3-us-west-2.amazonaws.com/t2depi-files-dev/{}'.format(s3path_final)
             longLabel = vis_defs.get('file_defs', {}).get('longLabel')
             if longLabel is None:
-                longLabel = ("{assay_title} of {biosample_term_name} {output_type} "
+                longLabel = ("{assay_title} of {biosample_term_name} {output_type}"
                              "{biological_replicate_number}")
             longLabel += " {experiment.accession} - {file.accession}"  # Always add the accessions
             track["longLabel"] = sanitize_label(convert_mask(longLabel, dataset, a_file))
