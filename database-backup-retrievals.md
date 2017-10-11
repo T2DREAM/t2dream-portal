@@ -43,6 +43,7 @@ archive_timeout = 60
 archive_command = '/opt/wal-e/bin/envfile --config /home/ubuntu/.aws/credentials --section default --upper -- /opt/wal-e/bin/wal-e --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix)" wal-push "%\
 p"'
 
+Restart postgres
 **Step 4**
 
 Create base backup
@@ -60,7 +61,7 @@ Schedule base-backup
 sudo crontab -e
 ```
 
-0 1 * * *  sudo -i -u postgres /opt/wal-e/bin/envfile --config ~postgres/.aws/credentials --section default --upper -- /opt/wal-e/bin/wal-e --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix)" backup-push /var/lib/postgresql/9.3/main
+0 1 * * *  sudo -i -u postgres /opt/wal-e/bin/envfile --config /home/ubuntu/.aws/credentials --section default --upper -- /opt/wal-e/bin/wal-e --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix)" backup-push /var/lib/postgresql/9.3/main
 
 The cron job will be triggered daily at 1 am(PST)
 
