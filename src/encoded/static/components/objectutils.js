@@ -388,7 +388,7 @@ export const RestrictedDownloadButton = createReactClass({
                         <div className="tooltip-arrow" />
                         <div className="tooltip-inner">
                             If you are a collaborator or owner of this file,<br />
-                            please contact <a href="mailto:encode-help@lists.stanford.edu">encode-help@lists.stanford.edu</a><br />
+                            please contact <a href="mailto:t2dream-l@mailman.ucsd.edu">t2dream-l@mailman.ucsd.edu</a><br />
                             to receive a copy of this file
                         </div>
                     </div>
