@@ -394,7 +394,7 @@ const News = createReactClass({
         return (
             <Panel addClasses="news-blank">
                 <h2>No matching news items</h2>
-                <a href="/news/">Latest ENCODE News</a>
+                <a href="/news/">Latest T2DREAM News</a>
             </Panel>
         );
     },

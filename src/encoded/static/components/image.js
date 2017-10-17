@@ -170,7 +170,7 @@ var ProjectBadge = module.exports.ProjectBadge = createReactClass({
         award: PropTypes.object.isRequired, // Award whose project's badge we display
         addClasses: PropTypes.string // Classes to add to image
     },
-
+    
     projectMap: {
         ENCODE: {
             imageClass: 'badge-encode',
@@ -208,6 +208,10 @@ var ProjectBadge = module.exports.ProjectBadge = createReactClass({
             imageClass: 'badge-mouseencode',
             alt: 'ENCODE Mouse Project',
         },
+	'AMP': {
+	    imageClass: 'badge-t2dream',
+	    alt: 'AMP Consortium',
+	    },
         community: {
             imageClass: 'badge-community',
             alt: 'Community submission',
