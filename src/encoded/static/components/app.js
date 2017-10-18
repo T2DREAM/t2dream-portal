@@ -63,6 +63,7 @@ const projectList = [
     'ENCODE',
     'Roadmap',
     'GGR',
+    'AMP',
 ];
 const biosampleTypeList = [
     'immortalized cell line',
