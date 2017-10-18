@@ -1313,18 +1313,18 @@ class TwitterWidget extends React.Component {
         return (
             <div ref="twitterwidget">
                 <div className="twitter-header">
-                    <h3>Twitter <a href="https://twitter.com/T2DREAM_AMP" title="T2DREAM Twitter page in a new window or tab" target="_blank" rel="noopener noreferrer"className="twitter-ref">@T2DREAM_AMP</a></h3>
+                    <h3>Twitter <a href="https://twitter.com/EncodeDCC" title="ENCODE DCC Twitter page in a new window or tab" target="_blank" rel="noopener noreferrer"className="twitter-ref">@EncodeDCC</a></h3>
                 </div>
                 {this.props.height ?
                     <a
                         ref={(anchor) => { this.anchor = anchor; }}
                         className="twitter-timeline"
-                        href="https://twitter.com/T2DREAM_AMP" // from T2DREAM twitter
+                        href="https://twitter.com/encodedcc" // from encodedcc twitter
                         data-chrome="noheader"
-                        data-screen-name="T2DREAM_AMP"
+                        data-screen-name="EncodeDCC"
                         data-height={this.props.height.toString()} // height so it matches with rest of site
                     >
-                        @T2DREAM_AMP
+                        @EncodeDCC
                     </a>
                 : null}
             </div>
