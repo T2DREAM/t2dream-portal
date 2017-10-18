@@ -204,11 +204,7 @@ var ProjectBadge = module.exports.ProjectBadge = createReactClass({
             imageClass: 'badge-ggr',
             alt: 'Genomics of Gene Regulation Project',
         },
-        'ENCODE2-Mouse': {
-            imageClass: 'badge-mouseencode',
-            alt: 'ENCODE Mouse Project',
-        },
-	'AMP': {
+	AMP: {
 	    imageClass: 'badge-t2dream',
 	    alt: 'AMP Consortium',
 	    },
