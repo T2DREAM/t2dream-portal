@@ -18,7 +18,7 @@ from .ab_lot_status_data import (
     unique_key='accession',
     properties={
         'title': 'Antibodies Registry',
-        'description': 'Listing of ENCODE antibodies',
+        'description': 'Listing of T2D consortium antibodies',
     })
 class AntibodyLot(SharedItem):
     item_type = 'antibody_lot'

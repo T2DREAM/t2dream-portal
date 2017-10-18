@@ -18,7 +18,7 @@ import re
     unique_key='accession',
     properties={
         'title': 'Biosamples',
-        'description': 'Biosamples used in the ENCODE project',
+        'description': 'Biosamples used in the AMP-T2D project',
     })
 class Biosample(Item, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms):
     item_type = 'biosample'

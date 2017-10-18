@@ -47,7 +47,7 @@ def acl_from_settings(settings):
 class EncodedRoot(Root):
     properties = {
         'title': 'Home',
-        'portal_title': 'ENCODE',
+        'portal_title': 'T2DREAM',
     }
 
     @reify

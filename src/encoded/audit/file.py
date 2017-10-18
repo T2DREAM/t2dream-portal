@@ -605,9 +605,10 @@ def audit_file_chip_seq_control_read_depth(value, system,
                                                          'ENCODE2-Mouse',
                                                          'ENCODE2',
                                                          'ENCODE',
+                                                         'AMP-T2D',
                                                          'Roadmap')):
     '''
-    An alignment file from the ENCODE Processing Pipeline should have read depth
+    An alignment file from the AMP-T2D Processing Pipeline should have read depth
     in accordance with the criteria
     '''
 
@@ -624,31 +625,31 @@ def audit_file_chip_seq_control_read_depth(value, system,
         return
 
     if 'analysis_step_version' not in value:
-        detail = 'ENCODE Processed alignment file {} has '.format(value['@id']) + \
+        detail = 'AMP-T2D Processed alignment file {} has '.format(value['@id']) + \
             'no analysis step version'
         yield AuditFailure('missing analysis step version', detail, level='INTERNAL_ACTION')
         return
 
     if 'analysis_step' not in value['analysis_step_version']:
-        detail = 'ENCODE Processed alignment file {} has '.format(value['@id']) + \
+        detail = 'AMP-T2D Processed alignment file {} has '.format(value['@id']) + \
             'no analysis step in {}'.format(value['analysis_step_version']['@id'])
         yield AuditFailure('missing analysis step', detail, level='INTERNAL_ACTION')
         return
 
     if 'pipelines' not in value['analysis_step_version']['analysis_step']:
-        detail = 'ENCODE Processed alignment file {} has '.format(value['@id']) + \
+        detail = 'AMP-T2D Processed alignment file {} has '.format(value['@id']) + \
             'no pipelines in {}'.format(value['analysis_step_version']['analysis_step']['@id'])
         yield AuditFailure('missing pipelines in analysis step', detail, level='INTERNAL_ACTION')
         return
 
     if 'software_versions' not in value['analysis_step_version']:
-        detail = 'ENCODE Processed alignment file {} has '.format(value['@id']) + \
+        detail = 'AMP-T2D Processed alignment file {} has '.format(value['@id']) + \
             'no software_versions in {}'.format(value['analysis_step_version']['@id'])
         yield AuditFailure('missing software versions', detail, level='INTERNAL_ACTION')
         return
 
     if value['analysis_step_version']['software_versions'] == []:
-        detail = 'ENCODE Processed alignment file {} has no '.format(value['@id']) + \
+        detail = 'AMP-T2D Processed alignment file {} has no '.format(value['@id']) + \
             'softwares listed in software_versions,' + \
             ' under {}'.format(value['analysis_step_version']['@id'])
         yield AuditFailure('missing software', detail, level='INTERNAL_ACTION')
@@ -727,7 +728,7 @@ def check_control_read_depth_standards(value,
                     value['assembly'],
                     read_depth) + \
                     'usable fragments. ' + \
-                    'The minimum ENCODE standard for a control of ChIP-seq assays targeting broad ' + \
+                    'The minimum AMP-T2D standard for a control of ChIP-seq assays targeting broad ' + \
                     'histone mark {} '.format(control_to_target) + \
                     'is 40 million usable fragments, the recommended number of usable ' + \
                     'fragments is > 45 million. (See /data-standards/chip-seq/ )'
@@ -736,7 +737,7 @@ def check_control_read_depth_standards(value,
                     value['@id'],
                     read_depth) + \
                     'usable fragments. ' + \
-                    'The minimum ENCODE standard for a control of ChIP-seq assays targeting broad ' + \
+                    'The minimum AMP-T2D standard for a control of ChIP-seq assays targeting broad ' + \
                     'histone mark {} '.format(control_to_target) + \
                     'is 40 million usable fragments, the recommended number of usable ' + \
                     'fragments is > 45 million. (See /data-standards/chip-seq/ )'
@@ -753,7 +754,7 @@ def check_control_read_depth_standards(value,
                     value['assembly'],
                     read_depth) + \
                     'usable fragments. ' + \
-                    'The minimum ENCODE standard for a control of ChIP-seq assays targeting narrow ' + \
+                    'The minimum AMP-T2D standard for a control of ChIP-seq assays targeting narrow ' + \
                     'histone mark {} '.format(control_to_target) + \
                     'is 10 million usable fragments, the recommended number of usable ' + \
                     'fragments is > 20 million. (See /data-standards/chip-seq/ )'
@@ -762,7 +763,7 @@ def check_control_read_depth_standards(value,
                     value['@id'],
                     read_depth) + \
                     'usable fragments. ' + \
-                    'The minimum ENCODE standard for a control of ChIP-seq assays targeting narrow ' + \
+                    'The minimum AMP-T2D standard for a control of ChIP-seq assays targeting narrow ' + \
                     'histone mark {} '.format(control_to_target) + \
                     'is 10 million usable fragments, the recommended number of usable ' + \
                     'fragments is > 20 million. (See /data-standards/chip-seq/ )'
@@ -780,7 +781,7 @@ def check_control_read_depth_standards(value,
                     value['assembly'],
                     read_depth) + \
                     'usable fragments. ' + \
-                    'The minimum ENCODE standard for a control of ChIP-seq assays targeting ' + \
+                    'The minimum AMP-T2D standard for a control of ChIP-seq assays targeting ' + \
                     '{} and investigated as a transcription factor '.format(control_to_target) + \
                     'is 10 million usable fragments, the recommended number of usable ' + \
                     'fragments is > 20 million. (See /data-standards/chip-seq/ )'
@@ -789,7 +790,7 @@ def check_control_read_depth_standards(value,
                     value['@id'],
                     read_depth) + \
                     'usable fragments. ' + \
-                    'The minimum ENCODE standard for a control of ChIP-seq assays targeting ' + \
+                    'The minimum AMP-T2D standard for a control of ChIP-seq assays targeting ' + \
                     '{} and investigated as a transcription factor '.format(control_to_target) + \
                     'is 10 million usable fragments, the recommended number of usable ' + \
                     'fragments is > 20 million. (See /data-standards/chip-seq/ )'
