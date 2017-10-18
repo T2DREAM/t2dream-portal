@@ -34,8 +34,8 @@ var Footer = createReactClass({
                         <div className="row">
                             <div className="col-sm-6 col-sm-push-6">
                                 <ul className="footer-links">
-                                    <li><a href="mailto:kgaulton@ucsd.edu">Contact</a></li>
-                                    <li><a href="">Terms of Use</a></li>
+                                    <li><a href="mailto:t2dream-l@mailman.ucsd.edu">Contact</a></li>
+                                    <li><a href="https://ucsd.edu/about/terms-of-use.html">Terms of Use</a></li>
                                     <li id="user-actions-footer">{userActionRender}</li>
                                 </ul>
                                 <p className="copy-notice">&copy;{new Date().getFullYear()} Regents of the University of California.</p>
