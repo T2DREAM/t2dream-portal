@@ -571,7 +571,7 @@ def get_target_name(bam_file):
 def extract_award_version(bam_file):
     if 'dataset' in bam_file and 'award' in bam_file['dataset'] and \
        'rfa' in bam_file['dataset']['award']:
-        if bam_file['dataset']['award']['rfa'] in ['ENCODE2-Mouse', 'ENCODE2', 'AMP-T2D']:
+        if bam_file['dataset']['award']['rfa'] in ['ENCODE2-Mouse', 'ENCODE2']:
             return 'ENC2'
     return 'ENC3'
 
