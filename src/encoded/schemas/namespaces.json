@@ -1,8 +1,6 @@
 {
     "UniProtKB": "http://www.uniprot.org/uniprot/",
     "ENCODE": "https://www.encodeproject.org/experiments/",
-    "T2DREAM":"https://www.t2dream-demo.org/",
-    "T2D":"http://www.type2diabetesgenetics.org/",
     "EBI": "https://www.ebi.ac.uk/arrayexpress/experiments/",
     "HGNC": "http://www.genecards.org/cgi-bin/carddisp.pl?gene=",
     "ENSEMBL": "http://www.ensembl.org/Homo_sapiens/Gene/Summary?g=",

@@ -188,12 +188,11 @@
             "title": "Published by",
             "type": "array",
             "uniqueItems": true,
-            "default": ["AMP-T2D consortium"],
+            "default": ["ENCODE"],
             "items": {
                 "title": "Published by",
             "type": "string",
             "enum": [
-		"AMP-T2D consortium",
                 "ENCODE",
                 "mouseENCODE",
                 "modENCODE",

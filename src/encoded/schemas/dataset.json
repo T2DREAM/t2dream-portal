@@ -79,7 +79,7 @@
             "items": {
                 "type": "string",
                 "enum": [
-                    "T2DREAM",
+                    "DREAM",
                     "ENCORE",
                     "ENTEx",
                     "SESCC",
