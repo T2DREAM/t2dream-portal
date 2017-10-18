@@ -26,7 +26,7 @@ from pyramid.view import (
     name='antibody-approvals',
     properties={
         'title': 'Antibody Approvals',
-        'description': 'Listing of characterization approvals for AMP T2D antibodies',
+        'description': 'Listing of characterization approvals for ENCODE antibodies',
     })
 class AntibodyApproval(Item):
     schema = load_schema('encoded:schemas/antibody_approval.json')

@@ -316,7 +316,7 @@ class FileSet(Dataset):
     unique_key='accession',
     properties={
         'title': "Annotation file set",
-        'description': 'A set of annotation files produced by T2D consortium.',
+        'description': 'A set of annotation files produced by ENCODE.',
     })
 class Annotation(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms):
     item_type = 'annotation'
@@ -412,7 +412,7 @@ class PublicationData(FileSet, CalculatedFileSetBiosample, CalculatedFileSetAssa
     unique_key='accession',
     properties={
         'title': "Reference file set",
-        'description': 'A set of reference files used by T2D consortium.',
+        'description': 'A set of reference files used by ENCODE.',
     })
 class Reference(FileSet):
     item_type = 'reference'

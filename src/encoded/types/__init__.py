@@ -70,7 +70,7 @@ class Organism(Item):
     unique_key='source:name',
     properties={
         'title': 'Sources',
-        'description': 'Listing of sources and vendors for T2D consortium material',
+        'description': 'Listing of sources and vendors for ENCODE material',
     })
 class Source(Item):
     item_type = 'source'
