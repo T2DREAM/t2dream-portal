@@ -982,7 +982,7 @@ const BatchDownload = search.BatchDownload = createReactClass({
                 <ModalBody>
                     <p>Click the &ldquo;Download&rdquo; button below to download a &ldquo;files.txt&rdquo; file that contains a list of URLs to a file containing all the experimental metadata and links to download the file.
                     The first line of the file will always be the URL to download the metadata file. <br />
-                    Further description of the contents of the metadata file are described in the <a href="/help/batch-download/">Batch Download help doc</a>.</p><br />
+                   
                     <p>The &ldquo;files.txt&rdquo; file can be copied to any server.<br />
                     The following command using cURL can be used to download all the files in the list:</p><br />
                     <code>xargs -n 1 curl -O -L &lt; files.txt</code><br />
