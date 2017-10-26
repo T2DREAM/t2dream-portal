@@ -41,6 +41,7 @@ const portal = {
             title: 'Tools',
             children: [
                 {id: 'region', title: 'Region Search', url: '/region-search/'},
+		{id: 'region', title: 'Annotation Region Search', url: '/annotation_region_search/'},
             ],
         },
        

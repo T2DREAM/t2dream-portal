@@ -236,7 +236,7 @@ def main(global_config, **local_config):
             maxsize=50
         )
         config.include('.region_search')
-        config.include('.epigenomic_search')
+        config.include('.annotation_region_search')
         config.include('.peak_indexer')
     config.include(static_resources)
     config.include(changelogs)
