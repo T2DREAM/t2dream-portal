@@ -192,7 +192,7 @@ class AssayClicking extends React.Component {
                         </div>
 		       <div className="site-banner-search">
 		       
-                                      <h4 className="search-header">Explore Experiments: </h4>
+                                      <h4 className="search-header">Explore experiments: </h4>
                                       <SearchEngine />
                                       <h4 className="search-header">Explore annotations:</h4>
                                       <SearchEngine1 />
