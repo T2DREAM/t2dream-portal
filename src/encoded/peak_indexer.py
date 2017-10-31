@@ -26,10 +26,12 @@ TRACKHUB_CACHING = True
 # from .visualization import VISIBLE_DATASET_TYPES_LC
 VISIBLE_DATASET_TYPES_LC = ["experiment", "annotation"]
 
+
 SEARCH_MAX = 99999  # OutOfMemoryError if too high
 log = logging.getLogger(__name__)
 
-# hashmap of assays,annoatations and corresponding file types that are being indexed
+
+# hashmap of assays and corresponding file types that are being indexed
 _INDEXED_DATA = {
     'ChIP-seq': {
         'file_type': ['bed narrowPeak']
@@ -37,25 +39,29 @@ _INDEXED_DATA = {
     'DNase-seq': {
         'file_type': ['bed narrowPeak']
     },
-    'ATAC-seq': {
+    'eCLIP': {
         'file_type': ['bed narrowPeak']
-    },
-    'chromatin state': {
-        'file_type': ['bed bed3+']
-    }    
+    }
 }
 
 # Species and references being indexed
 _ASSEMBLIES = ['hg19', 'mm10', 'mm9', 'GRCh38']
 
+
 def includeme(config):
     config.add_route('index_file', '/index_file')
     config.scan(__name__)
+
+
+
 def tsvreader(file):
     reader = csv.reader(file, delimiter='\t')
     for row in reader:
         yield row
+
 # Mapping should be generated dynamically for each assembly type
+
+
 def get_mapping(assembly_name='hg19'):
     return {
         assembly_name: {
@@ -84,12 +90,16 @@ def get_mapping(assembly_name='hg19'):
             }
         }
     }
+
+
 def index_settings():
     return {
         'index': {
             'number_of_shards': 1
         }
     }
+
+
 def get_assay_term_name(accession, request):
     '''
     Input file accession and returns assay_term_name of the experiment the file
@@ -99,22 +109,19 @@ def get_assay_term_name(accession, request):
     if 'assay_term_name' in context:
         return context['assay_term_name']
     return None
-def get_annotation_type(accession, request):
-    '''
-    Input file accession and returns annotation_type of the annotation the file
-    belongs to
-    '''
-    context = request.embed(accession)
-    if 'annotation_type' in context:
-        return context['annotation_type']
-    return None
+
+
 def all_bed_file_uuids(request):
     stmt = text("select distinct(resources.rid) from resources, propsheets where resources.rid = propsheets.rid and resources.item_type='file' and propsheets.properties->>'file_format' = 'bed' and properties->>'status' = 'released';")
     connection = request.registry[DBSESSION].connection()
     uuids = connection.execute(stmt)
     return [str(item[0]) for item in uuids]
+
+
 def all_visualizable_uuids(request):
     return list(all_uuids(request.registry, types=VISIBLE_DATASET_TYPES_LC))
+
+
 def index_peaks(uuid, request):
     """
     Indexes bed files in elasticsearch index
@@ -130,6 +137,8 @@ def index_peaks(uuid, request):
     if assembly == 'mm10-minimal':
         assembly = 'mm10'
 
+
+
     if 'File' not in context['@type'] or 'dataset' not in context:
         return
 
@@ -144,17 +153,9 @@ def index_peaks(uuid, request):
     if assay_term_name is None or isinstance(assay_term_name, collections.Hashable) is False:
         return
 
-    annotation_type = get_annotation_type(context['dataset'], request)    
-    if annotation_type is None or isinstance(annotation_type, collections.Hashable) is False:
-        return
-
-    #if assay_term_name != None:
-    #    what_happens = assay_term_name
-    #else:
-    #    what_happens = annotation_type
     flag = False
 
-    for k, v in _INDEXED_DATA.get(annotation_type, {}).items():
+    for k, v in _INDEXED_DATA.get(assay_term_name, {}).items():
         if k in context and context[k] in v:
             if 'file_format' in context and context['file_format'] == 'bed':
                 flag = True
@@ -216,9 +217,11 @@ def object_indexer_done(registry,last_xmin):
             return True
     return False
 
+
 def index_visualizable(request, invalidated):
     regen_vis_uuids = list(set(invalidated).intersection(all_visualizable_uuids(request)))
     request.registry.notify(AfterIndexedExperimentsAndDatasets(regen_vis_uuids, request))
+
 
 @view_config(route_name='index_file', request_method='POST', permission="index")
 def index_file(request):
