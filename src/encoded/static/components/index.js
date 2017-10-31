@@ -38,6 +38,6 @@ require('./blocks');
 require('./user');
 require('./schema');
 require('./region_search');
-require('./annotation_region_search');
+//require('./annotation_region_search');
 
 module.exports = require('./app');
