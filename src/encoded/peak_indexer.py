@@ -39,7 +39,7 @@ _INDEXED_DATA = {
     'DNase-seq': {
         'file_type': ['bed narrowPeak']
     },
-    'eCLIP': {
+    'ATAC-seq': {
         'file_type': ['bed narrowPeak']
     }
 }
