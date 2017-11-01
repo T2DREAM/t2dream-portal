@@ -40,7 +40,7 @@ _INDEXED_DATA = {
         'file_type': ['bed narrowPeak']
     },
     'ATAC-seq': {
-        'file_type': ['bed narrowPeak']
+        'output_type': ['peaks']
     }
 }
 
