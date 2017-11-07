@@ -43,7 +43,11 @@ _INDEXED_DATA = {
         'output_type': ['peaks']
     }
 }
-
+_INDEXED_DATA1 = {
+    'chromatin state': {
+        'output_type': ['peaks']
+    }
+}
 # Species and references being indexed
 _ASSEMBLIES = ['hg19', 'mm10', 'mm9', 'GRCh38']
 
@@ -53,14 +57,12 @@ def includeme(config):
     config.scan(__name__)
 
 
-
 def tsvreader(file):
     reader = csv.reader(file, delimiter='\t')
     for row in reader:
         yield row
 
 # Mapping should be generated dynamically for each assembly type
-
 
 def get_mapping(assembly_name='hg19'):
     return {
@@ -100,14 +102,24 @@ def index_settings():
     }
 
 
-def get_assay_term_name(accession, request):
+#def get_assay_term_name(accession, request):
     '''
     Input file accession and returns assay_term_name of the experiment the file
     belongs to
     '''
+#    context = request.embed(accession)
+#    if 'assay_term_name' in context:
+#        return context['assay_term_name']
+#        return None
+
+def get_annotation_type(accession, request):
+    '''
+    Input file accession and returns annotation_type of the annotation the file
+    belongs to
+    '''
     context = request.embed(accession)
-    if 'assay_term_name' in context:
-        return context['assay_term_name']
+    if 'annotation_type' in context:
+        return context['annotation_type']
     return None
 
 
@@ -149,18 +161,29 @@ def index_peaks(uuid, request):
     if assembly not in _ASSEMBLIES:
         return
 
-    assay_term_name = get_assay_term_name(context['dataset'], request)
-    if assay_term_name is None or isinstance(assay_term_name, collections.Hashable) is False:
+    #assay_term_name = get_assay_term_name(context['dataset'], request)
+    #if assay_term_name is None or isinstance(assay_term_name, collections.Hashable) is False:
+    #    return
+    annotation_type = get_annotation_type(context['dataset'], request)
+    if annotation_type is None or isinstance(annotation_type, collections.Hashable) is False:
         return
 
     flag = False
+    flag1 = False
 
-    for k, v in _INDEXED_DATA.get(assay_term_name, {}).items():
-        if k in context and context[k] in v:
+    #for k, v in _INDEXED_DATA.get(assay_term_name, {}).items():
+    #    if k in context and context[k] in v:
+    #        if 'file_format' in context and context['file_format'] == 'bed':
+    #            flag = True
+    #            break
+    #if not flag:
+    #    return
+    for l, m in _INDEXED_DATA1.get(annotation_type, {}).items():
+        if l in context and context[l] in m:
             if 'file_format' in context and context['file_format'] == 'bed':
-                flag = True
+                flag1 = True
                 break
-    if not flag:
+    if not flag1:
         return
 
     urllib3.disable_warnings()
