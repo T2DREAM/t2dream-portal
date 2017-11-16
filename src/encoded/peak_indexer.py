@@ -34,8 +34,8 @@ log = logging.getLogger(__name__)
 # hashmap of assays and corresponding file types that are being indexed
 _INDEXED_DATA = {
     'ChIP-seq': {
-        'file_type': ['bed narrowPeak']
-        },
+        'file_type': ['bed narrowPeak'],
+    },
     'DNase-seq': {
         'file_type': ['bed narrowPeak']
     },
@@ -43,11 +43,7 @@ _INDEXED_DATA = {
         'output_type': ['peaks']
     }
 }
-_INDEXED_DATA1 = {
-    'chromatin state': {
-        'output_type': ['peaks']
-    }
-}
+
 # Species and references being indexed
 _ASSEMBLIES = ['hg19', 'mm10', 'mm9', 'GRCh38']
 
@@ -57,12 +53,14 @@ def includeme(config):
     config.scan(__name__)
 
 
+
 def tsvreader(file):
     reader = csv.reader(file, delimiter='\t')
     for row in reader:
         yield row
 
 # Mapping should be generated dynamically for each assembly type
+
 
 def get_mapping(assembly_name='hg19'):
     return {
@@ -102,24 +100,14 @@ def index_settings():
     }
 
 
-#def get_assay_term_name(accession, request):
+def get_assay_term_name(accession, request):
     '''
     Input file accession and returns assay_term_name of the experiment the file
     belongs to
     '''
-#    context = request.embed(accession)
-#    if 'assay_term_name' in context:
-#        return context['assay_term_name']
-#        return None
-
-def get_annotation_type(accession, request):
-    '''
-    Input file accession and returns annotation_type of the annotation the file
-    belongs to
-    '''
     context = request.embed(accession)
-    if 'annotation_type' in context:
-        return context['annotation_type']
+    if 'assay_term_name' in context:
+        return context['assay_term_name']
     return None
 
 
@@ -161,29 +149,18 @@ def index_peaks(uuid, request):
     if assembly not in _ASSEMBLIES:
         return
 
-    #assay_term_name = get_assay_term_name(context['dataset'], request)
-    #if assay_term_name is None or isinstance(assay_term_name, collections.Hashable) is False:
-    #    return
-    annotation_type = get_annotation_type(context['dataset'], request)
-    if annotation_type is None or isinstance(annotation_type, collections.Hashable) is False:
+    assay_term_name = get_assay_term_name(context['dataset'], request)
+    if assay_term_name is None or isinstance(assay_term_name, collections.Hashable) is False:
         return
 
     flag = False
-    flag1 = False
 
-    #for k, v in _INDEXED_DATA.get(assay_term_name, {}).items():
-    #    if k in context and context[k] in v:
-    #        if 'file_format' in context and context['file_format'] == 'bed':
-    #            flag = True
-    #            break
-    #if not flag:
-    #    return
-    for l, m in _INDEXED_DATA1.get(annotation_type, {}).items():
-        if l in context and context[l] in m:
+    for k, v in _INDEXED_DATA.get(assay_term_name, {}).items():
+        if k in context and context[k] in v:
             if 'file_format' in context and context['file_format'] == 'bed':
-                flag1 = True
+                flag = True
                 break
-    if not flag1:
+    if not flag:
         return
 
     urllib3.disable_warnings()
