@@ -1,7 +1,7 @@
 #cloud-config
 
 # Launch instance with network interfaces configured to the local IP addresses we references in the config.
-# $ aws ec2 run-instances --user-data file://check-files.yml --iam-instance-profile Name="encoded-instance" --image-id ami-5a928a3b --region us-west-2 --security-groups ssh-http-https --instance-type c4.xlarge
+# $ aws ec2 run-instances --user-data file://check-files.yml --iam-instance-profile Name="encoded-instance" --image-id ami-1c1eff2f --region us-west-2 --security-groups ssh-http-https --instance-type c4.xlarge
 
 bootcmd:
 - cloud-init-per once ssh-users-ca echo "TrustedUserCAKeys /etc/ssh/users_ca.pub" >> /etc/ssh/sshd_config
@@ -26,8 +26,8 @@ runcmd:
 
 - set -ex
 - systemctl daemon-reload  # See https://bugs.launchpad.net/cloud-init/+bug/1449318
-- mkdir -p /s3/encode-files
-- mkdir -p /s3/encoded-files-dev
+- mkdir -p /s3/t2depi-files
+- mkdir -p /s3/t2depi-files-dev
 
 - curl -sS -L -o /usr/local/bin/goofys https://github.com/kahing/goofys/releases/download/v0.0.5/goofys
 - chmod +x /usr/local/bin/goofys
@@ -43,20 +43,20 @@ runcmd:
 - chown build:build /opt/encValData
 - sudo -u build git clone --depth 1 https://github.com/ENCODE-DCC/encValData /opt/encValData
 
-- curl -sS -L -o /usr/local/bin/validateFiles https://github.com/ENCODE-DCC/kentUtils/raw/master/bin/linux.x86_64/validateFiles
+- curl -sS -L -o /usr/local/bin/validateFiles http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/validateFiles
 - chmod +x /usr/local/bin/validateFiles
 
 - mkdir /opt/encoded
 - chown build:build /opt/encoded
-- sudo -u build git clone --no-checkout https://github.com/ENCODE-DCC/encoded.git /opt/encoded
+- sudo -u build git clone --no-checkout https://github.com/T2DREAM/t2dream-portal.git /opt/encoded
 - sudo -u build git -C /opt/encoded checkout %(COMMIT)s
-
+- chmod +x /opt/encoded/checkfiles/script
 - cd /opt/encoded/checkfiles
 - sudo -u build pyvenv .
 - sudo -u build bin/pip install -r requirements.txt
 
 - cd /home/ubuntu
-- sudo -iu ubuntu /opt/encoded/checkfiles/bin/python /opt/encoded/checkfiles/checkfiles.py $(cat /opt/checkfiles_args.txt)
+- nohup /opt/encoded/checkfiles/script $(cat /opt/checkfiles_args.txt) 2> errors.log 1> output.log &
 
 
 users:
@@ -67,8 +67,8 @@ users:
   system: true
 
 mounts:
-- [ "goofys-ulimit#encode-files", "/s3/encode-files", "fuse", "_netdev,allow_other,--file-mode=0444,--dir-mode=0555,--stat-cache-ttl=0", "0", "0" ]
-- [ "goofys-ulimit#encoded-files-dev", "/s3/encoded-files-dev", "fuse", "_netdev,allow_other,--file-mode=0444,--dir-mode=0555,--stat-cache-ttl=0", "0", "0" ]
+- [ "goofys-ulimit#t2depi-files", "/s3/t2depi-test-files-upload", "fuse", "_netdev,allow_other,--file-mode=0444,--dir-mode=0555,--stat-cache-ttl=0", "0", "0" ]
+- [ "goofys-ulimit#t2depi-files-dev", "/s3/t2depi-files-dev", "fuse", "_netdev,allow_other,--file-mode=0444,--dir-mode=0555,--stat-cache-ttl=0", "0", "0" ]
 
 write_files:
 - path: /opt/checkfiles_args.txt
@@ -81,9 +81,9 @@ write_files:
     [Service]
     # See https://bugs.launchpad.net/cloud-init/+bug/1449318
     KillMode=process
-- path: /usr/local/bin/goofys-ulimit
+- path: /usr/rc.local
   permissions: 0755
   content: |
-    #!/bin/sh
-    ulimit -n 60000
-    exec goofys "$@"
+    #!/bin/sh -e
+    cd /home/ubuntu; nohup /opt/encoded/checkfiles/script %(ARGS)s 2> errors.log 1> output.log &
+    exit 0

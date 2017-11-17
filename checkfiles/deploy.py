@@ -9,7 +9,7 @@ BDM = [
     {
         'DeviceName': '/dev/sda1',
         'Ebs': {
-            'VolumeSize': 1024,
+            'VolumeSize': 512,
             'VolumeType': 'gp2',
             'DeleteOnTermination': True
         }
@@ -77,7 +77,7 @@ def run(image_id, instance_type,
     )
 
     instance = reservation[0]  # Instance:i-34edd56f
-    print('%s.%s.encodedcc.org' % (instance.instance_id, domain))
+    print('%s.%s.t2dream-demo.org' % (instance.instance_id, domain))
     instance.wait_until_exists()
     instance.create_tags(Tags=[
         {'Key': 'Name', 'Value': name},
@@ -85,7 +85,7 @@ def run(image_id, instance_type,
         {'Key': 'commit', 'Value': commit},
         {'Key': 'started_by', 'Value': username},
     ])
-    print('ssh %s.%s.encodedcc.org' % (name, domain))
+    print('ssh %s.%s.t2dream-demo.org' % (name, domain))
     print('pending...')
     instance.wait_until_running()
     print(instance.state['Name'])
@@ -109,7 +109,7 @@ def main():
     parser.add_argument(
         '-n', '--name', type=hostname, help="Instance name")
     parser.add_argument(
-        '--image-id', default='ami-4b37d42b',
+        '--image-id', default='ami-1c1eff2f',
         help="ubuntu/images/hvm-ssd/ubuntu-wily-15.10-amd64-server-20160217.1")
     parser.add_argument(
         '--instance-type', default='c4.xlarge',
