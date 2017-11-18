@@ -1,5 +1,6 @@
 from future.standard_library import install_aliases
 install_aliases()  # NOQA
+import encoded.schema_formats # needed to import before snovault to add FormatCheckers
 import base64
 import codecs
 import json
@@ -224,6 +225,7 @@ def main(global_config, **local_config):
     if 'elasticsearch.server' in config.registry.settings:
         config.include('snovault.elasticsearch')
         config.include('.search')
+        config.include('.secondary_indexer')
 
     if 'snp_search.server' in config.registry.settings:
         addresses = aslist(config.registry.settings['snp_search.server'])
