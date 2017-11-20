@@ -11,7 +11,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.security import effective_principals
 from urllib.parse import urlencode
 from collections import OrderedDict
-from .visualization import vis_format_external_url
+from .visualization import vis_format_url
 
 
 
@@ -507,10 +507,10 @@ def search_result_actions(request, doc_types, es_results, position=None):
                     pos = None
                     if 'region-search' in request.url and position is not None:
                         pos = position
-                    ucsc_url = vis_format_external_url("ucsc", hub_url, assembly, pos)
+                    ucsc_url = vis_format_url("ucsc", hub_url, assembly, pos)
                     if ucsc_url is not None:
                         browser_urls['UCSC'] = ucsc_url
-                    ensembl_url = vis_format_external_url("ensembl", hub_url, assembly, pos)
+                    ensembl_url = vis_format_url("ensembl", hub_url, assembly, pos)
                     if ensembl_url is not None:
                         browser_urls['Ensembl'] = ensembl_url
                     if browser_urls:
