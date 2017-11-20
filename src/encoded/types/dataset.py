@@ -21,6 +21,8 @@ from .shared_calculated_properties import (
     CalculatedSeriesAssay,
     CalculatedSeriesBiosample,
     CalculatedSeriesTreatment,
+    CalculatedSeriesTarget,
+    CalculatedVisualize
 )
 
 from itertools import chain
