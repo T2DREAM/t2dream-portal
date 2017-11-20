@@ -1,4 +1,4 @@
-#cloud-config
+cloud-config
 
 # Launch instance with network interfaces configured to the local IP addresses we references in the config.
 # $ aws ec2 run-instances --user-data file://check-files.yml --iam-instance-profile Name="encoded-instance" --image-id ami-1c1eff2f --region us-west-2 --security-groups ssh-http-https --instance-type c4.xlarge
@@ -27,7 +27,7 @@ runcmd:
 - set -ex
 - systemctl daemon-reload  # See https://bugs.launchpad.net/cloud-init/+bug/1449318
 - mkdir -p /s3/t2depi-files
-- mkdir -p /s3/t2depi-files-dev
+- mkdir -p /s3/t2depi-test-files-upload
 
 - curl -sS -L -o /usr/local/bin/goofys https://github.com/kahing/goofys/releases/download/v0.0.5/goofys
 - chmod +x /usr/local/bin/goofys
@@ -67,7 +67,7 @@ users:
   system: true
 
 mounts:
-- [ "goofys-ulimit#t2depi-files", "/s3/t2depi-test-files-upload", "fuse", "_netdev,allow_other,--file-mode=0444,--dir-mode=0555,--stat-cache-ttl=0", "0", "0" ]
+- [ "goofys-ulimit#t2depi-test-files-upload", "/s3/t2depi-test-files-upload", "fuse", "_netdev,allow_other,--file-mode=0444,--dir-mode=0555,--stat-cache-ttl=0", "0", "0" ]
 - [ "goofys-ulimit#t2depi-files-dev", "/s3/t2depi-files-dev", "fuse", "_netdev,allow_other,--file-mode=0444,--dir-mode=0555,--stat-cache-ttl=0", "0", "0" ]
 
 write_files:
