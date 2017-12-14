@@ -4,7 +4,7 @@ Run sanity checks on files.
 Example.
 
     %(prog)s --username ACCESS_KEY_ID --password SECRET_ACCESS_KEY \\
-        --output check_files.log https://www.t2dream-demo.org
+        --output check_files.log https://www.t2depigenome.org
 """
 import datetime
 import os.path

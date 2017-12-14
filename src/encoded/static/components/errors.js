@@ -84,7 +84,7 @@ var LoginDenied = module.exports.LoginDenied = createReactClass({
 
                         <p>Please be aware that login access (to unreleased data) is available only to AMP-T2D Consortium members.</p>
                         <p>Please contact <a href='mailto:t2dream-l@mailman.ucsd.edu'>Help Desk</a> if you need an account, or if your old account is not working.</p>
-                        <p><a href='https://ucsd.edu/about/terms-of-use.html'>Terms and Conditions</a> &emsp; <a href='http://www.t2dream-demo.org/policy/'>Privacy Policy</a></p>
+                        <p><a href='https://ucsd.edu/about/terms-of-use.html'>Terms and Conditions</a> &emsp; <a href='https://www.t2depigenome.org/policy/'>Privacy Policy</a></p>
                     </div>
                 </div>
             </div>
