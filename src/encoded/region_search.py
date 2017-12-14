@@ -36,8 +36,13 @@ _REGION_FIELDS = [
 ]
 
 _FACETS = [
-    ('annotation_type', {'title': 'Annotation'}),
-    ('biosample_term_name', {'title': 'Biosample term'}),    
+    ('assay_term_name', {'title': 'Assay'}),
+    ('biosample_term_name', {'title': 'Biosample term'}),
+    ('target.label', {'title': 'Target'}),
+    ('replicates.library.biosample.donor.organism.scientific_name', {
+            'title': 'Organism'
+            }),
+    ('organ_slims', {'title': 'Organ'}),
     ('assembly', {'title': 'Genome assembly'}),
     ('files.file_type', {'title': 'Available data'})
 ]
@@ -330,7 +335,6 @@ def region_search(context, request):
                                      index=chromosome.lower(),
                                      doc_type=_GENOME_TO_ALIAS[assembly],
                                      size=99999)
-        log.warn(peak_results)
     except Exception:
         result['notification'] = 'Error during search'
         return result
@@ -340,11 +344,10 @@ def region_search(context, request):
             file_uuids.append(hit['_id'])
     file_uuids = list(set(file_uuids))
     result['notification'] = 'No results found'
-    log.warn(file_uuids)
 
     # if more than one peak found return the experiments with those peak files
     if len(file_uuids):
-        query = get_filtered_query('', [], set(), principals, ['Annotation'])
+        query = get_filtered_query('', [], set(), principals, ['Experiment'])
         del query['query']
         query['filter']['and']['filters'].append({
             'terms': {
@@ -353,11 +356,11 @@ def region_search(context, request):
         })
         used_filters = set_filters(request, query, result)
         used_filters['files.uuid'] = file_uuids
-        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Annotation'])
-        schemas = (types[item_type].schema for item_type in ['Annotation'])
+        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Experiment'])
+        schemas = (types[item_type].schema for item_type in ['Experiment'])
         #log.warn(query)
         es_results = es.search(
-            body=query, index='snovault', doc_type='annotation', size=size
+            body=query, index='snovault', doc_type='experiment', size=size
         )
         #log.warn(pprint.pformat(es_results))
         result['@graph'] = list(format_results(request, es_results['hits']['hits']))
@@ -368,7 +371,7 @@ def region_search(context, request):
         if result['total'] > 0:
             result['notification'] = 'Success'
             position_for_browser = format_position(result['coordinates'], 200)
-            result.update(search_result_actions(request, ['Annotation'], es_results, position=position_for_browser))
+            result.update(search_result_actions(request, ['Experiment'], es_results, position=position_for_browser))
 
     return result
 
