@@ -485,8 +485,8 @@ def lookup_vis_defs(vis_type):
 
 
 PENNANTS = {
-    "T2DREAM":     ("http://www.t2dream-demo.org/static/img/logo.png "
-                  "t2dream-demo.org/ "
+    "T2DREAM":     ("https://www.t2depigenome.org/static/img/logo.png "
+                  "t2depigenome.org/ "
                   "\"This trackhub was automatically generated from the files and metadata found "
                   "at the T2DREAM portal\""),
     "ENCODE":    ("https://www.encodeproject.org/static/img/pennant-encode.png "
@@ -1149,7 +1149,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
 
     # second pass once all rep_techs are known
     if host is None:
-        host ="https://t2depigenome-test.org"
+        host ="https://www.t2depigenome.org"
     for view_tag in composite["view"].get("group_order", []):
         view = composite["view"]["groups"][view_tag]
         output_types = view.get("output_type", [])
@@ -1890,7 +1890,7 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
             #           (len(results),(time.time() - PROFILE_START_TIME)))
         host=request.host_url
         if host is None or host.find("localhost") > -1:
-            host = "https://t2depigenome-test.org"
+            host = "https://www.t2depigenome.org"
 
         acc_composite = make_acc_composite(dataset, assembly, host=host, hide=hide)
         if USE_CACHE:
@@ -2421,7 +2421,7 @@ def hub(context, request):
         url_end = url_ret[1][1:]            
         text = generate_trackDb(request, embedded, url_end.split('/')[0])
     else:
-        data_policy = ('<br /><a href="http://www.t2dream-demo.org/policy">'
+        data_policy = ('<br /><a href="https://www.t2depigenome.org/policy">'
                        'T2DREAM data use policy</p>')
         text = generate_html(context, request) + data_policy
         content_mime = 'text/html'
