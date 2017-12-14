@@ -1,26 +1,28 @@
 /* NavBar */
 .navbar-inverse {
     border: none;
-    border-bottom: 0px solid #4e7294;
-    background: #6dafec;
-
+    border-bottom: 2px solid #DCDCDC;
+    background: #ffffff;
+    font-size: 1.25rem;
     .navbar-brand {
-        margin-left: -15px;
-        color: #fff;
-        font-size: 1.4rem;
-        font-weight: 200;
-        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-
+        margin-left: 0px;
+	padding-left: 0px;
+	padding-top: 10px;
+	padding-right: 8px;
+        color: #696969;
+        font-size: 1.3rem;
+        font-weight: 400;
+	&:focus,
         &:hover {
-            text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8);
+            background-color: #DCDCDC;
         }
     }
 
     .nav > li > a {
-        color: #fff;   
+        color: #696969;   
         &:focus,
         &:hover {
-            background-color: #2f4961;
+            background-color: #DCDCDC;
         }
 
         /* Disabled sign-in link */
