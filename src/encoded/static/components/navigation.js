@@ -43,8 +43,9 @@ var Navigation = module.exports = createReactClass({
         var portal = this.context.portal;
         return (
             <div id="navbar" className="navbar navbar-fixed-top navbar-inverse">
+                <AmpBanner />
                 <div className="container">
-                    <Navbar brand={portal.portal_title} brandlink="/" label="main" navClasses="navbar-main">
+                    <Navbar brand="Home" brandlink="/" label="main" navClasses="navbar-main">
                         <GlobalSections />
                         <UserActions />
                         {this.props.isHomePage ? null : <ContextActions />}
@@ -54,6 +55,26 @@ var Navigation = module.exports = createReactClass({
         );
     }
 });
+
+//AMP banner 
+var AmpBanner = React.createClass({
+	render: function() {
+	    return (
+		    <div>
+		    <meta charSet="utf-8" />
+		    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+		    <div className="container-fluid" style={{borderBottom: 'solid 1px #fff', backgroundImage: "url('/static/components/assets/images/AMP_banner_middle.png')", backgroundPosition: 'left top', backgroundRepeat: 'repeat-x', backgroundColor: '#397eb5',height: 70, padding: 0, minWidth: 900}}>
+		    <div className="container-fluid" style={{borderBottom: 'solid 1px #fff', backgroundImage: "url('/static/components/assets/images/AMP_banner_right.png')", backgroundPosition: 'right top', backgroundRepeat: 'no-repeat', height: 70, padding: 0}}>
+		    <div style={{borderBottom: 'solid 1px #fff', backgroundImage: "url('/static/components/assets/images/AMP_banner_left.png')", backgroundPosition: 'left top',backgroundRepeat: 'no-repeat', color: '#fff', padding: '15px 0 0 20px',height: 70, fontSize: 30, fontWeight: 200, letterSpacing: '0.01em'}}>
+		    ACCELERATING MEDICINES PARTNERSHIP (AMP)
+		    </div>
+		    </div>
+		    </div>
+		    </div>
+		    );
+	}
+    });
+
 
 
 // Main navigation menus

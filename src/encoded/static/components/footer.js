@@ -45,7 +45,6 @@ var Footer = createReactClass({
                                 <ul className="footer-logos">
                                 <li><a href="/"><img src="/static/img/logo.png" alt="T2DREAM" id="t2dream-logo" height="55px" width="130px" /></a></li>
                                 <li><a href="http://www.ucsd.edu"><img src="/static/img/UCSanDiegoLogo-BlueGold.png" alt="UC San Diego" id="ucsd-logo" width="130px" height="40px" /></a></li>
-                                <li><a href="https://www.niddk.nih.gov"><img src="/static/img/niddk.png" alt="NIDDK" id="niddk-logo" width="120px" height="60px" /></a></li>
                                 </ul>
                             </div>
                         </div>
