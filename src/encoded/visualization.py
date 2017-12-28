@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 # NOTE: Caching is turned on and off with this global AND TRACKHUB_CACHING in peak_indexer.py
-USE_CACHE = False  # Use elasticsearch caching of individual acc_composite blobs
+USE_CACHE = True  # Use elasticsearch caching of individual acc_composite blobs
 
 
 _ASSEMBLY_MAPPER = {
@@ -1149,7 +1149,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
 
     # second pass once all rep_techs are known
     if host is None:
-        host ="https://www.t2depigenome.org"
+        host ="https://t2depigenome.org"
     for view_tag in composite["view"].get("group_order", []):
         view = composite["view"]["groups"][view_tag]
         output_types = view.get("output_type", [])
@@ -1653,9 +1653,9 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
         return {}
 
     if request:
-        host = request.host_url
+        host = "https://t2depigenome.org"
     else:
-        host = ""
+        host = "https://t2depigenome.org"
     # {
     # "hub_description": { ... },  similar to hub.txt/genome.txt
     # "datasets": { ... },         one per experiment, contains "browser" objects, one per track
@@ -1890,7 +1890,7 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
             #           (len(results),(time.time() - PROFILE_START_TIME)))
         host=request.host_url
         if host is None or host.find("localhost") > -1:
-            host = "https://www.t2depigenome.org"
+            host = "https://t2depigenome.org"
 
         acc_composite = make_acc_composite(dataset, assembly, host=host, hide=hide)
         if USE_CACHE:
@@ -1988,7 +1988,8 @@ def generate_batch_trackDb(request, hide=False, regen=False):
     path = '/%s/?%s' % (view, urlencode(params, True))
     results = request.embed(path, as_user=True)['@graph']
     if not USE_CACHE:
-        accs = [result['accession'] for result in results]
+        log.debug("len(results) = %d   %.3f secs" %
+                  (len(results), (time.time() - PROFILE_START_TIME)))
     else:
         # Note: better memory usage to get acc array from non-embedded results,
         # since acc_composites should be in cache
