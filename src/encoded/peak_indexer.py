@@ -3,7 +3,6 @@ import io
 import gzip
 import csv
 import logging
-import pprint
 import collections
 from pyramid.view import view_config
 from sqlalchemy.sql import text
@@ -24,8 +23,7 @@ import copy
 
 SEARCH_MAX = 99999  # OutOfMemoryError if too high
 log = logging.getLogger(__name__)
-#log.setLevel(logging.DEBUG)                                                                                                                                                         
-log.setLevel(logging.INFO)
+
 
 # hashmap of assays and corresponding file types that are being indexed
 _INDEXED_DATA = {
@@ -140,10 +138,16 @@ def index_peaks(uuid, request):
     # Index human data for now
     if assembly not in _ASSEMBLIES:
         return
+<<<<<<< HEAD
     assay_term_name = get_assay_term_name(context['dataset'], request)
     if assay_term_name is None or isinstance(assay_term_name, collections.Hashable) is False:
         return
+=======
+>>>>>>> parent of 2df7deb... working annotation region search and logs
 
+    assay_term_name = get_assay_term_name(context['dataset'], request)
+    if assay_term_name is None or isinstance(assay_term_name, collections.Hashable) is False:
+        return
 
     flag = False
 
