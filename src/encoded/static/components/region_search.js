@@ -132,7 +132,11 @@ var AdvSearch = createReactClass({
                         <input type="hidden" name="annotation" value={this.state.terms['annotation']} />
                         <div className="form-group">
 <<<<<<< HEAD
+<<<<<<< HEAD
 	                 <label>Enter any one of human Gene name, Symbol, Synonyms, Gene ID, HGNC ID, coordinates, rsid, Ensemble ID</label>
+=======
+                            <label>Enter any one of human Gene name, Symbol, Synonyms, Gene ID, HGNC ID, coordinates, rsid, Ensemble ID</label>
+>>>>>>> parent of 2df7deb... working annotation region search and logs
 =======
                             <label>Enter any one of human Gene name, Symbol, Synonyms, Gene ID, HGNC ID, coordinates, rsid, Ensemble ID</label>
 >>>>>>> parent of 2df7deb... working annotation region search and logs

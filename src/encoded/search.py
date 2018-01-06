@@ -524,6 +524,10 @@ def search_result_actions(request, doc_types, es_results, position=None):
     # batch download disabled for region-search results
     if '/region-search/' not in request.url:
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        #if (doc_types == ['Experiment'] or doc_types == ['Annotation']) and any(
+>>>>>>> parent of 2df7deb... working annotation region search and logs
 =======
         #if (doc_types == ['Experiment'] or doc_types == ['Annotation']) and any(
 >>>>>>> parent of 2df7deb... working annotation region search and logs

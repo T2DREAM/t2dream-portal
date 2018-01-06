@@ -139,9 +139,12 @@ def index_peaks(uuid, request):
     if assembly not in _ASSEMBLIES:
         return
 <<<<<<< HEAD
+<<<<<<< HEAD
     assay_term_name = get_assay_term_name(context['dataset'], request)
     if assay_term_name is None or isinstance(assay_term_name, collections.Hashable) is False:
         return
+=======
+>>>>>>> parent of 2df7deb... working annotation region search and logs
 =======
 >>>>>>> parent of 2df7deb... working annotation region search and logs
 

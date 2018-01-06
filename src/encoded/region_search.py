@@ -40,8 +40,13 @@ _FACETS = [
     ('target.label', {'title': 'Target'}),
     ('replicates.library.biosample.donor.organism.scientific_name', {
 <<<<<<< HEAD
+<<<<<<< HEAD
             'title': 'Organism'
             }),
+=======
+        'title': 'Organism'
+    }),
+>>>>>>> parent of 2df7deb... working annotation region search and logs
 =======
         'title': 'Organism'
     }),
@@ -349,6 +354,10 @@ def region_search(context, request):
     file_uuids = list(set(file_uuids))
     result['notification'] = 'No results found'
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of 2df7deb... working annotation region search and logs
 =======
 
 >>>>>>> parent of 2df7deb... working annotation region search and logs
@@ -367,7 +376,10 @@ def region_search(context, request):
         query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Experiment'])
         schemas = (types[item_type].schema for item_type in ['Experiment'])
 <<<<<<< HEAD
+<<<<<<< HEAD
         #log.warn(query)
+=======
+>>>>>>> parent of 2df7deb... working annotation region search and logs
 =======
 >>>>>>> parent of 2df7deb... working annotation region search and logs
         es_results = es.search(
