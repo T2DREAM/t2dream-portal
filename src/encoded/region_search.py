@@ -16,7 +16,6 @@ import requests
 from urllib.parse import urlencode
 
 import logging
-import pprint
 import re
 
 
@@ -40,8 +39,13 @@ _FACETS = [
     ('biosample_term_name', {'title': 'Biosample term'}),
     ('target.label', {'title': 'Target'}),
     ('replicates.library.biosample.donor.organism.scientific_name', {
+<<<<<<< HEAD
             'title': 'Organism'
             }),
+=======
+        'title': 'Organism'
+    }),
+>>>>>>> parent of 2df7deb... working annotation region search and logs
     ('organ_slims', {'title': 'Organ'}),
     ('assembly', {'title': 'Genome assembly'}),
     ('files.file_type', {'title': 'Available data'})
@@ -344,6 +348,10 @@ def region_search(context, request):
             file_uuids.append(hit['_id'])
     file_uuids = list(set(file_uuids))
     result['notification'] = 'No results found'
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of 2df7deb... working annotation region search and logs
 
     # if more than one peak found return the experiments with those peak files
     if len(file_uuids):
@@ -358,11 +366,14 @@ def region_search(context, request):
         used_filters['files.uuid'] = file_uuids
         query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Experiment'])
         schemas = (types[item_type].schema for item_type in ['Experiment'])
+<<<<<<< HEAD
         #log.warn(query)
+=======
+>>>>>>> parent of 2df7deb... working annotation region search and logs
         es_results = es.search(
             body=query, index='snovault', doc_type='experiment', size=size
         )
-        #log.warn(pprint.pformat(es_results))
+
         result['@graph'] = list(format_results(request, es_results['hits']['hits']))
         result['total'] = total = es_results['hits']['total']
         result['facets'] = format_facets(es_results, _FACETS, used_filters, schemas, total, principals)
