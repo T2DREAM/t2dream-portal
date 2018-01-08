@@ -22,6 +22,7 @@ from pkg_resources import resource_filename
 
 import logging
 import boto
+import pprint
 log = logging.getLogger(__name__)
 #log.setLevel(logging.DEBUG)
 log.setLevel(logging.INFO)
@@ -197,6 +198,7 @@ SUPPORTED_MASK_TOKENS = [
                                                 # variable and seems to not be being applied
                                                 # # correctly in the html generation
     "{lab.title}",                              # In metadata
+    "{award.rfa}",
     # TODO "{software? or pipeline?}",  # Cricket: "I am stumbling over the fact that we
     #                                   #    can't distinguish tophat and star produced files"
     # TODO "{phase}",                   # Cricket: "If we get to the point of being fancy
@@ -283,6 +285,8 @@ def lookup_token(token, dataset, a_file=None):
         return term
     elif token == "{lab.title}":
         return dataset['lab'].get('title', 'unknown')
+    elif token == "{award.rna}":
+        return dataset.get['award'].get('rfa','unknown')
     elif token == "{biosample_term_name|multiple}":
         return dataset.get("biosample_term_name", "multiple biosamples")
     # TODO: rna_species
@@ -481,8 +485,8 @@ def lookup_vis_defs(vis_type):
 
 
 PENNANTS = {
-    "T2DREAM":     ("http://www.t2dream-demo.org/static/img/logo.png "
-                  "t2dream-demo.org/ "
+    "T2DREAM":     ("https://www.t2depigenome.org/static/img/logo.png "
+                  "t2depigenome.org/ "
                   "\"This trackhub was automatically generated from the files and metadata found "
                   "at the T2DREAM portal\""),
     "ENCODE":    ("https://www.encodeproject.org/static/img/pennant-encode.png "
@@ -746,7 +750,7 @@ def sanitize_label(s):
     '''Encodes the string to swap special characters and leaves spaces alone.'''
     new_s = ""      # longLabel and shorLabel can have spaces and some special characters
     for c in s:
-        new_s += sanitize_char(c, [' ', '_', '.', '-', '(', ')', '+'], htmlize=True)
+        new_s += sanitize_char(c, [' ', '_', '.', '-', '(', ')', '+'], htmlize=False)
     return new_s
 
 
@@ -1081,7 +1085,6 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
     rep_techs = {}
     files = []
     ucsc_assembly = composite['ucsc_assembly']
-
     # first time through just to get rep_tech
     group_order = composite["view"].get("group_order", [])
     for view_tag in group_order:
@@ -1090,11 +1093,8 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
         file_format_types = view.get("file_format_type", [])
         file_format = view["type"].split()[0]
         if file_format == "bigBed":
+            view["type"] = "bigBed"  # scoreFilter implies score so 6 +
             format_type = view.get('file_format_type','')
-            if format_type == 'bedMethyl' or "itemRgb" in view:
-                view["type"] = "bigBed 9 +"  # itemRgb implies at least 9 +
-            elif format_type in ['broadPeak','narrowPeak'] or "scoreFilter" in view:
-                view["type"] = "bigBed 6 +"  # scoreFilter implies score so 6 +
         # log.debug("%d files looking for type %s" % (len(dataset["files"]),view["type"]))
         for a_file in dataset["files"]:
             if a_file['status'] not in VISIBLE_FILE_STATUSES:
@@ -1149,7 +1149,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
 
     # second pass once all rep_techs are known
     if host is None:
-        host = "http://www.t2dream-demo.org"
+        host ="https://t2depigenome.org"
     for view_tag in composite["view"].get("group_order", []):
         view = composite["view"]["groups"][view_tag]
         output_types = view.get("output_type", [])
@@ -1173,10 +1173,10 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             track["name"] = a_file['accession']
             track["type"] = view["type"]
             typetrack = view["type"]
-            s3path = subprocess.check_output('aws s3 ls s3://t2depi-test-files-upload/2017 --recursive | grep {}.{}  | cut -c 32-' .format(a_file['accession'],view["type"]),shell=True)
+            s3path = subprocess.check_output('aws s3 ls s3://t2depi-files-dev/2017 --recursive | grep {}.{} | cut -c 32-' .format(a_file['accession'],view["type"]),shell=True)
             s3path1 = s3path.decode('ascii')
             s3path_final = s3path1.strip()
-            track["bigDataUrl"] = 'https://s3-us-west-2.amazonaws.com/t2depi-test-files-upload/{}'.format(s3path_final)
+            track["bigDataUrl"] = 'https://s3-us-west-2.amazonaws.com/t2depi-files-dev/{}'.format(s3path_final)
             longLabel = vis_defs.get('file_defs', {}).get('longLabel')
             if longLabel is None:
                 longLabel = ("{assay_title} of {biosample_term_name} {output_type}"
@@ -1653,9 +1653,9 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
         return {}
 
     if request:
-        host = request.host_url
+        host = "https://t2depigenome.org"
     else:
-        host = "http://www.t2dream-demo.org"
+        host = "https://t2depigenome.org"
     # {
     # "hub_description": { ... },  similar to hub.txt/genome.txt
     # "datasets": { ... },         one per experiment, contains "browser" objects, one per track
@@ -1890,7 +1890,7 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
             #           (len(results),(time.time() - PROFILE_START_TIME)))
         host=request.host_url
         if host is None or host.find("localhost") > -1:
-            host = "http://www.t2dream-demo.org"
+            host = "https://t2depigenome.org"
 
         acc_composite = make_acc_composite(dataset, assembly, host=host, hide=hide)
         if USE_CACHE:
@@ -2422,7 +2422,7 @@ def hub(context, request):
         url_end = url_ret[1][1:]            
         text = generate_trackDb(request, embedded, url_end.split('/')[0])
     else:
-        data_policy = ('<br /><a href="http://www.t2dream-demo.org/policy">'
+        data_policy = ('<br /><a href="https://www.t2depigenome.org/policy">'
                        'T2DREAM data use policy</p>')
         text = generate_html(context, request) + data_policy
         content_mime = 'text/html'
