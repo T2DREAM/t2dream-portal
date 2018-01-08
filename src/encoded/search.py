@@ -523,6 +523,7 @@ def search_result_actions(request, doc_types, es_results, position=None):
     # TODO we could enable them for Datasets as well here, but not sure how well it will work
     # batch download disabled for region-search results
     if '/region-search/' not in request.url:
+        #if (doc_types == ['Experiment'] or doc_types == ['Annotation']) and any(
         if (doc_types == ['Experiment']) and any(
                 bucket['doc_count'] > 0
                 for bucket in aggregations['files-file_type']['files-file_type']['buckets']):
@@ -911,7 +912,7 @@ def matrix(context, request):
         raise HTTPBadRequest(explanation=msg)
     schema = type_info.schema
     if type_info.name is 'Annotation':
-        result['title'] = 'Annotation'
+        result['title'] = 'Encyclopedia'
     else:
         result['title'] = type_info.name + ' Matrix'
 
