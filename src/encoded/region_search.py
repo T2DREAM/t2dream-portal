@@ -35,18 +35,8 @@ _REGION_FIELDS = [
 ]
 
 _FACETS = [
-<<<<<<< HEAD
-    ('assay_term_name', {'title': 'Assay'}),
-    ('biosample_term_name', {'title': 'Biosample term'}),
-    ('target.label', {'title': 'Target'}),
-    ('replicates.library.biosample.donor.organism.scientific_name', {
-        'title': 'Organism'
-    }),
-    ('organ_slims', {'title': 'Organ'}),
-=======
     ('annotation_type', {'title': 'Annotation'}),
     ('biosample_term_name', {'title': 'Biosample term'}),    
->>>>>>> parent of 0eaa93c... Region Search reverted
     ('assembly', {'title': 'Genome assembly'}),
     ('files.file_type', {'title': 'Available data'})
 ]
@@ -363,14 +353,9 @@ def region_search(context, request):
         })
         used_filters = set_filters(request, query, result)
         used_filters['files.uuid'] = file_uuids
-<<<<<<< HEAD
-        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Experiment'])
-        schemas = (types[item_type].schema for item_type in ['Experiment'])
-=======
         query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Annotation'])
         schemas = (types[item_type].schema for item_type in ['Annotation'])
         #log.warn(query)
->>>>>>> parent of 0eaa93c... Region Search reverted
         es_results = es.search(
             body=query, index='snovault', doc_type='annotation', size=size
         )

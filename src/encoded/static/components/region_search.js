@@ -131,11 +131,7 @@ var AdvSearch = createReactClass({
                     <form id="panel1" className="adv-search-form" ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1">
                         <input type="hidden" name="annotation" value={this.state.terms['annotation']} />
                         <div className="form-group">
-<<<<<<< HEAD
-                            <label>Enter any one of human Gene name, Symbol, Synonyms, Gene ID, HGNC ID, coordinates, rsid, Ensemble ID</label>
-=======
                             <label>Enter coordinates of variant or rsid</label>
->>>>>>> parent of 0eaa93c... Region Search reverted
                             <div className="input-group input-group-region-input">
                                 <input ref="annotation" defaultValue={region} name="region" type="text" placeholder="Enter Search (e.g.  chr8:118184783-118184783, rs7903146)     
 " className="form-control" onChange={this.handleChange} />

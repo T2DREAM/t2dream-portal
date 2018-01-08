@@ -144,16 +144,8 @@ def index_peaks(uuid, request):
     # Index human data for now
     if assembly not in _ASSEMBLIES:
         return
-<<<<<<< HEAD
-
-    assay_term_name = get_assay_term_name(context['dataset'], request)
-    if assay_term_name is None or isinstance(assay_term_name, collections.Hashable) is False:
-=======
     annotation_type = get_annotation_type(context['dataset'], request)
     if annotation_type is None or isinstance(annotation_type, collections.Hashable) is False:
->>>>>>> parent of 0eaa93c... Region Search reverted
-        return
-
     flag = False
 
     for k, v in _INDEXED_DATA.get(annotation_type, {}).items():
