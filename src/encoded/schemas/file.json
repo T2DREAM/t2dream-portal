@@ -799,6 +799,7 @@
             "comment": "Required property for bam, sam, gtf, gff, bed and bigBed file format files. This property should not be submitted with sra or fastq files.",
             "type": "string",
             "enum": [
+	    	"hg18",
                 "mm9",
                 "mm10",
                 "mm10-minimal",
