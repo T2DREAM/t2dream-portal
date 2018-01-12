@@ -378,6 +378,7 @@
                 "RNA-seq",
                 "DNase-seq",
                 "eCLIP",
+		"GRO-seq",
                 "shRNA knockdown followed by RNA-seq",
                 "RNA Bind-n-Seq",
                 "transcription profiling by array assay",
