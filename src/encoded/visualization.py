@@ -35,6 +35,7 @@ _ASSEMBLY_MAPPER = {
     'GRCh38-minimal': 'hg38',
     'GRCh38': 'hg38',
     'GRCh37': 'hg19',
+    "hg18": 'hg18',
     'mm10-minimal': 'mm10',
     'GRCm38': 'mm10',
     'NCBI37': 'mm9',
@@ -47,6 +48,13 @@ _ASSEMBLY_MAPPER_FULL = {
     'GRCh38':         { 'species':          'Homo sapiens',     'assembly_reference': 'GRCh38',
                         'common_name':      'human',
                         'ucsc_assembly':    'hg38',
+                        'ensembl_host':     'www.ensembl.org',
+                        'quickview':        True,
+                        'comment':          'Ensembl works'
+    },
+    'hg18':         {   'species':          'Homo sapiens',     'assembly_reference': 'GRCh18',
+                        'common_name':      'human',
+                        'ucsc_assembly':    'hg18',
                         'ensembl_host':     'www.ensembl.org',
                         'quickview':        True,
                         'comment':          'Ensembl works'
@@ -157,6 +165,7 @@ ASSEMBLY_MAPPINGS = {
     "hg38":             ["GRCh38", "GRCh38-minimal"],
     "GRCh37":           ["hg19", "GRCh37"],  # Is GRCh37 ever in encoded?
     "hg19":             ["hg19", "GRCh37"],
+    "hg18":             ["hg18"],
     "GRCm38":           ["mm10", "mm10-minimal", "GRCm38"],  # Is GRCm38 ever in encoded?
     "mm10":             ["mm10", "mm10-minimal", "GRCm38"],
     "mm10-minimal":     ["mm10", "mm10-minimal", "GRCm38"],
