@@ -24,6 +24,7 @@ var {Panel, PanelBody, PanelHeading} = panel;
 
 var regionGenomes = [
     {value: 'GRCh37', display: 'hg19'},
+    {value: 'hg18', display: 'hg18'},
     {value: 'GRCh38', display: 'GRCh38'},
     {value: 'GRCm37', display: 'mm9'},
     {value: 'GRCm38', display: 'mm10'}
