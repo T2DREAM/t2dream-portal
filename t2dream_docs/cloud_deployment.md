@@ -37,8 +37,9 @@ Login to instance to check status of installation:
 ssh ubuntu@ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com
 
 View progress:
+```
 tail -f /var/log/cloud-init-output.log
-
+```
 Server should automatically reboot after installation is complete
 
 Going to the URL http://ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com should return the homepage, although without the initial splash page
