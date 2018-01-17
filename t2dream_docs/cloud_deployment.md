@@ -47,4 +47,4 @@ Going to the URL http://ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com shoul
 
 **Loading data from Wal-Backup**
 
-Refer to the
+Refer to [Wal-retrival document](https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/database-backup-retrievals.md) to load either LATEST backedup data or roll back to previous backup versions.
