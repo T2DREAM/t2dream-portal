@@ -799,7 +799,7 @@ def add_to_es(request, comp_id, composite):
     if not es:
         return
     if not es.indices.exists(index):
-        es.indices.create(index=index, body={'index': {'number_of_shards': 1, 'max_result_window': 99999 }}, wait_for_active_shards=1))
+        es.indices.create(index=index, body={'index': {'number_of_shards': 1, 'max_result_window': 99999 }}, wait_for_active_shards=1)
         mapping = {'default': {"enabled": False}}
         es.indices.put_mapping(index=index, doc_type='default', body=mapping)
         log.debug("created %s index" % index)
