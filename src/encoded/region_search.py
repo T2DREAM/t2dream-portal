@@ -93,18 +93,17 @@ def get_peak_query(start, end, with_inner_hits=False, within_peaks=False):
     """
     query = {
         'query': {
-            'filtered': {
+            'bool': {
                 'filter': {
                     'nested': {
                         'path': 'positions',
-                        'filter': {
+                        'query': {
                             'bool': {
                                 'should': []
                             }
                         }
                     }
-                },
-                '_cache': True,
+                }
             }
         },
         '_source': False,
@@ -128,9 +127,9 @@ def get_peak_query(start, end, with_inner_hits=False, within_peaks=False):
         }
     }
     for key, value in search_ranges.items():
-        query['query']['filtered']['filter']['nested']['filter']['bool']['should'].append(get_bool_query(value['start'], value['end']))
+        query['query']['bool']['filter']['nested']['query']['bool']['should'].append(get_bool_query(value['start'], value['end']))
     if with_inner_hits:
-        query['query']['filtered']['filter']['nested']['inner_hits'] = {'size': 99999}
+        query['query']['bool']['filter']['nested']['inner_hits'] = {'size': 99999}
     return query
 
 
@@ -346,7 +345,7 @@ def region_search(context, request):
     if len(file_uuids):
         query = get_filtered_query('', [], set(), principals, ['Annotation'])
         del query['query']
-        query['filter']['and']['filters'].append({
+        query['post_filter']['bool']['must'].append({
             'terms': {
                 'embedded.files.uuid': file_uuids
             }
@@ -356,7 +355,7 @@ def region_search(context, request):
         query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Annotation'])
         schemas = (types[item_type].schema for item_type in ['Annotation'])
         es_results = es.search(
-            body=query, index='snovault', doc_type='annotation', size=size
+            body=query, index='annotation', doc_type='annotation', size=size
         )
 
         result['@graph'] = list(format_results(request, es_results['hits']['hits']))
@@ -390,22 +389,24 @@ def suggest(context, request):
     es = request.registry[ELASTIC_SEARCH]
     query = {
         "suggester": {
-            "text": text,
-            "completion": {
-                "field": "name_suggest",
-                "size": 100
+            "default-suggest": {
+                "text": text,
+                "completion": {
+                    "field": "name_suggest",
+                    "size": 100
+                    }
+                }
             }
         }
-    }
     try:
-        results = es.suggest(index='annotations', body=query)
+        results = es.search(index='annotations', body=query)
     except:
         return result
     else:
         result['@id'] = '/suggest/?' + urlencode({'genome': requested_genome, 'q': text}, ['q','genome'])
         result['@graph'] = []
-        for item in results['suggester'][0]['options']:
-            if _GENOME_TO_SPECIES[requested_genome].replace('_', ' ') == item['payload']['species']:
+        for item in results['suggest']['default-suggest'][0]['options']:
+            if _GENOME_TO_SPECIES[requested_genome].replace('_', ' ') == item['_source']['payload']['species']:
                 result['@graph'].append(item)
         result['@graph'] = result['@graph'][:10]
         return result
