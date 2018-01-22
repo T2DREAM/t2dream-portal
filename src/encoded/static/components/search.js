@@ -319,7 +319,7 @@ var BiosampleComponent = createReactClass({
         } else {
             constructs = result.constructs[0] ? result.constructs[0].target.label : '';
         }
-        const treatment = (result.treatments[0] && result.treatments[0].treatment_term_name) ? result.treatments[0].treatment_term_name : '';
+        const treatment = (result.treatments && result.treatments.length) ? result.treatments[0].treatment_term_name : '';
         const mutatedGenes = result.donor && result.donor.mutated_gene && result.donor.mutated_gene.label;
 
         // Build the text of the synchronization string
@@ -481,7 +481,7 @@ var DatasetComponent =  createReactClass({
         if (seriesDataset) {
             biosampleTerm = (result.biosample_term_name && typeof result.biosample_term_name === 'object' && result.biosample_term_name.length === 1) ? result.biosample_term_name[0] :
                 ((result.biosample_term_name && typeof result.biosample_term_name === 'string') ? result.biosample_term_name : '');
-            const organisms = _.uniq(result.organism && result.organism.length && result.organism.map(resultOrganism => resultOrganism.scientific_name));
+            const organisms = (result.organism && result.organism.length) ? _.uniq(result.organism.map(resultOrganism => resultOrganism.scientific_name)): [];
             if (organisms.length === 1) {
                 organism = organisms[0];
             }
@@ -1409,7 +1409,7 @@ const Search = search.Search = createReactClass({
             <div>
                 {facetdisplay ?
                     <div className="panel data-display main-panel">
-                        <ResultTable {...this.props} key={undefined} searchBase={searchBase} assemblies={assemblies} onChange={this.context.navigate} currentRegion={this.currentRegion} />
+                        <ResultTable {...this.props} searchBase={searchBase} assemblies={assemblies} onChange={this.context.navigate} currentRegion={this.currentRegion} />
                     </div>
                 : <h4>{notification}</h4>}
             </div>
