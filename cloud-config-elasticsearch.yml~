@@ -141,7 +141,7 @@ write_files:
 - path: /etc/elasticsearch/elasticsearch.yml
   content: |
     network.host: 0.0.0.0
-    http.port: 9201
+    http.port: 9200
     transport.tcp.port: 9299
     node.master: false
     node.data: true
