@@ -195,7 +195,7 @@ runcmd:
 - sudo -u postgres ln -s /etc/postgresql/9.3/main/recovery.conf /var/lib/postgresql/9.3/main/
 - /etc/init.d/postgresql start
 - sudo -u encoded python3.4 bootstrap.py --buildout-version 2.9.5 --setuptools-version 18.5
-- sudo -u encoded LANG=en_US.UTF-8 bin/buildout -c %(ROLE)s.cfg production-ini:region_search_instance=localhost:9201
+- sudo -u encoded LANG=en_US.UTF-8 bin/buildout -c %(ROLE)s.cfg production-ini:region_search_instance=localhost:9200
 - sudo -u encoded bin/aws s3 cp --recursive s3://encoded-conf-prod/.aws .aws
 - until sudo -u postgres psql postgres -c ""; do sleep 10; done
 - sudo -u encoded sh -c 'cat /dev/urandom | head -c 256 | base64 > session-secret.b64'
@@ -271,7 +271,7 @@ write_files:
 - path: /etc/elasticsearch/elasticsearch.yml
   content: |
     network.host: 0.0.0.0
-    http.port: 9201
+    http.port: 9200
     transport.tcp.port: 9299
     node.master: true
     node.data: false

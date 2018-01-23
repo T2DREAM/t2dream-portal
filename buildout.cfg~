@@ -86,7 +86,7 @@ output = ${buildout:directory}/production.ini
 accession_factory = encoded.server_defaults.test_accession
 file_upload_bucket = t2depi-files-dev
 blob_bucket = t2depi-blobs-dev
-region_search_instance = localhost:9201
+region_search_instance = localhost:9200
 create_tables = true
 snovault.load_test_data = encoded.loadxl:load_test_data
 
