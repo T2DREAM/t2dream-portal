@@ -1,11 +1,19 @@
 import React from 'react';
+<<<<<<< HEAD
+=======
+import PropTypes from 'prop-types';
+>>>>>>> parent of c6fef83... ES5 update
 import { Panel, PanelHeading, PanelBody } from '../libs/bootstrap/panel';
 import { AuditIndicators, AuditDetail, AuditMixin } from './audit';
 import DataColors from './datacolors';
 import { FetchedData, Param } from './fetched';
 import globals from './globals';
 import { ProjectBadge } from './image';
+<<<<<<< HEAD
 import { PickerActionsMixin } from './search';
+=======
+import { PickerActions } from './search';
+>>>>>>> parent of c6fef83... ES5 update
 import StatusLabel from './statuslabel';
 
 
@@ -113,7 +121,10 @@ function createDoughnutChart(chartId, values, labels, colors, baseSearchUri, nav
                         if (activePoints[0]) { // if click on wrong area, do nothing
                             const clickedElementIndex = activePoints[0]._index;
                             const term = chart.data.labels[clickedElementIndex];
+<<<<<<< HEAD
                             navigate(`${baseSearchUri}${term}`);
+=======
+>>>>>>> parent of c6fef83... ES5 update
                             navigate(`${baseSearchUri}${globals.encodedURIComponent(term)}`);
                         }
                     },
@@ -127,6 +138,7 @@ function createDoughnutChart(chartId, values, labels, colors, baseSearchUri, nav
     });
 }
 
+<<<<<<< HEAD
 
 // Display and handle clicks in the chart of labs.
 const LabChart = React.createClass({
@@ -152,6 +164,13 @@ const LabChart = React.createClass({
     },
 
     createChart: function (chartId, facetData) {
+=======
+
+// Display and handle clicks in the chart of labs.
+class LabChart extends React.Component {
+    // Update existing chart with new data.
+    static updateChart(chart, facetData) {
+>>>>>>> parent of c6fef83... ES5 update
         // Extract the non-zero values, and corresponding labels and colors for the data.
         const values = [];
         const labels = [];
@@ -162,6 +181,7 @@ const LabChart = React.createClass({
             }
         });
         const colors = labels.map((label, i) => labColorList[i % labColorList.length]);
+<<<<<<< HEAD
 
         // Create the chart.
         createDoughnutChart(chartId, values, labels, colors, `${this.props.linkUri}${this.props.award.name}&lab.title=`, (uri) => { this.context.navigate(uri); })
@@ -170,6 +190,30 @@ const LabChart = React.createClass({
                 this.chart = chartInstance;
             });
     },
+=======
+
+        // Update chart data and redraw with the new data
+        chart.data.datasets[0].data = values;
+        chart.data.datasets[0].backgroundColor = colors;
+        chart.data.labels = labels;
+        chart.update();
+    }
+
+    constructor() {
+        super();
+        this.createChart = this.createChart.bind(this);
+    }
+
+    componentDidMount() {
+        this.createChart(`${labChartId}-${this.props.ident}`, this.props.labs);
+    }
+
+    componentDidUpdate() {
+        if (this.chart) {
+            this.constructor.updateChart(this.chart, this.props.labs);
+        }
+    }
+>>>>>>> parent of c6fef83... ES5 update
 
     // Update existing chart with new data.
     updateChart: function (chart, facetData) {
@@ -217,6 +261,7 @@ const LabChart = React.createClass({
     },
 });
 
+<<<<<<< HEAD
 
 // Display and handle clicks in the chart of assays.
 const CategoryChart = React.createClass({
@@ -228,11 +273,20 @@ const CategoryChart = React.createClass({
         categoryFacet: React.PropTypes.string.isRequired, // Add to linkUri to link to matrix facet item
         ident: React.PropTypes.string.isRequired, // Unique identifier to `id` the charts
     },
+=======
+LabChart.propTypes = {
+    award: PropTypes.object.isRequired, // Award being displayed
+    labs: PropTypes.array.isRequired, // Array of labs facet data
+    linkUri: PropTypes.string.isRequired, // Base URI for matrix links
+    ident: PropTypes.string.isRequired, // Unique identifier to `id` the charts
+};
+>>>>>>> parent of c6fef83... ES5 update
 
     contextTypes: {
         navigate: React.PropTypes.func,
     },
 
+<<<<<<< HEAD
     componentDidMount: function () {
         if (this.props.categoryData.length) {
             this.createChart(`${categoryChartId}-${this.props.ident}`, this.props.categoryData);
@@ -248,6 +302,13 @@ const CategoryChart = React.createClass({
     createChart: function (chartId, facetData) {
         const { award, linkUri, categoryFacet } = this.props;
 
+=======
+
+// Display and handle clicks in the chart of assays.
+class CategoryChart extends React.Component {
+    // Update existing chart with new data.
+    static updateChart(chart, facetData) {
+>>>>>>> parent of c6fef83... ES5 update
         // Extract the non-zero values, and corresponding labels and colors for the data.
         const values = [];
         const labels = [];
@@ -259,6 +320,7 @@ const CategoryChart = React.createClass({
         });
         const colors = labels.map((label, i) => typeSpecificColorList[i % typeSpecificColorList.length]);
 
+<<<<<<< HEAD
         // Create the chart.
         createDoughnutChart(chartId, values, labels, colors, `${linkUri}${award.name}&${categoryFacet}=`, (uri) => { this.context.navigate(uri); })
             .then((chartInstance) => {
@@ -266,6 +328,35 @@ const CategoryChart = React.createClass({
                 this.chart = chartInstance;
             });
     },
+=======
+        // Update chart data and redraw with the new data.
+        chart.data.datasets[0].data = values;
+        chart.data.datasets[0].backgroundColor = colors;
+        chart.data.labels = labels;
+        chart.update();
+    }
+
+    constructor() {
+        super();
+
+        this.createChart = this.createChart.bind(this);
+    }
+
+    componentDidMount() {
+        if (this.props.categoryData.length) {
+            this.createChart(`${categoryChartId}-${this.props.ident}`, this.props.categoryData);
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.chart) {
+            this.constructor.updateChart(this.chart, this.props.categoryData);
+        }
+    }
+
+    createChart(chartId, facetData) {
+        const { award, linkUri, categoryFacet } = this.props;
+>>>>>>> parent of c6fef83... ES5 update
 
     // Update existing chart with new data.
     updateChart: function (chart, facetData) {
@@ -313,6 +404,7 @@ const CategoryChart = React.createClass({
     },
 });
 
+<<<<<<< HEAD
 
 // Display and handle clicks in the chart of labs.
 const StatusChart = React.createClass({
@@ -340,6 +432,26 @@ const StatusChart = React.createClass({
     },
 
     createChart: function (chartId, facetData) {
+=======
+CategoryChart.propTypes = {
+    award: PropTypes.object.isRequired, // Award being displayed
+    categoryData: PropTypes.array.isRequired, // Type-specific data to display in a chart
+    title: PropTypes.string.isRequired, // Title to display above the chart
+    linkUri: PropTypes.string.isRequired, // Element of matrix URI to select
+    categoryFacet: PropTypes.string.isRequired, // Add to linkUri to link to matrix facet item
+    ident: PropTypes.string.isRequired, // Unique identifier to `id` the charts
+};
+
+CategoryChart.contextTypes = {
+    navigate: PropTypes.func,
+};
+
+
+// Display and handle clicks in the chart of labs.
+class StatusChart extends React.Component {
+    // Update existing chart with new data.
+    static updateChart(chart, facetData) {
+>>>>>>> parent of c6fef83... ES5 update
         // Extract the non-zero values, and corresponding labels and colors for the data.
         const values = [];
         const labels = [];
@@ -351,6 +463,7 @@ const StatusChart = React.createClass({
         });
         const colors = labels.map((label, i) => statusColorList[i % statusColorList.length]);
 
+<<<<<<< HEAD
         // Create the chart.
         createDoughnutChart(chartId, values, labels, colors, `${this.props.linkUri}${this.props.award.name}&status=`, (uri) => { this.context.navigate(uri); })
             .then((chartInstance) => {
@@ -361,6 +474,33 @@ const StatusChart = React.createClass({
 
     // Update existing chart with new data.
     updateChart: function (chart, facetData) {
+=======
+        // Update chart data and redraw with the new data
+        chart.data.datasets[0].data = values;
+        chart.data.datasets[0].backgroundColor = colors;
+        chart.data.labels = labels;
+        chart.update();
+    }
+
+    constructor() {
+        super();
+        this.createChart = this.createChart.bind(this);
+    }
+
+    componentDidMount() {
+        if (this.props.statuses.length) {
+            this.createChart(`${statusChartId}-${this.props.ident}`, this.props.statuses);
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.chart) {
+            this.constructor.updateChart(this.chart, this.props.statuses);
+        }
+    }
+
+    createChart(chartId, facetData) {
+>>>>>>> parent of c6fef83... ES5 update
         // Extract the non-zero values, and corresponding labels and colors for the data.
         const values = [];
         const labels = [];
@@ -372,6 +512,7 @@ const StatusChart = React.createClass({
         });
         const colors = labels.map((label, i) => statusColorList[i % statusColorList.length]);
 
+<<<<<<< HEAD
         // Update chart data and redraw with the new data
         chart.data.datasets[0].data = values;
         chart.data.datasets[0].backgroundColor = colors;
@@ -380,6 +521,17 @@ const StatusChart = React.createClass({
     },
 
     render: function () {
+=======
+        // Create the chart.
+        createDoughnutChart(chartId, values, labels, colors, `${this.props.linkUri}${this.props.award.name}&status=`, (uri) => { this.context.navigate(uri); })
+            .then((chartInstance) => {
+                // Save the created chart instance.
+                this.chart = chartInstance;
+            });
+    }
+
+    render() {
+>>>>>>> parent of c6fef83... ES5 update
         const { statuses, ident } = this.props;
 
         // Calculate a (hopefully) unique ID to put on the DOM elements.
@@ -387,7 +539,11 @@ const StatusChart = React.createClass({
 
         return (
             <div className="award-charts__chart">
+<<<<<<< HEAD
                 <div className="title">
+=======
+                <div className="award-charts__title">
+>>>>>>> parent of c6fef83... ES5 update
                     Status
                 </div>
                 {statuses.length ?
@@ -402,6 +558,7 @@ const StatusChart = React.createClass({
                 }
             </div>
         );
+<<<<<<< HEAD
     },
 });
 
@@ -431,6 +588,32 @@ const ChartRenderer = React.createClass({
     //   uriBase: URI to search for data for the charts
     //   linkUri: URI base to link to matrix
     searchData: {
+=======
+    }
+}
+
+StatusChart.propTypes = {
+    award: PropTypes.object.isRequired, // Award being displayed
+    statuses: PropTypes.array, // Array of status facet data
+    linkUri: PropTypes.string.isRequired, // URI to use for matrix links
+    ident: PropTypes.string.isRequired, // Unique identifier to `id` the charts
+};
+
+StatusChart.defaultProps = {
+    statuses: [],
+};
+
+StatusChart.contextTypes = {
+    navigate: PropTypes.func,
+};
+
+
+const ChartRenderer = (props) => {
+    const { award, experiments, annotations } = props;
+
+    // Put all search-related configuration data in one consistent place.
+    const searchData = {
+>>>>>>> parent of c6fef83... ES5 update
         experiments: {
             ident: 'experiments',
             data: [],
@@ -453,6 +636,7 @@ const ChartRenderer = React.createClass({
             uriBase: '/search/?type=Annotation&award.name=',
             linkUri: '/matrix/?type=Annotation&award.name=',
         },
+<<<<<<< HEAD
     },
 
     render: function () {
@@ -557,10 +741,136 @@ const AwardCharts = React.createClass({
             chartSource: {}, // Element of `this.chartSource` that generated the data in `awardData`.
         };
     },
+=======
+    };
+
+    // Find the chart data in the returned facets.
+    const experimentsConfig = searchData.experiments;
+    const annotationsConfig = searchData.annotations;
+    searchData.experiments.data = (experiments && experiments.facets) || [];
+    searchData.annotations.data = (annotations && annotations.facets) || [];
+    ['experiments', 'annotations'].forEach((chartCategory) => {
+        if (searchData[chartCategory].data.length) {
+            // Get the array of lab data.
+            const labFacet = searchData[chartCategory].data.find(facet => facet.field === 'lab.title');
+            searchData[chartCategory].labs = (labFacet && labFacet.terms && labFacet.terms.length) ? labFacet.terms.sort((a, b) => (a.key < b.key ? -1 : (a.key > b.key ? 1 : 0))) : [];
+
+            // Get the array of data specific to experiments or annotations.
+            const categoryFacet = searchData[chartCategory].data.find(facet => facet.field === searchData[chartCategory].categoryFacet);
+            searchData[chartCategory].categoryData = (categoryFacet && categoryFacet.terms && categoryFacet.terms.length) ? categoryFacet.terms : [];
+
+            // Get the array of status data.
+            const statusFacet = searchData[chartCategory].data.find(facet => facet.field === 'status');
+            searchData[chartCategory].statuses = (statusFacet && statusFacet.terms && statusFacet.terms.length) ? statusFacet.terms : [];
+        }
+    });
+
+    return (
+        <div className="award-charts">
+            <div className="award-chart__group-wrapper">
+                <h2>Assays</h2>
+                {experimentsConfig.labs.length ?
+                    <div className="award-chart__group">
+                        <LabChart
+                            award={award}
+                            labs={experimentsConfig.labs}
+                            linkUri={experimentsConfig.linkUri}
+                            ident={experimentsConfig.ident}
+                        />
+                        <CategoryChart
+                            award={award}
+                            categoryData={experimentsConfig.categoryData || []}
+                            title={experimentsConfig.title}
+                            linkUri={experimentsConfig.linkUri}
+                            categoryFacet={experimentsConfig.categoryFacet}
+                            ident={experimentsConfig.ident}
+                        />
+                        <StatusChart
+                            award={award}
+                            statuses={experimentsConfig.statuses || []}
+                            linkUri={experimentsConfig.linkUri}
+                            ident={experimentsConfig.ident}
+                        />
+                    </div>
+                :
+                    <div className="browser-error">No assays were submitted under this award</div>
+                }
+            </div>
+            <div className="award-chart__group-wrapper">
+                <h2>Annotations</h2>
+                {annotationsConfig.labs.length ?
+                    <div className="award-chart__group">
+                        <LabChart
+                            award={award}
+                            labs={annotationsConfig.labs}
+                            linkUri={annotationsConfig.linkUri}
+                            ident={annotationsConfig.ident}
+                        />
+                        <CategoryChart
+                            award={award}
+                            categoryData={annotationsConfig.categoryData || []}
+                            linkUri={annotationsConfig.linkUri}
+                            categoryFacet={annotationsConfig.categoryFacet}
+                            title={annotationsConfig.title}
+                            ident={annotationsConfig.ident}
+                        />
+                        <StatusChart
+                            award={award}
+                            statuses={annotationsConfig.statuses || []}
+                            linkUri={annotationsConfig.linkUri}
+                            ident={annotationsConfig.ident}
+                        />
+                    </div>
+                :
+                    <div className="browser-error">No annotations were submitted under this award</div>
+                }
+            </div>
+        </div>
+    );
+};
+
+ChartRenderer.propTypes = {
+    award: PropTypes.object.isRequired, // Award being displayed
+    experiments: PropTypes.object, // Search result of matching experiments
+    annotations: PropTypes.object, // Search result of matching annotations
+};
+
+ChartRenderer.defaultProps = {
+    experiments: {},
+    annotations: {},
+};
+
+
+// Overall component to render the award charts
+const AwardCharts = (props) => {
+    const { award } = props;
+
+    return (
+        <Panel>
+            <PanelHeading>
+                <h4>{award.pi && award.pi.lab ? <span>{award.pi.lab.title}</span> : <span>No PI indicated</span>}</h4>
+                <ProjectBadge award={award} addClasses="badge-heading" />
+            </PanelHeading>
+            <PanelBody>
+                <FetchedData ignoreErrors>
+                    <Param name="experiments" url={`/search/?type=Experiment&award.name=${award.name}`} />
+                    <Param name="annotations" url={`/search/?type=Annotation&award.name=${award.name}`} />
+                    <ChartRenderer award={award} />
+                </FetchedData>
+            </PanelBody>
+        </Panel>
+    );
+};
+
+AwardCharts.propTypes = {
+    award: PropTypes.object.isRequired, // Award represented by this chart
+};
+>>>>>>> parent of c6fef83... ES5 update
 
     render: function () {
         const { award } = this.props;
 
+<<<<<<< HEAD
         return (
             <Panel>
                 <PanelHeading>
@@ -630,8 +940,82 @@ const Award = React.createClass({
 });
 
 globals.content_views.register(Award, 'Award');
+=======
+const Award = (props) => {
+    const { context } = props;
+    const statuses = [{ status: context.status, title: 'Status' }];
+
+    return (
+        <div className={globals.itemClass(context, 'view-item')}>
+            <header className="row">
+                <div className="col-sm-12">
+                    <h2>{context.title || context.name}</h2>
+                    <div className="status-line">
+                        <div className="characterization-status-labels">
+                            <StatusLabel status={statuses} />
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <AwardCharts award={context} />
+
+            <Panel>
+                <PanelHeading>
+                    <h4>Description</h4>
+                </PanelHeading>
+                <PanelBody>
+                    {context.url ?
+                        <div>
+                            <strong>NHGRI project information: </strong><a href={context.url} title={`${context.name} project page at NHGRI`}>{context.name}</a>
+                            <hr />
+                        </div>
+                    : null}
+                    {context.description ?
+                        <div className="two-column-long-text two-column-long-text--gap">
+                            <p>{context.description}</p>
+                        </div>
+                    :
+                        <p className="browser-error">Award has no description</p>
+                    }
+                </PanelBody>
+            </Panel>
+        </div>
+    );
+};
+
+Award.propTypes = {
+    context: PropTypes.object.isRequired, // Award object being rendered
+};
+
+globals.content_views.register(Award, 'Award');
 
 
+const Listing = (props) => {
+    const result = props.context;
+    return (
+        <li>
+            <div className="clearfix">
+                <PickerActions {...props} />
+                <div className="pull-right search-meta">
+                    <p className="type meta-title">Award</p>
+                    <p className="type">{` ${result.name}`}</p>
+                    <p className="type meta-status">{` ${result.status}`}</p>
+                </div>
+                <div className="accession">
+                    <a href={result['@id']}>{result.title}</a>
+                </div>
+                <div className="data-row">
+                    <div><strong>Project / RFA: </strong>{result.project} / {result.rfa}</div>
+                </div>
+            </div>
+        </li>
+    );
+};
+>>>>>>> parent of c6fef83... ES5 update
+
+
+<<<<<<< HEAD
 const Listing = React.createClass({
     propTypes: {
         context: React.PropTypes.object, // Object whose search result we're displaying
@@ -663,4 +1047,6 @@ const Listing = React.createClass({
         );
     },
 });
+=======
+>>>>>>> parent of c6fef83... ES5 update
 globals.listing_views.register(Listing, 'Award');

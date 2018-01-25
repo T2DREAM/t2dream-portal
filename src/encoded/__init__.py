@@ -177,16 +177,12 @@ def app_version(config):
     import hashlib
     import os
     import subprocess
-    try:
-        version = subprocess.check_output(
-            ['git', '-C', os.path.dirname(__file__), 'describe']).decode('utf-8').strip()
-        diff = subprocess.check_output(
-            ['git', '-C', os.path.dirname(__file__), 'diff', '--no-ext-diff'])
-        if diff:
-            version += '-patch' + hashlib.sha1(diff).hexdigest()[:7]
-    except:
-        # Travis can't run git describe without crashing
-        version = 'version_test'
+    version = subprocess.check_output(
+        ['git', '-C', os.path.dirname(__file__), 'describe']).decode('utf-8').strip()
+    diff = subprocess.check_output(
+        ['git', '-C', os.path.dirname(__file__), 'diff', '--no-ext-diff'])
+    if diff:
+        version += '-patch' + hashlib.sha1(diff).hexdigest()[:7]
     config.registry.settings['snovault.app_version'] = version
 
 

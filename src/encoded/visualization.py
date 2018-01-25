@@ -794,25 +794,38 @@ def sanitize_name(s):
 
 def add_to_es(request, comp_id, composite):
     '''Adds a composite json blob to elastic-search'''
-    index = "vis_composite"
+    key = "vis_composite"
     es = request.registry.get(ELASTIC_SEARCH, None)
     if not es:
         return
+<<<<<<< HEAD
     if not es.indices.exists(index):
         es.indices.create(index=index, body={'index': {'number_of_shards': 1, 'max_result_window': 99999 }}, wait_for_active_shards=1)
         mapping = {'default': {"enabled": False}}
         es.indices.put_mapping(index=index, doc_type='default', body=mapping)
         log.debug("created %s index" % index)
     es.index(index=index, doc_type='default', body=composite, id=comp_id)
+=======
+    if not es.indices.exists(key):
+        es.indices.create(index=key, body={'index': {'number_of_shards': 1}})
+        mapping = {'default': {"_all":    {"enabled": False},
+                               "_source": {"enabled": True},
+                               # "_id":     {"index": "not_analyzed", "store": True},
+                               # "_ttl":    {"enabled": True, "default": "1d"},
+                               }}
+        es.indices.put_mapping(index=key, doc_type='default', body=mapping)
+        log.debug("created %s index" % key)
+    es.index(index=key, doc_type='default', body=composite, id=comp_id)
+>>>>>>> parent of c6fef83... ES5 update
 
 
 def get_from_es(request, comp_id):
     '''Returns composite json blob from elastic-search, or None if not found.'''
-    index = "vis_composite"
+    key = "vis_composite"
     es = request.registry.get(ELASTIC_SEARCH, None)
-    if es and es.indices.exists(index):
+    if es and es.indices.exists(key):
         try:
-            result = es.get(index=index, doc_type='default', id=comp_id)
+            result = es.get(index=key, doc_type='default', id=comp_id)
             return result['_source']
         except:
             pass
@@ -821,12 +834,12 @@ def get_from_es(request, comp_id):
 
 def search_es(request, ids):
     '''Returns a list of composites from elastic-search, or None if not found.'''
-    index = "vis_composite"
+    key = "vis_composite"
     es = request.registry.get(ELASTIC_SEARCH, None)
-    if es and es.indices.exists(index):
+    if es and es.indices.exists(key):
         try:
             query = {"query": {"ids": {"values": ids}}}
-            res = es.search(body=query, index=index, doc_type='default', size=99999)  # size=200?
+            res = es.search(body=query, index=key, doc_type='default', size=99999)  # size=200?
             hits = res.get("hits", {}).get("hits", [])
             results = {}
             for hit in hits:

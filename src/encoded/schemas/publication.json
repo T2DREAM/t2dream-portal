@@ -286,7 +286,7 @@
     },
     "sort_by": {
         "publication_year": {
-            "unmapped_type": "keyword",
+            "ignore_unmapped": true,
             "order": "desc",
             "missing": "_last" 
         }

@@ -22,10 +22,15 @@ def json_from_path(path, default=None):
 def index_settings():
     return {
         'index': {
+<<<<<<< HEAD
             'number_of_shards': 1,
             'max_result_window': 99999
         },
         'analysis.analyzer': 'standard'
+=======
+            'number_of_shards': 1
+        }
+>>>>>>> parent of c6fef83... ES5 update
     }
 
 
@@ -40,8 +45,11 @@ def run(app):
 
     mapping = {
         'properties': {
-            'suggest': {
+            'name_suggest': {
                 'type': 'completion',
+                'index_analyzer': 'standard',
+                'search_analyzer': 'standard',
+                'payloads': True
             }
         }
     }

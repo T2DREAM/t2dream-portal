@@ -1935,7 +1935,7 @@ const FileDetailView = function (node, qcClick, auditIndicators, auditDetail, se
                         </div>
                     : null}
 
-                    {selectedFile.analysis_step_version && selectedFile.analysis_step_version.software_versions && selectedFile.analysis_step_version.software_versions.length ?
+                    {selectedFile.analysis_step_version ?
                         <div data-test="software">
                             <dt>Software</dt>
                             <dd>{softwareVersionList(selectedFile.analysis_step_version.software_versions)}</dd>
