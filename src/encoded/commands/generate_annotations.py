@@ -25,7 +25,7 @@ def get_annotation():
 
 def rate_limited_request(url):
     response = requests.get(url)
-    if int(response.headers.get('X-RateLimit-Remaining')) < 2:
+    if int(response.headers.get('X-RateLimit-Remaining')) < mp.cpu_count():
         print('spleeping for about {} seconds'.format(response.headers.get('X-RateLimit-Reset')))
         time.sleep(int(float(response.headers.get('X-RateLimit-Reset'))) + 1)
     return response.json()
@@ -59,25 +59,23 @@ def human_single_annotation(r):
         # Ensembl ID is used to grab annotations for different references
         if 'Ensembl Gene ID' not in r:
             return
-        if not r['Ensembl Gene ID']:
+        elif r['Ensembl Gene ID'] is None:
             return
 
         # Annotations are keyed by Gene ID in ES
         if 'Entrez Gene ID' not in r:
             return
-        if not r['Entrez Gene ID']:
-            return
 
         # Assumption: payload.id and id should always be same
         doc = {'annotations': []}
-        doc['suggest'] = {
+        doc['name_suggest'] = {
             'input': [r['Approved Name'] + species,
                       r['Approved Symbol'] + species,
                       r['HGNC ID'],
-                      r['Entrez Gene ID'] + ' (Gene ID)']
-            }
-        doc['payload'] = {'id': r['HGNC ID'],
-                          'species': species_for_payload}
+                      r['Entrez Gene ID'] + ' (Gene ID)'],
+            'payload': {'id': r['HGNC ID'],
+                        'species': species_for_payload}
+        }
         doc['id'] = r['HGNC ID']
 
         if r['Entrez Gene ID'].isdigit():
@@ -86,7 +84,7 @@ def human_single_annotation(r):
         # Adding gene synonyms to autocomplete
         if r['Synonyms'] is not None and r['Synonyms'] != '':
             synonyms = [x.strip(' ') + species for x in r['Synonyms'].split(',')]
-            doc['suggest']['input'] = doc['suggest']['input'] + synonyms
+            doc['name_suggest']['input'] = doc['name_suggest']['input'] + synonyms
 
         url = '{ensembl}lookup/id/{id}?content-type=application/json'.format(
             ensembl=_ENSEMBL_URL,
@@ -138,18 +136,18 @@ def mouse_single_annotation(r):
     doc = {'annotations': []}
     species = ' (mus musculus)'
     species_for_payload = re.split('[(|)]', species)[1]
-    doc['suggest'] = {
-        'input': []
-        }
-        doc['payload']: {'id': r['Ensembl Gene ID'],
+    doc['name_suggest'] = {
+        'input': [],
+        'payload': {'id': r['Ensembl Gene ID'],
                     'species': species_for_payload}
+    }
     doc['id'] = r['Ensembl Gene ID']
 
     if 'MGI symbol' in r and r['MGI symbol'] is not None:
-        doc['suggest']['input'].append(r['MGI symbol'] + species)
+        doc['name_suggest']['input'].append(r['MGI symbol'] + species)
 
     if 'MGI ID' in r and r['MGI ID'] is not None:
-        doc['suggest']['input'].append(r['MGI ID'] + species)
+        doc['name_suggest']['input'].append(r['MGI ID'] + species)
 
     doc['annotations'].append({
         'assembly_name': 'GRCm38',
@@ -209,8 +207,7 @@ def human_annotations(human_file):
     Generates JSON from TSV files
     """
     zipped_rows = get_rows_from_file(human_file, '\r')
-    # Too many processes causes the http requests causes the remote to respond with error
-    pool = mp.Pool(processes=1)
+    pool = mp.Pool()
     annotations = pool.map(human_single_annotation, zipped_rows)
     return prepare_for_bulk_indexing(annotations)
 
@@ -221,8 +218,7 @@ def mouse_annotations(mouse_file):
     Updates and get JSON file for mouse annotations
     """
     zipped_rows = get_rows_from_file(mouse_file, '\n')
-    # Too many processes causes the http requests causes the remote to respond with error
-    pool = mp.Pool(processes=1)
+    pool = mp.Pool()
     annotations = pool.map(mouse_single_annotation, zipped_rows)
     return prepare_for_bulk_indexing(annotations)
 
@@ -248,9 +244,11 @@ def other_annotations(file, species, assembly):
         doc = {'annotations': []}
         annotation = get_annotation()
 
-        doc['suggest'] = {'input': [r['Associated Gene Name'] + species]}
-        doc['payload'] = {'id': r['Ensembl Gene ID'],
+        doc['name_suggest'] = {
+            'input': [r['Associated Gene Name'] + species],
+            'payload': {'id': r['Ensembl Gene ID'],
                         'species': species_for_payload}
+        }
         doc['id'] = r['Ensembl Gene ID']
         annotation['assembly_name'] = assembly
         annotation['chromosome'] = r['Chromosome Name']
@@ -276,15 +274,14 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(
         description="Generate annotations JSON file for multiple species",
-        epilog=EPILOG, 
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=EPILOG, formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     human = human_annotations(_HGNC_FILE)
     mouse = mouse_annotations(_MOUSE_FILE)
     annotations = human + mouse
 
     # Create annotations JSON file
-    with open('annotations_local.json', 'w') as outfile:
+    with open('annotations.json', 'w') as outfile:
         json.dump(annotations, outfile)
 
 

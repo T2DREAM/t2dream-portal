@@ -68,7 +68,8 @@ def get_mapping(assembly_name='hg19'):
             },
             'properties': {
                 'uuid': {
-                    'type': 'keyword',
+                    'type': 'string',
+                    'index': 'not_analyzed'
                 },
                 'positions': {
                     'type': 'nested',
@@ -89,8 +90,7 @@ def get_mapping(assembly_name='hg19'):
 def index_settings():
     return {
         'index': {
-            'number_of_shards': 1,
-            'max_result_window': 99999,
+            'number_of_shards': 1
         }
     }
 
@@ -263,26 +263,24 @@ def index_file(request):
         if txn_count == 0:
             return result
 
-        es.indices.refresh(index='_all')
-        res = es.search(index='_all', size=SEARCH_MAX, body={
-            'query': {
-                    'bool': {
-                        'should': [
-                            {
-                                'terms': {
-                                    'embedded_uuids': updated,
-                                    '_cache': False,
-                                    },
-                                },
+        es.indices.refresh(index=INDEX)
+        res = es.search(index=INDEX, size=SEARCH_MAX, body={
+            'filter': {
+                'or': [
+                    {
+                        'terms': {
+                            'embedded_uuids': updated,
+                            '_cache': False,
+                        },
+                    },
                     {
                         'terms': {
                             'linked_uuids': renamed,
                             '_cache': False,
-                            },
                         },
-                            ],
-                        }
                     },
+                ],
+            },
             '_source': False,
         })
         if res['hits']['total'] > SEARCH_MAX:
@@ -303,7 +301,7 @@ def index_file(request):
     if not dry_run:
         err = None
         uuid_current = None
-        print('length of invalidated {}'.format(len(invalidated)))
+        th_indexer_run = False
         invalidated_files = list(set(invalidated).intersection(set(all_bed_file_uuids(request))))
         try:
             files_indexed = 0

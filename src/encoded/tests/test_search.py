@@ -79,36 +79,28 @@ def test_set_filters():
         ('field1', 'value1'),
     ))
     query = {
-        'query': {
-            'query_string': {}
+        'filter': {
+            'and': {
+                'filters': [],
+            },
         },
-        'post_filter': {
-            'bool': {
-                'must': [],
-                'must_not': []
-            }
-        }
     }
     result = {'filters': []}
     used_filters = set_filters(request, query, result)
 
     assert used_filters == {'field1': ['value1']}
     assert query == {
-        'query': {
-            'query_string': {}
-        },
-        'post_filter': {
-            'bool': {
-                'must': [
+        'filter': {
+            'and': {
+                'filters': [
                     {
                         'terms': {
-                            'embedded.field1': ['value1'],
+                            'embedded.field1.raw': ['value1'],
                         },
                     },
                 ],
-                'must_not': []
-            }
-        }
+            },
+        },
     }
     assert result == {
         'filters': [
@@ -128,30 +120,22 @@ def test_set_filters_searchTerm():
         ('searchTerm', 'value1'),
     ))
     query = {
-        'query': {
-            'query_string': {}
+        'filter': {
+            'and': {
+                'filters': [],
+            },
         },
-        'post_filter': {
-            'bool': {
-                'must': [],
-                'must_not': []
-            }
-        }
     }
     result = {'filters': []}
     used_filters = set_filters(request, query, result)
 
     assert used_filters == {}
     assert query == {
-        'query': {
-            'query_string': {}
+        'filter': {
+            'and': {
+                'filters': [],
+            },
         },
-        'post_filter': {
-            'bool': {
-                'must': [],
-                'must_not': []
-            }
-        }
     }
     assert result == {
         'filters': [
@@ -163,10 +147,12 @@ def test_set_filters_searchTerm():
         ]
     }
 
+
 # Reserved params should NOT act as filters
 @pytest.mark.parametrize('param', [
-    'type', 'limit', 'mode',
-    'format', 'frame', 'datastore', 'field', 'sort', 'from', 'referrer'])
+    'type', 'limit', 'y.limit', 'x.limit', 'mode', 'annotation',
+    'format', 'frame', 'datastore', 'field', 'region', 'genome',
+    'sort', 'from', 'referrer'])
 def test_set_filters_reserved_params(param):
     from encoded.search import set_filters
 
@@ -174,30 +160,22 @@ def test_set_filters_reserved_params(param):
         (param, 'foo'),
     ))
     query = {
-        'query': {
-            'query_string': {}
+        'filter': {
+            'and': {
+                'filters': [],
+            },
         },
-        'post_filter': {
-            'bool': {
-                'must': [],
-                'must_not': []
-            }
-        }
     }
     result = {'filters': []}
     used_filters = set_filters(request, query, result)
 
     assert used_filters == {}
     assert query == {
-        'query': {
-            'query_string': {}
+        'filter': {
+            'and': {
+                'filters': [],
+            },
         },
-        'post_filter': {
-            'bool': {
-                'must': [],
-                'must_not': []
-            }
-        }
     }
     assert result == {
         'filters': [],
@@ -212,36 +190,28 @@ def test_set_filters_multivalued():
         ('field1', 'value2'),
     ))
     query = {
-        'query': {
-            'query_string': {}
+        'filter': {
+            'and': {
+                'filters': [],
+            },
         },
-        'post_filter': {
-            'bool': {
-                'must': [],
-                'must_not': []
-            }
-        }
     }
     result = {'filters': []}
     used_filters = set_filters(request, query, result)
 
     assert used_filters == {'field1': ['value1', 'value2']}
     assert query == {
-        'query': {
-            'query_string': {}
-        },
-        'post_filter': {
-            'bool': {
-                'must': [
+        'filter': {
+            'and': {
+                'filters': [
                     {
                         'terms': {
-                            'embedded.field1': ['value1', 'value2']
-                        }
-                    }
+                            'embedded.field1.raw': ['value1', 'value2'],
+                        },
+                    },
                 ],
-                'must_not': []
-            }
-        }
+            },
+        },
     }
     assert result == {
         'filters': [
@@ -266,36 +236,30 @@ def test_set_filters_negated():
         ('field1!', 'value1'),
     ))
     query = {
-        'query': {
-            'query_string': {}
+        'filter': {
+            'and': {
+                'filters': [],
+            },
         },
-        'post_filter': {
-            'bool': {
-                'must': [],
-                'must_not': []
-            }
-        }
     }
     result = {'filters': []}
     used_filters = set_filters(request, query, result)
 
     assert used_filters == {'field1!': ['value1']}
     assert query == {
-        'query': {
-            'query_string': {}
-        },
-        'post_filter': {
-            'bool': {
-                'must_not': [
+        'filter': {
+            'and': {
+                'filters': [
                     {
-                        'terms': {
-                            'embedded.field1': ['value1']
-                        }
-                    }
+                        'not': {
+                            'terms': {
+                                'embedded.field1.raw': ['value1'],
+                            },
+                        },
+                    },
                 ],
-                'must': []
-            }
-        }
+            },
+        },
     }
     assert result == {
         'filters': [
@@ -315,36 +279,28 @@ def test_set_filters_audit():
         ('audit.foo', 'value1'),
     ))
     query = {
-        'query': {
-            'query_string': {}
+        'filter': {
+            'and': {
+                'filters': [],
+            },
         },
-        'post_filter': {
-            'bool': {
-                'must': [],
-                'must_not': []
-            }
-        }
     }
     result = {'filters': []}
     used_filters = set_filters(request, query, result)
 
     assert used_filters == {'audit.foo': ['value1']}
     assert query == {
-        'query': {
-            'query_string': {}
-        },
-        'post_filter': {
-            'bool': {
-                'must': [
+        'filter': {
+            'and': {
+                'filters': [
                     {
                         'terms': {
-                            'audit.foo': ['value1']
+                            'audit.foo': ['value1'],
                         },
                     },
                 ],
-                'must_not': []
-            }
-        }
+            },
+        },
     }
     assert result == {
         'filters': [
@@ -365,15 +321,11 @@ def test_set_filters_exists_missing():
         ('field2!', '*'),
     ))
     query = {
-        'query': {
-            'query_string': {}
+        'filter': {
+            'and': {
+                'filters': [],
+            },
         },
-        'post_filter': {
-            'bool': {
-                'must': [],
-                'must_not': []
-            }
-        }
     }
     result = {'filters': []}
     used_filters = set_filters(request, query, result)
@@ -382,32 +334,24 @@ def test_set_filters_exists_missing():
         'field1': ['*'],
         'field2!': ['*'],
     }
-
     assert query == {
-        'query': {
-            'query_string': {}
-        },
-        'post_filter': {
-            'bool': {
-                'must': [
+        'filter': {
+            'and': {
+                'filters': [
                     {
                         'exists': {
-                            'field': 'embedded.field1'
-                        }
+                            'field': 'embedded.field1.raw',
+                        },
                     },
-                ],
-                'must_not': [
                     {
-                        'exists': {
-                            'field': 'embedded.field2'
+                        'missing': {
+                            'field': 'embedded.field2.raw',
                         }
                     }
-
-                ]
-            }
-        }
+                ],
+            },
+        },
     }
-
     assert result == {
         'filters': [
             {
@@ -437,18 +381,18 @@ def test_set_facets():
         ('audit.foo', ['value2']),
     ))
     principals = ['group.admin']
-    doc_types = ['Snowball']
+    doc_types = ['Experiment']
     aggs = set_facets(facets, used_filters, principals, doc_types)
 
-    expected = {
+    assert {
         'type': {
             'aggs': {
                 'type': {
                     'terms': {
-                        'field': 'embedded.@type',
+                        'field': 'embedded.@type.raw',
                         'exclude': ['Item'],
                         'min_doc_count': 0,
-                        'size': 200,
+                        'size': 100,
                     },
                 },
             },
@@ -456,11 +400,10 @@ def test_set_facets():
                 'bool': {
                     'must': [
                         {'terms': {'principals_allowed.view': ['group.admin']}},
-                        {'terms': {'embedded.@type': ['Snowball']}},
-                        {'terms': {'embedded.facet1': ['value1']}},
+                        {'terms': {'embedded.@type.raw': ['Experiment']}},
+                        {'terms': {'embedded.facet1.raw': ['value1']}},
                         {'terms': {'audit.foo': ['value2']}},
                     ],
-                    'must_not': []
                 },
             },
         },
@@ -470,7 +413,7 @@ def test_set_facets():
                     'terms': {
                         'field': 'audit.foo',
                         'min_doc_count': 0,
-                        'size': 200,
+                        'size': 100,
                     },
                 },
             },
@@ -478,10 +421,9 @@ def test_set_facets():
                 'bool': {
                     'must': [
                         {'terms': {'principals_allowed.view': ['group.admin']}},
-                        {'terms': {'embedded.@type': ['Snowball']}},
-                        {'terms': {'embedded.facet1': ['value1']}},
+                        {'terms': {'embedded.@type.raw': ['Experiment']}},
+                        {'terms': {'embedded.facet1.raw': ['value1']}},
                     ],
-                    'must_not': []
                 },
             },
         },
@@ -489,9 +431,9 @@ def test_set_facets():
             'aggs': {
                 'facet1': {
                     'terms': {
-                        'field': 'embedded.facet1',
+                        'field': 'embedded.facet1.raw',
                         'min_doc_count': 0,
-                        'size': 200,
+                        'size': 100,
                     },
                 },
             },
@@ -499,15 +441,13 @@ def test_set_facets():
                 'bool': {
                     'must': [
                         {'terms': {'principals_allowed.view': ['group.admin']}},
-                        {'terms': {'embedded.@type': ['Snowball']}},
+                        {'terms': {'embedded.@type.raw': ['Experiment']}},
                         {'terms': {'audit.foo': ['value2']}},
                     ],
-                    'must_not': []
                 },
             },
         }
-    }
-    assert(expected == aggs)
+    } == aggs
 
 
 def test_set_facets_negated_filter():
@@ -520,7 +460,7 @@ def test_set_facets_negated_filter():
         ('field2!', ['value1']),
     ))
     principals = ['group.admin']
-    doc_types = ['Snowball']
+    doc_types = ['Experiment']
     aggs = set_facets(facets, used_filters, principals, doc_types)
 
     assert {
@@ -528,9 +468,9 @@ def test_set_facets_negated_filter():
             'aggs': {
                 'facet1': {
                     'terms': {
-                        'field': 'embedded.facet1',
+                        'field': 'embedded.facet1.raw',
                         'min_doc_count': 0,
-                        'size': 200,
+                        'size': 100,
                     },
                 },
             },
@@ -538,10 +478,8 @@ def test_set_facets_negated_filter():
                 'bool': {
                     'must': [
                         {'terms': {'principals_allowed.view': ['group.admin']}},
-                        {'terms': {'embedded.@type': ['Snowball']}}
-                    ],
-                    'must_not': [
-                        {'terms': {'embedded.field2': ['value1']}}
+                        {'terms': {'embedded.@type.raw': ['Experiment']}},
+                        {'not': {'terms': {'embedded.field2.raw': ['value1']}}},
                     ],
                 },
             },
@@ -561,7 +499,7 @@ def test_set_facets_type_exists():
         ('field2!', ['*']),
     ))
     principals = ['group.admin']
-    doc_types = ['Snowball']
+    doc_types = ['Experiment']
     aggs = set_facets(facets, used_filters, principals, doc_types)
 
     assert {
@@ -571,18 +509,10 @@ def test_set_facets_type_exists():
                     'filters': {
                         'filters': {
                             'yes': {
-                                'bool': {
-                                    'must': {
-                                        'exists': {'field': 'embedded.field1'}
-                                    }
-                                }
+                                'exists': {'field': 'embedded.field1.raw'}
                             },
                             'no': {
-                                'bool': {
-                                    'must_not': {
-                                        'exists': {'field': 'embedded.field1'}
-                                    }
-                                }
+                                'missing': {'field': 'embedded.field1.raw'}
                             }
                         },
                     },
@@ -592,11 +522,9 @@ def test_set_facets_type_exists():
                 'bool': {
                     'must': [
                         {'terms': {'principals_allowed.view': ['group.admin']}},
-                        {'terms': {'embedded.@type': ['Snowball']}}
+                        {'terms': {'embedded.@type.raw': ['Experiment']}},
+                        {'missing': {'field': 'embedded.field2.raw'}},
                     ],
-                    'must_not': [
-                        {'exists': {'field': 'embedded.field2'}}
-                    ]
                 },
             },
         },
@@ -606,18 +534,10 @@ def test_set_facets_type_exists():
                     'filters': {
                         'filters': {
                             'yes': {
-                                'bool': {
-                                    'must': {
-                                        'exists': {'field': 'embedded.field2'}
-                                    }
-                                }
+                                'exists': {'field': 'embedded.field2.raw'}
                             },
                             'no': {
-                                'bool': {
-                                    'must_not': {
-                                        'exists': {'field': 'embedded.field2'}
-                                    }
-                                }
+                                'missing': {'field': 'embedded.field2.raw'}
                             }
                         },
                     },
@@ -627,10 +547,9 @@ def test_set_facets_type_exists():
                 'bool': {
                     'must': [
                         {'terms': {'principals_allowed.view': ['group.admin']}},
-                        {'terms': {'embedded.@type': ['Snowball']}},
-                        {'exists': {'field': 'embedded.field1'}},
+                        {'terms': {'embedded.@type.raw': ['Experiment']}},
+                        {'exists': {'field': 'embedded.field1.raw'}},
                     ],
-                    'must_not': []
                 },
             },
         },
@@ -692,7 +611,7 @@ def test_format_facets_no_aggregations():
     assert result == []
 
 
-def test_format_facets_skips_zero_bucket_facets():
+def test_format_facets_skips_single_bucket_facets():
     from encoded.search import format_facets
     es_result = {
         'aggregations': {
@@ -701,11 +620,11 @@ def test_format_facets_skips_zero_bucket_facets():
                     'buckets': [
                         {
                             'key': 'value1',
-                            'doc_count': 0,
+                            'doc_count': 2,
                         },
                     ]
                 },
-                'doc_count': 0,
+                'doc_count': 2,
             }
         }
     }
@@ -714,7 +633,7 @@ def test_format_facets_skips_zero_bucket_facets():
     ]
     used_filters = {}
     schemas = []
-    total = 42 
+    total = 42
     principals = []
     result = format_facets(
         es_result, facets, used_filters, schemas, total, principals)
