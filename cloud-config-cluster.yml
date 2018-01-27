@@ -271,14 +271,8 @@ write_files:
     index.search.slowlog.threshold.fetch.warn: 1s
     index.indexing.slowlog.threshold.index.warn: 25s
     network.host: 0.0.0.0
-<<<<<<< HEAD
-    http.port: 9201
-    transport.tcp.port: 9299
-=======
     action.auto_create_index: false
     index.mapper.dynamic: false
-
->>>>>>> parent of c6fef83... ES5 update
     node.master: true
     node.data: false
 

@@ -798,14 +798,6 @@ def add_to_es(request, comp_id, composite):
     es = request.registry.get(ELASTIC_SEARCH, None)
     if not es:
         return
-<<<<<<< HEAD
-    if not es.indices.exists(index):
-        es.indices.create(index=index, body={'index': {'number_of_shards': 1, 'max_result_window': 99999 }}, wait_for_active_shards=1)
-        mapping = {'default': {"enabled": False}}
-        es.indices.put_mapping(index=index, doc_type='default', body=mapping)
-        log.debug("created %s index" % index)
-    es.index(index=index, doc_type='default', body=composite, id=comp_id)
-=======
     if not es.indices.exists(key):
         es.indices.create(index=key, body={'index': {'number_of_shards': 1}})
         mapping = {'default': {"_all":    {"enabled": False},
@@ -816,8 +808,6 @@ def add_to_es(request, comp_id, composite):
         es.indices.put_mapping(index=key, doc_type='default', body=mapping)
         log.debug("created %s index" % key)
     es.index(index=key, doc_type='default', body=composite, id=comp_id)
->>>>>>> parent of c6fef83... ES5 update
-
 
 def get_from_es(request, comp_id):
     '''Returns composite json blob from elastic-search, or None if not found.'''
