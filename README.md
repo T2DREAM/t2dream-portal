@@ -1,4 +1,4 @@
-# T2DREAM Portal
+# ENCODE Metadata Database
 -------------------------------------------------------
 
 
