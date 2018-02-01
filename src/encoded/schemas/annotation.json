@@ -55,6 +55,8 @@
             "description": "The category that best describes the annotation set.",
             "type": "string",
             "enum": [
+	    	"accessible chromatin",
+		"binding footprints",
                 "binding sites",
                 "blacklist",
                 "candidate regulatory regions",
