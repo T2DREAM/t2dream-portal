@@ -1,4 +1,4 @@
-# ENCODE Metadata Database
+# T2DREAM Metadata Database
 -------------------------------------------------------
 
 
