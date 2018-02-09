@@ -20,6 +20,7 @@ log = logging.getLogger(__name__)
 @view_config(route_name='t2dkp', request_method='POST')
 def t2dkp(context,request):
     region = request.params['region']
+    log.warn(region)
     limit = 'all'
     genome = 'GRCh37'
     HEADERS = {'accept': 'application/json'}
