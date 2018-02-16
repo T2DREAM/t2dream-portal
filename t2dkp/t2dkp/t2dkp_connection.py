@@ -16,15 +16,16 @@ from pyramid.compat import bytes_
 from pyramid.httpexceptions import HTTPBadRequest
 import logging
 import io
+import urllib
 log = logging.getLogger(__name__)
-@view_config(route_name='t2dkp', request_method='POST')
-def t2dkp(context,request):
-    region = request.params['region']
-    limit = 'all'
-    genome = 'GRCh37'
+@view_config(route_name='t2dkp', request_method='POST', renderer='json')
+def t2dkp(context, request):
+    payload = request.json_body
+    data = json.dumps(payload)
     HEADERS = {'accept': 'application/json'}
-    URL = 'http://t2depigenome-test.org/peak_metadata/region='
-    r1 = requests.get(URL + region +'&genome=' + genome + '&limit=' + limit +'/peak_metadata.json', headers=HEADERS)
+    URL = 'http://t2depigenome-test.org/peak_metadata/'
+    URL1 = '%s/peak_metadata.json' % (urlencode(payload,doseq=True))
+    r1 = requests.get(URL + URL1)
     json_doc = r1.json()
     json_doc = json.dumps(json_doc, indent=4, separators=(',', ': '))
     return Response(content_type='text/plain',body=json_doc)
