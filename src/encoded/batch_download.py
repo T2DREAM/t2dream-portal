@@ -4,6 +4,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.view import view_config
 from pyramid.response import Response
 from snovault import TYPES
+from collections import OrderedDict
 from snovault.util import simple_path_ids
 from urllib.parse import (
     parse_qs,
@@ -11,11 +12,13 @@ from urllib.parse import (
 )
 from .search import iter_search_results
 from .search import list_visible_columns_for_schemas
-
+import pprint
 import csv
 import io
 import json
-
+import logging
+log = logging.getLogger(__name__)
+#log.setLevel(logging.INFO)
 
 
 def includeme(config):
@@ -32,7 +35,9 @@ _tsv_mapping = OrderedDict([
     ('File format', ['files.file_type']),
     ('Output type', ['files.output_type']),
     ('Experiment accession', ['accession']),
+    ('Annotation accession', ['accession']),
     ('Assay', ['assay_term_name']),
+    ('Annotation', ['annotation_type']),
     ('Biosample term id', ['biosample_term_id']),
     ('Biosample term name', ['biosample_term_name']),
     ('Biosample type', ['biosample_type']),
@@ -129,7 +134,7 @@ def get_peak_metadata_links(request):
         host_url=request.host_url,
         search_params=search_params
     )
-    return [peak_metadata_tsv_link, peak_metadata_json_link]
+    return [peak_metadata_tsv_link]
 
 def make_cell(header_column, row, exp_data_row):
     temp = []
@@ -171,42 +176,67 @@ def make_audit_cell(header_column, experiment_json, file_json):
 @view_config(route_name='peak_metadata', request_method='GET')
 def peak_metadata(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
+    log.warn(param_list)
     param_list['field'] = []
-    header = ['assay_term_name', 'coordinates', 'target.label', 'biosample.accession', 'file.accession', 'experiment.accession']
+    header = ['annotation_type', 'source', 'coordinates', 'file.accession', 'annotation.accession']
     param_list['limit'] = ['all']
     path = '/region-search/?{}&{}'.format(urlencode(param_list, True),'referrer=peak_metadata')
     results = request.embed(path, as_user=True)
+    #total = results(total)
     uuids_in_results = get_file_uuids(results)
+    #log.warn(get_file_uuids(results))
     rows = []
     json_doc = {}
+    #json_doc["is_error"] = "false"
+    #json_doc["numRecords"]= total
+    #log.warn(results['peaks'])
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
-            experiment_json = request.embed(file_json['dataset'])
+            annotation_json = request.embed(file_json['dataset'])
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
-                coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
+                chrom = '{}'.format(row['_index'])
+                assembly = '{}'.format(row['_type'])
+                start = int('{}'.format(hit['_source']['start']))
+                stop = int('{}'.format(hit['_source']['end']))
                 file_accession = file_json['accession']
-                experiment_accession = experiment_json['accession']
-                assay_name = experiment_json['assay_term_name']
-                target_name = experiment_json.get('target', {}).get('label') # not all experiments have targets
-                biosample_accession = get_biosample_accessions(file_json, experiment_json)
-                data_row.extend([assay_name, coordinates, target_name, biosample_accession, file_accession, experiment_accession])
+                annotation_accession = annotation_json['accession']
+                #total = '{}'.format(hit['total'])
+                coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
+                annotation = annotation_json['annotation_type']
+                biosample_term = annotation_json['biosample_term_name']
+                data_row.extend([annotation, biosample_term, coordinates, file_accession, annotation_accession])
                 rows.append(data_row)
-                if assay_name not in json_doc:
-                    json_doc[assay_name] = []
-                else:
-                    json_doc[assay_name].append({
-                        'coordinates': coordinates,
-                        'target.name': target_name,
-                        'biosample.accession': list(biosample_accession.split(', ')),
-                        'file.accession': file_accession,
-                        'experiment.accession': experiment_accession
+                if annotation not in json_doc:
+                    json_doc[annotation] = []
+                    json_doc[annotation].append({
+                        'ANNOTATION_TYPE': annotation,
+                        'source': biosample_term,
+                        'CHROM': chrom,
+                        'START': start,
+                        'STOP': stop,
+                        'VALUE': None,
+                        'ASSEMBLY': assembly,
+                        'ANNOTATION_FILE': file_accession,
+                        'ANNOTATION_ID': annotation_accession
                     })
+                else:
+                    json_doc[annotation].append({
+                        'ANNOTATION_TYPE': annotation,
+                        'source': biosample_term,
+                        'CHROM': chrom,
+                        'START': start,
+                        'STOP': stop,
+                        'VALUE': None,
+                        'ASSEMBLY': assembly,
+                        'ANNOTATION_FILE': file_accession,
+                        'ANNOTATION_ID': annotation_accession
+                })
     if 'peak_metadata.json' in request.url:
         return Response(
             content_type='text/plain',
-            body=json.dumps(json_doc),
+            body=json.dumps(json_doc,indent=2,sort_keys=True),
             content_disposition='attachment;filename="%s"' % 'peak_metadata.json'
         )
     fout = io.StringIO()
@@ -219,10 +249,11 @@ def peak_metadata(context, request):
         content_disposition='attachment;filename="%s"' % 'peak_metadata.tsv'
     )
 
-
 @view_config(route_name='metadata', request_method='GET')
 def metadata_tsv(context, request):
+    log.warn(search_params)
     param_list = parse_qs(request.matchdict['search_params'])
+    log.warn(param_list)
     if 'referrer' in param_list:
         search_path = '/{}/'.format(param_list.pop('referrer')[0])
     else:
@@ -236,6 +267,7 @@ def metadata_tsv(context, request):
         if _tsv_mapping[prop][0].startswith('files'):
             file_attributes = file_attributes + [_tsv_mapping[prop][0]]
     param_list['limit'] = ['all']
+    #log.warn(param_list)
     path = '{}?{}'.format(search_path, urlencode(param_list, True))
     results = request.embed(path, as_user=True)
     rows = []
@@ -248,7 +280,7 @@ def metadata_tsv(context, request):
 
             f_attributes = ['files.title', 'files.file_type',
                             'files.output_type']
-
+            
             for f in experiment_json['files']:
                 if 'files.file_type' in param_list:
                     if f['file_type'] not in param_list['files.file_type']:
@@ -358,6 +390,7 @@ def format_row(columns):
 @view_config(route_name='report_download', request_method='GET')
 def report_download(context, request):
     types = request.params.getall('type')
+    log.warn(types)
     if len(types) != 1:
         msg = 'Report view requires specifying a single type.'
         raise HTTPBadRequest(explanation=msg)
