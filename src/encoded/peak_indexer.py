@@ -20,31 +20,44 @@ from snovault.elasticsearch.interfaces import (
     SNP_SEARCH_ES,
 )
 import copy
+
+
 SEARCH_MAX = 99999  # OutOfMemoryError if too high
 log = logging.getLogger(__name__)
-#log.setLevel(logging.INFO)
+#log.setLevel(logging.DEBUG)                                                                                                                                                         
+log.setLevel(logging.INFO)
+
 # hashmap of assays and corresponding file types that are being indexed
 _INDEXED_DATA = {
-    'ChIP-seq': {
-        'file_type': ['bed narrowPeak'],
-    },
     'chromatin state': {
-        'file_type': ['bed bed3+']
+        'file_type': ['bed bed3+'],
+    },
+    'DNase-seq': {
+        'file_type': ['bed narrowPeak']
     },
     'ATAC-seq': {
         'output_type': ['peaks']
     }
 }
+
 # Species and references being indexed
 _ASSEMBLIES = ['hg19', 'mm10', 'mm9', 'GRCh38']
+
+
 def includeme(config):
     config.add_route('index_file', '/index_file')
     config.scan(__name__)
+
+
+
 def tsvreader(file):
     reader = csv.reader(file, delimiter='\t')
     for row in reader:
         yield row
+
 # Mapping should be generated dynamically for each assembly type
+
+
 def get_mapping(assembly_name='hg19'):
     return {
         assembly_name: {
@@ -69,66 +82,71 @@ def get_mapping(assembly_name='hg19'):
                             'type': 'long'
                         }
                     }
-                },
-                'extra': {
-                    'type': 'nested',
-                    'properties': {
-                        'name': {
-                            'type': 'string'
-                        },
-                        'value': {
-                            'type': 'string'
-                        }
-                    }
                 }
-                }
+            }
         }
-}
+    }
+
+
 def index_settings():
     return {
         'index': {
             'number_of_shards': 1
         }
     }
+
+
 def get_annotation_type(accession, request):
     '''
     Input file accession and returns annotation_type of the annotation the file
     belongs to
     '''
     context = request.embed(accession)
-    log.debug('index accession: {}'.format(accession))
-    log.warn('index accession: {}'.format(accession))
     if 'annotation_type' in context:
         return context['annotation_type']
     return None
+
+
 def all_bed_file_uuids(request):
     stmt = text("select distinct(resources.rid) from resources, propsheets where resources.rid = propsheets.rid and resources.item_type='file' and propsheets.properties->>'file_format' = 'bed' and properties->>'status' = 'released';")
     connection = request.registry[DBSESSION].connection()
     uuids = connection.execute(stmt)
     return [str(item[0]) for item in uuids]
+
+
 def index_peaks(uuid, request):
     """
     Indexes bed files in elasticsearch index
     """
     context = request.embed('/', str(uuid), '@@object')
+
     if 'assembly' not in context:
         return
+
     assembly = context['assembly']
+
     # Treat mm10-minimal as mm1
     if assembly == 'mm10-minimal':
         assembly = 'mm10'
+
+
+
     if 'File' not in context['@type'] or 'dataset' not in context:
-        log.warn("File not in context type or dataset not in context: {}".format(pprint.pformat(context)))
         return
+
     if 'status' not in context or context['status'] != 'released':
         return
+
     # Index human data for now
     if assembly not in _ASSEMBLIES:
         return
     annotation_type = get_annotation_type(context['dataset'], request)
     if annotation_type is None or isinstance(annotation_type, collections.Hashable) is False:
         None
+
+
     flag = False
+
     for k, v in _INDEXED_DATA.get(annotation_type, {}).items():
         if k in context and context[k] in v:
             if 'file_format' in context and context['file_format'] == 'bed':
@@ -136,6 +154,7 @@ def index_peaks(uuid, request):
                 break
     if not flag:
         return
+
     urllib3.disable_warnings()
     es = request.registry.get(SNP_SEARCH_ES, None)
     http = urllib3.PoolManager()
@@ -147,31 +166,37 @@ def index_peaks(uuid, request):
     comp.seek(0)
     r.release_conn()
     file_data = dict()
+
     with gzip.open(comp, mode='rt') as file:
         for row in tsvreader(file):
-            chrom, start, end, name, value = row[0].lower(), int(row[1]), int(row[2]),row[3],row[4]
-            if chrom in file_data:
-                file_data[chrom].append({
-                    'start': start + 1,
-                    'end': end + 1,
-                    'name': name,
-                    'value': value
-                })
+            chrom, start, end = row[0].lower(), int(row[1]), int(row[2])
+            if isinstance(start, int) and isinstance(end, int):
+                if chrom in file_data:
+                    file_data[chrom].append({
+                        'start': start + 1,
+                        'end': end + 1
+                    })
+                else:
+                    file_data[chrom] = [{'start': start + 1, 'end': end + 1}]
             else:
-                file_data[chrom] = {'start': start + 1, 'end': end + 1, 'name':name, 'value':value}
+                log.warn('positions are not integers, will not index file')
+
     for key in file_data:
         log.warn(key)
         doc = {
             'uuid': context['uuid'],
-            'positions': (file_data[key]['start'], file_data[key]['end']),
-            'extra': (file_data[key]['name'], file_data[key]['value'])
+            'positions': file_data[key]
         }
         log.warn(doc)
         if not es.indices.exists(key):
             es.indices.create(index=key, body=index_settings())
+
         if not es.indices.exists_type(index=key, doc_type=assembly):
             es.indices.put_mapping(index=key, doc_type=assembly, body=get_mapping(assembly))
+
         es.index(index=key, doc_type=assembly, body=doc, id=context['uuid'])
+
+
 @view_config(route_name='index_file', request_method='POST', permission="index")
 def index_file(request):
     registry = request.registry
@@ -182,6 +207,7 @@ def index_file(request):
     record = request.json.get('record', False)
     es = registry[ELASTIC_SEARCH]
     es_peaks = registry[SNP_SEARCH_ES]
+
     session = registry[DBSESSION]()
     connection = session.connection()
     if recovery:
@@ -195,6 +221,7 @@ def index_file(request):
             "SELECT txid_snapshot_xmin(txid_current_snapshot());"
         )
     xmin = query.scalar()  # lowest xid that is still in progress
+
     first_txn = None
     last_xmin = None
     if 'last_xmin' in request.json:
@@ -206,10 +233,12 @@ def index_file(request):
             pass
         else:
             last_xmin = status['_source']['xmin']
+
     result = {
         'xmin': xmin,
         'last_xmin': last_xmin,
     }
+
     if last_xmin is None:
         result['types'] = request.json.get('types', None)
         invalidated = list(all_uuids(registry))
@@ -217,6 +246,7 @@ def index_file(request):
         txns = session.query(TransactionRecord).filter(
             TransactionRecord.xid >= last_xmin,
         )
+
         invalidated = set()
         updated = set()
         renamed = set()
@@ -231,9 +261,11 @@ def index_file(request):
                 first_txn = min(first_txn, txn.timestamp)
             renamed.update(txn.data.get('renamed', ()))
             updated.update(txn.data.get('updated', ()))
+
         result['txn_count'] = txn_count
         if txn_count == 0:
             return result
+
         es.indices.refresh(index=INDEX)
         res = es.search(index=INDEX, size=SEARCH_MAX, body={
             'filter': {
@@ -268,6 +300,7 @@ def index_file(request):
                 txn_count=txn_count,
                 first_txn_timestamp=first_txn.isoformat(),
             )
+
     if not dry_run:
         err = None
         uuid_current = None
@@ -277,6 +310,7 @@ def index_file(request):
             files_indexed = 0
             for uuid in invalidated_files:
                 uuid_current = uuid
+
                 index_peaks(uuid, request)
                 files_indexed += 1
         except Exception as e:
@@ -297,4 +331,3 @@ def index_file(request):
                         item['error'] = "Error occured during indexing, check the logs"
                 result['errors'] = error_messages
     return result
-    log.warn(result)
