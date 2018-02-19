@@ -14,9 +14,8 @@ from .batch_download import get_peak_metadata_links
 from collections import OrderedDict
 import requests
 from urllib.parse import urlencode
-
-import logging
 import pprint
+import logging
 import re
 
 
@@ -36,13 +35,8 @@ _REGION_FIELDS = [
 ]
 
 _FACETS = [
-    ('assay_term_name', {'title': 'Assay'}),
+    ('annotation_type', {'title': 'Annotation'}),
     ('biosample_term_name', {'title': 'Biosample term'}),
-    ('target.label', {'title': 'Target'}),
-    ('replicates.library.biosample.donor.organism.scientific_name', {
-            'title': 'Organism'
-            }),
-    ('organ_slims', {'title': 'Organ'}),
     ('assembly', {'title': 'Genome assembly'}),
     ('files.file_type', {'title': 'Available data'})
 ]
@@ -273,6 +267,7 @@ def region_search(context, request):
         'filters': []
     }
     principals = effective_principals(request)
+    #log.warn(principals)
     es = request.registry[ELASTIC_SEARCH]
     snp_es = request.registry['snp_search']
     region = request.params.get('region', '*')
@@ -330,11 +325,12 @@ def region_search(context, request):
             peak_query = get_peak_query(start, end, with_inner_hits=True, within_peaks=region_inside_peak_status)
         else:
             peak_query = get_peak_query(start, end, within_peaks=region_inside_peak_status)
-
+        #log.warn(peak_query) 
         peak_results = snp_es.search(body=peak_query,
                                      index=chromosome.lower(),
                                      doc_type=_GENOME_TO_ALIAS[assembly],
                                      size=99999)
+        #log.warn(peak_results)
     except Exception:
         result['notification'] = 'Error during search'
         return result
@@ -344,26 +340,34 @@ def region_search(context, request):
             file_uuids.append(hit['_id'])
     file_uuids = list(set(file_uuids))
     result['notification'] = 'No results found'
+    #log.warn(file_uuids)
+
 
     # if more than one peak found return the experiments with those peak files
     if len(file_uuids):
-        query = get_filtered_query('', [], set(), principals, ['Experiment'])
+        #log.warn(principals)
+        query = get_filtered_query('', [], set(), principals, ['Annotation'])
         del query['query']
         query['filter']['and']['filters'].append({
             'terms': {
                 'embedded.files.uuid': file_uuids
             }
         })
+        #log.warn(result)
+        #log.warn(request)
         used_filters = set_filters(request, query, result)
         used_filters['files.uuid'] = file_uuids
-        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Experiment'])
-        schemas = (types[item_type].schema for item_type in ['Experiment'])
-        #log.warn(query)
+        #log.warn(used_filters)
+        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Annotation'])
+        log.warn(principals)
+        schemas = (types[item_type].schema for item_type in ['Annotation'])
+        #log.warn(schemas)
         es_results = es.search(
-            body=query, index='snovault', doc_type='experiment', size=size
+            body=query, index='snovault', doc_type='annotation', size=size
         )
-        #log.warn(pprint.pformat(es_results))
+        log.warn(request)
         result['@graph'] = list(format_results(request, es_results['hits']['hits']))
+        #log.warn(result['@graph'])
         result['total'] = total = es_results['hits']['total']
         result['facets'] = format_facets(es_results, _FACETS, used_filters, schemas, total, principals)
         result['peaks'] = list(peak_results['hits']['hits'])
@@ -371,10 +375,10 @@ def region_search(context, request):
         if result['total'] > 0:
             result['notification'] = 'Success'
             position_for_browser = format_position(result['coordinates'], 200)
-            result.update(search_result_actions(request, ['Experiment'], es_results, position=position_for_browser))
+            result.update(search_result_actions(request, ['Annotation'], es_results, position=position_for_browser))
 
     return result
-
+    #log.warn(result)
 
 @view_config(route_name='suggest', request_method='GET', permission='search')
 def suggest(context, request):
