@@ -24,6 +24,7 @@ import copy
 
 SEARCH_MAX = 99999  # OutOfMemoryError if too high
 log = logging.getLogger(__name__)
+#log.setLevel(logging.DEBUG)                                                                                                                                                         
 log.setLevel(logging.INFO)
 
 # hashmap of assays and corresponding file types that are being indexed
@@ -31,8 +32,8 @@ _INDEXED_DATA = {
     'ChIP-seq': {
         'file_type': ['bed narrowPeak'],
     },
-    'chromatin state': {
-        'file_type': ['bed bed3+']
+    'DNase-seq': {
+        'file_type': ['bed narrowPeak']
     },
     'ATAC-seq': {
         'output_type': ['peaks']
@@ -95,16 +96,14 @@ def index_settings():
     }
 
 
-def get_annotation_type(accession, request):
+def get_assay_term_name(accession, request):
     '''
-    Input file accession and returns annotation_type of the annotation the file
+    Input file accession and returns assay_term_name of the experiment the file
     belongs to
     '''
     context = request.embed(accession)
-    log.debug('index accession: {}'.format(accession))
-    log.warn('index accession: {}'.format(accession))
-    if 'annotation_type' in context:
-        return context['annotation_type']
+    if 'assay_term_name' in context:
+        return context['assay_term_name']
     return None
 
 
@@ -133,7 +132,6 @@ def index_peaks(uuid, request):
 
 
     if 'File' not in context['@type'] or 'dataset' not in context:
-        log.warn("File not in context type or dataset not in context: {}".format(pprint.pformat(context)))
         return
 
     if 'status' not in context or context['status'] != 'released':
@@ -142,11 +140,14 @@ def index_peaks(uuid, request):
     # Index human data for now
     if assembly not in _ASSEMBLIES:
         return
-    annotation_type = get_annotation_type(context['dataset'], request)
-    if annotation_type is None or isinstance(annotation_type, collections.Hashable) is False:
-        None
+    assay_term_name = get_assay_term_name(context['dataset'], request)
+    if assay_term_name is None or isinstance(assay_term_name, collections.Hashable) is False:
+        return
+
+
     flag = False
-    for k, v in _INDEXED_DATA.get(annotation_type, {}).items():
+
+    for k, v in _INDEXED_DATA.get(assay_term_name, {}).items():
         if k in context and context[k] in v:
             if 'file_format' in context and context['file_format'] == 'bed':
                 flag = True

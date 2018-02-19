@@ -24,10 +24,10 @@ var {Panel, PanelBody, PanelHeading} = panel;
 
 var regionGenomes = [
     {value: 'GRCh37', display: 'hg19'},
-    {value: 'hg18', display: 'hg18'},
     {value: 'GRCh38', display: 'GRCh38'},
     {value: 'GRCm37', display: 'mm9'},
-    {value: 'GRCm38', display: 'mm10'}
+    {value: 'GRCm38', display: 'mm10'},
+    {value: 'hg18', display: 'hg18'}
 ];
 
 
@@ -132,7 +132,7 @@ var AdvSearch = createReactClass({
                     <form id="panel1" className="adv-search-form" ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1">
                         <input type="hidden" name="annotation" value={this.state.terms['annotation']} />
                         <div className="form-group">
-                            <label>Enter any one of human Gene name, Symbol, Synonyms, Gene ID, HGNC ID, coordinates, rsid, Ensemble ID</label>
+	                 <label>Enter any one of human Gene name, Symbol, Synonyms, Gene ID, HGNC ID, coordinates, rsid, Ensemble ID</label>
                             <div className="input-group input-group-region-input">
                                 <input ref="annotation" defaultValue={region} name="region" type="text" placeholder="Enter Search (e.g. rs7903146, TCF7L2)     
 " className="form-control" onChange={this.handleChange} />
@@ -233,8 +233,17 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
                                                     : null}
                                                 </span>
                                             }
-                                        </div>
-                     </div>
+		     {context['download_elements'] ?
+		      <DropdownButton title='Download Elements' label="downloadelements" wrapperClasses="results-table-button">
+		      <DropdownMenu>
+		      {context['download_elements'].map(link =>
+							<a key={link} data-bypass="true" target="_blank" private-browsing="true" href={link}>
+							    {link.split('.').pop()}
+							</a>
+							)}
+		      </DropdownMenu>
+		      </DropdownButton>
+		      : null}
 		     {visualizeKeys ?
 		      <DropdownButton disabled={visualize_disabled} title={visualize_disabled ? 'Filter to ' + visualizeLimit + ' to visualize' : 'Visualize'} label="batchhubs" wrapperClasses="results-table-button">
 		      <DropdownMenu>
@@ -248,6 +257,8 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 </DropdownMenu>
 </DropdownButton>
 : null}
+</div>
+</div>
                                   <hr />
                                   <ul className="nav result-table" id="result-table">
                                       {results.map(function (result) {
