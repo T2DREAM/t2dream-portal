@@ -32,9 +32,6 @@ _INDEXED_DATA = {
     'chromatin state': {
         'file_type': ['bed bed3+'],
     },
-    'DNase-seq': {
-        'file_type': ['bed narrowPeak']
-    },
     'ATAC-seq': {
         'output_type': ['peaks']
     }
@@ -80,12 +77,18 @@ def get_mapping(assembly_name='hg19'):
                         },
                         'end': {
                             'type': 'long'
+                        },
+                        'state': {
+                            'type': 'string'
+                            },
+                        'val': {
+                            'type': 'string'
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
 
 def index_settings():
@@ -129,8 +132,6 @@ def index_peaks(uuid, request):
     if assembly == 'mm10-minimal':
         assembly = 'mm10'
 
-
-
     if 'File' not in context['@type'] or 'dataset' not in context:
         return
 
@@ -169,15 +170,17 @@ def index_peaks(uuid, request):
 
     with gzip.open(comp, mode='rt') as file:
         for row in tsvreader(file):
-            chrom, start, end = row[0].lower(), int(row[1]), int(row[2])
+            chrom, start, end, state, val = row[0].lower(), int(row[1]), int(row[2]), row[3], row[4] 
             if isinstance(start, int) and isinstance(end, int):
                 if chrom in file_data:
                     file_data[chrom].append({
                         'start': start + 1,
-                        'end': end + 1
+                        'end': end + 1,
+                        'state': state,
+                        'val': val
                     })
                 else:
-                    file_data[chrom] = [{'start': start + 1, 'end': end + 1}]
+                    file_data[chrom] = [{'start': start + 1, 'end': end + 1, 'state': state, 'val': val}]
             else:
                 log.warn('positions are not integers, will not index file')
 
@@ -185,7 +188,7 @@ def index_peaks(uuid, request):
         log.warn(key)
         doc = {
             'uuid': context['uuid'],
-            'positions': file_data[key]
+            'positions': file_data[key],
         }
         log.warn(doc)
         if not es.indices.exists(key):
