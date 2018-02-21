@@ -176,7 +176,7 @@ def make_audit_cell(header_column, experiment_json, file_json):
 @view_config(route_name='peak_metadata', request_method='GET')
 def peak_metadata(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
-    log.warn(param_list)
+    #log.warn(param_list)
     param_list['field'] = []
     header = ['annotation_type', 'source', 'coordinates', 'file.accession', 'annotation.accession']
     param_list['limit'] = ['all']
@@ -200,6 +200,8 @@ def peak_metadata(context, request):
                 assembly = '{}'.format(row['_type'])
                 start = int('{}'.format(hit['_source']['start']))
                 stop = int('{}'.format(hit['_source']['end']))
+                state = '{}'.format(hit['_source']['state'])
+                val = '{}'.format(hit['_source']['val'])
                 file_accession = file_json['accession']
                 annotation_accession = annotation_json['accession']
                 #total = '{}'.format(hit['total'])
@@ -211,27 +213,25 @@ def peak_metadata(context, request):
                 if annotation not in json_doc:
                     json_doc[annotation] = []
                     json_doc[annotation].append({
-                        'ANNOTATION_TYPE': annotation,
-                        'source': biosample_term,
-                        'CHROM': chrom,
-                        'START': start,
-                        'STOP': stop,
-                        'VALUE': None,
-                        'ASSEMBLY': assembly,
-                        'ANNOTATION_FILE': file_accession,
-                        'ANNOTATION_ID': annotation_accession
+                        'annotation_type': annotation,
+                        'biosample_term_name': biosample_term,
+                        'region': coordinates,
+                        'state': state,
+                        'value': val,
+                        'genome': assembly,
+                        'file_accession': file_accession,
+                        'accession': annotation_accession
                     })
                 else:
                     json_doc[annotation].append({
-                        'ANNOTATION_TYPE': annotation,
-                        'source': biosample_term,
-                        'CHROM': chrom,
-                        'START': start,
-                        'STOP': stop,
-                        'VALUE': None,
-                        'ASSEMBLY': assembly,
-                        'ANNOTATION_FILE': file_accession,
-                        'ANNOTATION_ID': annotation_accession
+                        'annotation_type': annotation,
+                        'biosample_term_name': biosample_term,
+                        'region': coordinates,
+                        'state': state,
+                        'value': val,
+                        'genome': assembly,
+                        'file_accession': file_accession,
+                        'accession': annotation_accession
                 })
     if 'peak_metadata.json' in request.url:
         return Response(
