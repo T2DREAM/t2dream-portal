@@ -18,7 +18,7 @@ import logging
 import io
 import urllib
 log = logging.getLogger(__name__)
-@view_config(route_name='t2dkp', request_method='POST', renderer='json')
+@view_config(route_name='getAnnotationRegion', request_method='POST', renderer='json')
 def t2dkp(context, request):
     payload = request.json_body
     data = json.dumps(payload)
@@ -31,8 +31,8 @@ def t2dkp(context, request):
     return Response(content_type='text/plain',body=json_doc)
 if __name__ == '__main__':
     config = Configurator()
-    config.add_route('t2dkp', '/t2dkp')
-    config.add_view(t2dkp, route_name='t2dkp')
+    config.add_route('getAnnotationRegion', '/getAnnotationRegion')
+    config.add_view(getAnnotationRegion, route_name='getAnnotationRegion')
     config.scan()
     app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 8080, app)
