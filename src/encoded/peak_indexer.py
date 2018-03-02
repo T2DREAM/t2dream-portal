@@ -29,11 +29,8 @@ log.setLevel(logging.INFO)
 
 # hashmap of assays and corresponding file types that are being indexed
 _INDEXED_DATA = {
-    'chromatin state': {
-        'file_type': ['bed bed3+'],
-    },
-    'ATAC-seq': {
-        'output_type': ['peaks']
+    'accessible chromatin': {
+        'output_type': ['peaks'],
     }
 }
 
