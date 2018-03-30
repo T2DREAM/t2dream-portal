@@ -18,7 +18,6 @@ import pprint
 import logging
 import re
 
-
 log = logging.getLogger(__name__)
 
 
@@ -359,24 +358,25 @@ def region_search(context, request):
         used_filters['files.uuid'] = file_uuids
         #log.warn(used_filters)
         query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Annotation'])
-        log.warn(principals)
+        #log.warn(principals)
         schemas = (types[item_type].schema for item_type in ['Annotation'])
         #log.warn(schemas)
         es_results = es.search(
             body=query, index='snovault', doc_type='annotation', size=size
         )
-        log.warn(request)
+        #log.warn(request)
         result['@graph'] = list(format_results(request, es_results['hits']['hits']))
         #log.warn(result['@graph'])
         result['total'] = total = es_results['hits']['total']
         result['facets'] = format_facets(es_results, _FACETS, used_filters, schemas, total, principals)
+        #log.warn(result['facets'])
         result['peaks'] = list(peak_results['hits']['hits'])
+        #log.warn(result['peaks'])
         result['download_elements'] = get_peak_metadata_links(request)
         if result['total'] > 0:
             result['notification'] = 'Success'
             position_for_browser = format_position(result['coordinates'], 200)
             result.update(search_result_actions(request, ['Annotation'], es_results, position=position_for_browser))
-
     return result
     #log.warn(result)
 
