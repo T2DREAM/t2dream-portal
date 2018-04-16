@@ -40,7 +40,7 @@ const portal = {
             id: 'tools',
             title: 'Tools',
             children: [
-                {id: 'region', title: 'Region Search', url: '/region-search/'},
+                {id: 'variant', title: 'Variant Search', url: '/variant-search/'},
             ],
         },
        

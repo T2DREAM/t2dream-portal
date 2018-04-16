@@ -1992,7 +1992,7 @@ def generate_batch_trackDb(request, hide=False, regen=False):
 
     view = 'search'
     if 'region' in param_list:
-        view = 'region-search'
+        view = 'variant-search'
     path = '/%s/?%s' % (view, urlencode(params, True))
     results = request.embed(path, as_user=True)['@graph']
     if not USE_CACHE:
@@ -2343,7 +2343,7 @@ def generate_batch_hubs(context, request):
         log.debug('parse_qs: %s' % (param_list))
         view = 'search'
         if 'region' in param_list:
-            view = 'region-search'
+            view = 'variant-search'
         path = '/%s/?%s' % (view, urlencode(param_list, True))
         log.debug('Path in hunt for assembly %s' % (path))
         results = request.embed(path, as_user=True)
