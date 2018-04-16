@@ -184,7 +184,7 @@ def peak_metadata(context, request):
     param_list['field'] = []
     header = ['annotation_type', 'source', 'coordinates', 'file.accession', 'annotation.accession']
     param_list['limit'] = ['all']
-    path = '/region-search/?{}&{}'.format(urlencode(param_list, True),'referrer=peak_metadata')
+    path = '/variant-search/?{}&{}'.format(urlencode(param_list, True),'referrer=peak_metadata')
     results = request.embed(path, as_user=True)
     #total = results(total)
     uuids_in_results = get_file_uuids(results)

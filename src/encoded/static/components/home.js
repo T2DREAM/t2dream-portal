@@ -1053,9 +1053,7 @@ Search1.contextTypes = {
 
 const regionGenomes = [
     { value: 'GRCh37', display: 'hg19' },
-    { value: 'GRCh38', display: 'GRCh38' },
-    { value: 'GRCm37', display: 'mm9' },
-    { value: 'GRCm38', display: 'mm10' },
+    { value: 'GRCh38', display: 'GRCh38' }
 ];
 
 const AutocompleteBox = (props) => {
@@ -1227,20 +1225,14 @@ class AdvSearch extends React.Component {
         const region = id.query.region || '';
 
         return (
-                    <form className="home-form" ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1" action="/region-search/">
+                    <form className="home-form" ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1" action="/variant-search/">
                         <input type="hidden" name="annotation" value={this.state.terms.annotation} />
 
                               <div className="form-group">
                               <h4> Search variants and regions: </h4>
                                <div className="input-group input-group-region-input">
-                                <input id="annotation" ref={(input) => { this.annotation = input; }} defaultValue={region} name="region" placeholder="Enter Search (e.g. rs7903146, TCF7L2)
+                                <input id="annotation" ref={(input) => { this.annotation = input; }} defaultValue={region} name="region" placeholder="Enter Search (e.g. rs7903146)
 " type="text" className="form-control" onChange={this.handleChange} />
-                                {(this.state.showAutoSuggest && this.state.searchTerm) ?
-                                    <FetchedData loadingComplete>
-                                        <Param name="auto" url={`/suggest/?genome=${this.state.genome}&q=${this.state.searchTerm}`} type="json" />
-                                        <AutocompleteBox name="annotation" userTerm={this.state.searchTerm} handleClick={this.handleAutocompleteClick} />
-                                    </FetchedData>
-                                : null}
                                <div className="input-group-addon input-group-select-addon">
                                     <select value={this.state.genome} name="genome" onChange={this.handleAssemblySelect}>
                                         {regionGenomes.map(genomeId =>
