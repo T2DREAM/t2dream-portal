@@ -119,6 +119,10 @@ source ~/.bash_profile
 >Uninstall and re-install openssl using the following command when you install pyenv
 >- `brew uninstall --ignore-dependencies openssl && brew install openssl && CFLAGS="-I$(brew --prefix openssl)/include" LDFLAGS="-L$(brew --prefix openssl)/lib" pyenv install <VERSION>`
 
+**Set the correct Python for the current directory:**
+```bash
+pyenv local 3.4.3
+```
 
 ### **4. Run buildout:**
 
@@ -133,7 +137,7 @@ source ~/.bash_profile
 
 
 >:star: _Note_: **Clean ALL the Things!** If you wish to **completely rebuild** the application or **cleanly reload** dependencies (:warning: long re-build time!):  
->- `make clean && python3 bootstrap.py --buildout-version 2.9.5 --setuptools-version 18.5 && bin/buildout`
+>- `make clean && buildout bootstrap && bin/buildout`
 
 
 ### **5. Start the application locally**
