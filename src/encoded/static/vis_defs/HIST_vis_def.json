@@ -2,8 +2,8 @@
     "HIST": {
         "rule": "'{assay_term_name}' == 'ChIP-seq' and 'histone' in '{target.investigated_as}'",
         "assay_composite": {
-            "longLabel":  "Collection of T2DREAM Histone ChIP-seq experiments",
-            "shortLabel": "T2DREAM Histone ChIP"
+            "longLabel":  "Collection of Diabetes Epigenome Atlas Histone ChIP-seq experiments",
+            "shortLabel": "Diabetes Epigenome Atlas Histone ChIP"
         },
         "longLabel":  "{target} {target.investigated_as} {assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{target} {target.investigated_as} of {biosample_term_name} {accession}",

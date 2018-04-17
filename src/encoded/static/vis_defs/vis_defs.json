@@ -18,8 +18,8 @@
             "example: rule: '{assay_term_name}' == 'ChIP-seq' and 'histone' in '{target.investigated_as}'   "
                         ],
         "assay_composite": {
-            "longLabel":  "Collection of Miscellaneous T2DREAM datasets",
-            "shortLabel": "T2DREAM Misc."
+            "longLabel":  "Collection of Miscellaneous Diabetes Epigenome Atlas datasets",
+            "shortLabel": "Diabetes Epigenome Atlas Misc."
         },
         "longLabel":  "{assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{assay_title} of {biosample_term_name} {accession}",

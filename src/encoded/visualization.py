@@ -494,7 +494,7 @@ def lookup_vis_defs(vis_type):
 
 
 PENNANTS = {
-    "T2DREAM":     ("https://www.t2depigenome.org/static/img/logo.png "
+    "Diabetes Epigenome Atlas":     ("https://www.t2depigenome.org/static/img/logo.png "
                   "t2depigenome.org/ "
                   "\"This trackhub was automatically generated from the files and metadata found "
                   "at the T2DREAM portal\""),

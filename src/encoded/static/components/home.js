@@ -106,7 +106,7 @@ export default class Home extends React.Component {
                                  <div className="social">
                                 <div className="social-news">
                                   <div className="news-header">
-                                        <h3>News <a href="/news/" title="T2DREAM news" className="search-ref">View all news...</a></h3>
+                                        <h3>News <a href="/news/" title="Diabetes Epigenome Atlas news" className="search-ref">View all news...</a></h3>
                                     </div>
                                     <NewsLoader newsLoaded={this.newsLoaded} />
 
@@ -180,14 +180,14 @@ class AssayClicking extends React.Component {
                   <div className="site-banner-intro">
 		  <div className="site-banner-header">
 		  <img src="/static/img/logo.png" alt="logo"/>
-                   <h1>T2DREAM</h1>
+                   <h2>Diabetes Epigenome Atlas</h2>
                   </div> 
 		  <div className= "site-banner-title">
 		        <p></p>
 		         <h4>Type 2 Diabetes Regulatory Annotation Map</h4> 
 		 </div>
                             <div className="site-banner-intro-content">
-				<p>The T2DREAM project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
+				<p>The Diabetes Epigenome Atlas project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
                             </div>
                         </div>
 		       <div className="site-banner-search">

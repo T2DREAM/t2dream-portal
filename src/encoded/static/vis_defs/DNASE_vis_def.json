@@ -2,8 +2,8 @@
     "DNASE": {
         "rule": "'{assay_term_name}' == 'DNase-seq'",
         "assay_composite": {
-            "longLabel":  "Collection of T2DREAM DNase-HS experiments",
-            "shortLabel": "T2DREAM DNase-HS"
+            "longLabel":  "Collection of Diabetes Epigenome Atlas DNase-HS experiments",
+            "shortLabel": "Diabetes Epigenome Atlas DNase-HS"
         },
         "longLabel":  "{assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{assay_title} of {biosample_term_name} {accession}",
