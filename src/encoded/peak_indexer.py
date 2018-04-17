@@ -177,13 +177,13 @@ def index_peaks(uuid, request):
             if isinstance(start, int) and isinstance(end, int):
                 if chrom in file_data:
                     file_data[chrom].append({
-                        'start': start + 1,
-                        'end': end + 1,
+                        'start': start,
+                        'end': end,
                         'state': state,
                         'val': val
                     })
                 else:
-                    file_data[chrom] = [{'start': start + 1, 'end': end + 1, 'state': state, 'val': val}]
+                    file_data[chrom] = [{'start': start, 'end': end, 'state': state, 'val': val}]
             else:
                 log.warn('positions are not integers, will not index file')
 
@@ -336,4 +336,5 @@ def index_file(request):
                         log.error('Indexing error for {}, error message: {}'.format(item['uuid'], item['error']))
                         item['error'] = "Error occured during indexing, check the logs"
                 result['errors'] = error_messages
+    log.warn(result)
     return result
