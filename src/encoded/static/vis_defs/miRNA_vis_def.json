@@ -2,8 +2,8 @@
     "miRNA": {
         "rule": "'{assay_term_name}' in ['microRNA-seq','microRNA counts']",
         "assay_composite": {
-            "longLabel":  "Collection of T2DREAM microRNA experiments",
-            "shortLabel": "T2DREAM microRNA"
+            "longLabel":  "Collection of Diabetes Epigenome Atlas microRNA experiments",
+            "shortLabel": "Diabetes Epigenome Atlas microRNA"
         },
         "longLabel":  "{assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{assay_title} of {biosample_term_name} {accession}",

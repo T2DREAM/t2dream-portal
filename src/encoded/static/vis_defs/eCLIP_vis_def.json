@@ -2,8 +2,8 @@
     "eCLIP": {
         "rule": "'{assay_term_name}' == 'eCLIP'",
         "assay_composite": {
-            "longLabel":  "Collection of T2DREAM eCLIP experiments",
-            "shortLabel": "T2DREAM eCLIP"
+            "longLabel":  "Collection of Diabetes Epigenome Atlas eCLIP experiments",
+            "shortLabel": "Diabetes Epigenome Atlas eCLIP"
         },
         "longLabel":  "{target} {assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{target} {assay_title} of {biosample_term_name} {accession}",

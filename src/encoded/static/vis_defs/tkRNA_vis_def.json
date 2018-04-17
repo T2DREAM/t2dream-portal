@@ -2,8 +2,8 @@
     "tkRNA": {
         "rule": "'{assay_term_name}' in ['shRNA knockdown followed by RNA-seq','siRNA knockdown followed by RNA-seq','CRISPR genome editing followed by RNA-seq']",
         "assay_composite": {
-            "longLabel":  "Collection of T2DREAM targeted knockdowns RNA-seq experiments",
-            "shortLabel": "T2DREAM knockdown RNA-seq"
+            "longLabel":  "Collection of Diabetes Epigenome Atlas targeted knockdowns RNA-seq experiments",
+            "shortLabel": "Diabetes Epigenome Atlas knockdown RNA-seq"
         },
         "longLabel":  "{assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{assay_title} of {biosample_term_name} {accession}",

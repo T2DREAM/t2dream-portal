@@ -2,8 +2,8 @@
     "scRNA": {
          "rule": "'{assay_term_name}' == 'single cell RNA-seq'",
        "assay_composite": {
-            "longLabel":  "Collection of T2DREAM Single-Cell long-RNA-seq experiments",
-            "shortLabel": "T2DREAM SC RNA-seq"
+            "longLabel":  "Collection of Diabetes Epigenome Atlas Single-Cell long-RNA-seq experiments",
+            "shortLabel": "Diabetes Epigenome Atlas SC RNA-seq"
         },
         "longLabel":  "{assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{assay_title} of {biosample_term_name} {accession}",

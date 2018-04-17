@@ -14,7 +14,7 @@ import Home from './home';
 import { newsHead } from './page';
 
 const portal = {
-    portal_title: 'T2DREAM',
+    portal_title: 'Diabetes Epigenome Atlas',
     global_sections: [
         {
             id: 'about',
@@ -273,7 +273,7 @@ class App extends React.Component {
             auth: {
                 redirect: false,
             },
-	    //TBD replace with T2DREAM logo
+	    //TBD replace with Diabetes Epigenome Atlas logo
             theme: {
                 logo: logoUrl,
             },
