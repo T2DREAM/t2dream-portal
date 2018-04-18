@@ -1181,7 +1181,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             track["name"] = a_file['accession']
             track["type"] = view["type"]
             typetrack = view["type"]
-            s3path = subprocess.check_output('aws s3 ls s3://t2depi-files-dev/2017 --recursive | grep {}.{} | cut -c 32-' .format(a_file['accession'],view["type"]),shell=True)
+            s3path = subprocess.check_output('aws s3 ls s3://t2depi-files-dev --recursive | grep {}.{} | cut -c 32-' .format(a_file['accession'],view["type"]),shell=True)
             s3path1 = s3path.decode('ascii')
             s3path_final = s3path1.strip()
             track["bigDataUrl"] = 'https://s3-us-west-2.amazonaws.com/t2depi-files-dev/{}'.format(s3path_final)
