@@ -180,22 +180,20 @@ class AssayClicking extends React.Component {
                   <div className="site-banner-intro">
 		  <div className="site-banner-header">
 		  <img src="/static/img/logo.png" alt="logo"/>
-                   <h2>Diabetes Epigenome Atlas</h2>
                   </div> 
+		 <br/>
 		  <div className= "site-banner-title">
 		        <p></p>
-		         <h4>Type 2 Diabetes Regulatory Annotation Map</h4> 
 		 </div>
                             <div className="site-banner-intro-content">
-				<p>The Diabetes Epigenome Atlas project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
+				<p style={{'margin': '20px'}}>The Diabetes Epigenome Atlas project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
                             </div>
                         </div>
 		       <div className="site-banner-search">
 		       
-                                      <h4 className="search-header">Explore experiments: </h4>
+                                      <h4 className="search-header">Search Database: </h4>
                                       <SearchEngine />
-                                      <h4 className="search-header">Explore annotations:</h4>
-                                      <SearchEngine1 />
+		                      <h5 style={{'margin-left': '20px', 'margin-top': '0px', 'font-weight': 'normal', 'font-style': 'italic'}}>search experiment, annotation, biosample & <a href="help/getting-started">more</a></h5>
                                       <AdvSearch />
 		       </div>
                     </div>
@@ -991,12 +989,12 @@ const Search = (props, context) => {
         <form className="home-form" action="/search/">
             <div className="search-wrapper">
                 <span>
-                <input type="hidden" name="type" value="Experiment" />
+                <input type="hidden" name="searchTerm" />
                 <input
                     className="form-control search-query"
                     id="home-search"
                     type="text"
-                    placeholder="Enter search (e.g., islets, ATAC-seq)"
+                    placeholder="Enter search (e.g., Single Cell, Chromatin State)"
                     name="searchTerm"
                     defaultValue={searchTerm}
                     key={searchTerm}
@@ -1009,45 +1007,6 @@ const Search = (props, context) => {
 };
 
 Search.contextTypes = {
-    location_href: PropTypes.string,
-};
-
-class SearchEngine1 extends React.Component {
-render()
-{
-return <Search1 />
-}
-}
-
-SearchEngine1.contextTypes = {
-    location_href: PropTypes.string,
-};
-
-const Search1 = (props, context) => {
-    const id1 = url.parse(context.location_href, true);
-    const searchTerm1 = id1.query.searchTerm || '';
-    return (
-        <form className="home-form" action="/search/">
-            <div className="search-wrapper">
-                <span>
-                <input type="hidden" name="type" value="Annotation" />
-                <input
-                    className="form-control search-query"
-                    id="home-search"
-                    type="text"
-                    placeholder="Enter search (e.g., adipose, chromatin state)"
-                    name="searchTerm"
-                    defaultValue={searchTerm1}
-                    key={searchTerm1}
-                />
-            <input type="submit" value="GO" className="submit_3 pull-right" />
-            </span>
-            </div>
-        </form>
-    );
-};
-
-Search1.contextTypes = {
     location_href: PropTypes.string,
 };
 
@@ -1229,7 +1188,7 @@ class AdvSearch extends React.Component {
                         <input type="hidden" name="annotation" value={this.state.terms.annotation} />
 
                               <div className="form-group">
-                              <h4> Search variants and regions: </h4>
+                              <h4> Search variants & coordinates: </h4>
                                <div className="input-group input-group-region-input">
                                 <input id="annotation" ref={(input) => { this.annotation = input; }} defaultValue={region} name="region" placeholder="Enter Search (e.g. rs7903146)
 " type="text" className="form-control" onChange={this.handleChange} />
@@ -1243,6 +1202,7 @@ class AdvSearch extends React.Component {
                                <input type="submit" value="GO" className="submit_4 pull-right" />
                               </div>
                                </div>
+		               <h5 style={{'margin-left': '10px', 'margin-top': '0px', 'font-weight': 'normal', 'font-style': 'italic'}}>example: rs7903146, chr9:21940000</h5>
                     </form>
         );
     }
