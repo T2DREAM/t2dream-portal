@@ -24,11 +24,6 @@ var Footer = createReactClass({
         }
         return (
             <footer id="page-footer">
-                <div className="container">
-                    <div className="row">
-                        <div className="app-version">{this.props.version}</div>
-                    </div>
-                </div>
                 <div className="page-footer">
                     <div className="container">
                         <div className="row">
@@ -43,7 +38,7 @@ var Footer = createReactClass({
 
                             <div className="col-sm-6 col-sm-pull-6">
                                 <ul className="footer-logos">
-                                <li><a href="/"><img src="/static/img/logo.png" alt="Diabetes Epigenome Atlas" id="t2dream-logo" height="55px" width="130px" /></a></li>
+                                <li><a href="/"><img src="/static/img/logo_final.png" alt="Diabetes Epigenome Atlas" id="t2dream-logo" height="55px" width="130px" /></a></li>
                                 <li><a href="http://www.ucsd.edu"><img src="/static/img/UCSanDiegoLogo-BlueGold.png" alt="UC San Diego" id="ucsd-logo" width="130px" height="40px" /></a></li>
                                 </ul>
                             </div>
