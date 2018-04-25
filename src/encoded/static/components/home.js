@@ -1202,7 +1202,7 @@ class AdvSearch extends React.Component {
                                <input type="submit" value="GO" className="submit_4 pull-right" />
                               </div>
                                </div>
-		               <h5 style={{'margin-left': '10px', 'margin-top': '0px', 'font-weight': 'normal', 'font-style': 'italic'}}>example: rs7903146, chr9:21940000</h5>
+		    <h5 style={{'margin-left': '10px', 'margin-top': '0px', 'font-weight': 'normal', 'font-style': 'italic'}}>example: <a href='variant-search/?region=rs7903146&genome=GRCh37'>rs7903146</a>, <a href='variant-search/?region=chr10%3A66794059&genome=GRCh37'>chr10:66794059</a></h5>
                     </form>
         );
     }

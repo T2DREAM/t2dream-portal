@@ -245,19 +245,6 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 		      </DropdownMenu>
 		      </DropdownButton>
 		      : null}
-		     {visualizeKeys ?
-		      <DropdownButton disabled={visualize_disabled} title={visualize_disabled ? 'Filter to ' + visualizeLimit + ' to visualize' : 'Visualize'} label="batchhubs" wrapperClasses="results-table-button">
-		      <DropdownMenu>
-		      {visualizeKeys.map(assembly =>
-					 Object.keys(context.visualize_batch[assembly]).sort().map(browser =>
-												   <a key={[assembly, '_', browser].join()} data-bypass="true" target="_blank" private-browsing="true" href={context.visualize_batch[assembly][browser]}>
-												   {assembly} {browser}
-												   </a>
-												   )
-)}
-</DropdownMenu>
-</DropdownButton>
-: null}
 </div>
 </div> 
                                   <hr />
@@ -270,7 +257,6 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 						  <p className="type">Annotation accession</p>
 						  <p className="type">{result['accession']}</p>
 						  </div>
-						  <head><base href="http://t2depigenome-test.org/annotations" /> </head>
 						  <div class="accession">
 						  <a href={result['@id']}><h4><font color="#428bca">Annotation Dataset: {result.description}</font></h4></a>
 						  </div>
