@@ -20,6 +20,10 @@ export function dbxref(attributes) {
     if (prefix === 'GEO' && local.substr(0, 4) === 'SAMN') {
         prefix = 'GEOSAMN';
     }
+    // Handle two different kinds of GEO -- GSM/GSE vs SAMEA
+    if (prefix === 'GEO' && local.substr(0, 4) === 'SAMEA') {
+        prefix = 'GEOSAMEA';
+    }
 
     // Handle two different kinds of WormBase IDs -- Target vs Strain
     if (prefix === 'WormBase' && attributes.target_ref) {
