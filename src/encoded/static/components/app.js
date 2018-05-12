@@ -35,7 +35,7 @@ const portal = {
 	        { id: 'experiment', title: 'Experiments', url: '/matrix/?type=Experiment'},
                 { id: 'annotations', title: 'Annotations', url: '/matrix/?type=Annotation'},
 		{ id: 'sep-mm-1' },
-		{ id: 'publications', title: 'Publications', url: '/publications'},
+		{ id: 'publications', title: 'Publications', url: '/search/?type=Publication'},
             ],
         },
         {
