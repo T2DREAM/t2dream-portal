@@ -1,7 +1,7 @@
 
 ## Issues and how to fix them
 
-**Reindexing (required after fixing errors)**
+**Reindexing**
 
 curl -XDELETE 'http://localhost:9200/snovault' (**Beware** This deletes entire index)
 
