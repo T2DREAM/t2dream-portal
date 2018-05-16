@@ -237,6 +237,7 @@ def main(global_config, **local_config):
             timeout=60,
             maxsize=50
         )
+        config.include('.region_search')
         config.include('.variant_search')
         config.include('.peak_indexer')
     config.include(static_resources)
