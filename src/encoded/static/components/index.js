@@ -37,6 +37,7 @@ require('./inputs');
 require('./blocks');
 require('./user');
 require('./schema');
+require('./region_search');
 require('./variant_search');
 
 module.exports = require('./app');
