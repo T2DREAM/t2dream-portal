@@ -29,12 +29,11 @@ def includeme(config):
     config.add_route('batch_download', '/batch_download/{search_params}')
     config.add_route('metadata', '/metadata/{search_params}/{tsv}')
     config.add_route('peak_metadata', '/peak_metadata/{search_params}/{tsv}')
+    config.add_route('region_metadata', '/region_metadata/{search_params}/{tsv}')
+    config.add_route('report_download', '/report.tsv')
     config.add_route('experiment_metadata', '/experiment_metadata/{search_params}/{tsv}')
     config.add_route('annotation_metadata', '/annotation_metadata/{search_params}/{tsv}')
-    config.add_route('annotation_metadata_bucket', '/annotation_metadata_bucket/{search_params}/{tsv}')
-    config.add_route('report_download', '/report.tsv')
-    config.add_route('region_metadata', '/region_metadata/region_metadata.json')
-    config.add_route('experiment_bigWig_metadata', '/experiment_bigWig_metadata/{search_params}/{tsv}')
+    config.add_route('data_filters', '/data_filters/{search_params}/{tsv}')
     config.scan(__name__)
 
 # includes concatenated properties
@@ -140,6 +139,18 @@ def get_peak_metadata_links(request):
     )
     return [peak_metadata_tsv_link]
 
+def get_region_metadata_links(request):
+    if request.matchdict.get('search_params'):
+        search_params = request.matchdict['search_params']
+    else:
+        search_params = request.query_string
+
+    region_metadata_tsv_link = '{host_url}/region_metadata/{search_params}/region_metadata.tsv'.format(
+        host_url=request.host_url,
+        search_params=search_params
+    )
+    return [region_metadata_tsv_link]
+
 def make_cell(header_column, row, exp_data_row):
     temp = []
     for column in _tsv_mapping[header_column]:
@@ -180,27 +191,20 @@ def make_audit_cell(header_column, experiment_json, file_json):
 @view_config(route_name='peak_metadata', request_method='GET')
 def peak_metadata(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
-    #log.warn(param_list)
     param_list['field'] = []
     header = ['annotation_type', 'source', 'coordinates', 'file.accession', 'annotation.accession']
     param_list['limit'] = ['all']
     path = '/variant-search/?{}&{}'.format(urlencode(param_list, True),'referrer=peak_metadata')
     results = request.embed(path, as_user=True)
-    #total = results(total)
     uuids_in_results = get_file_uuids(results)
-    #log.warn(get_file_uuids(results))
     rows = []
     json_doc = {}
-    #json_doc["is_error"] = "false"
-    #json_doc["numRecords"]= total
-    #log.warn(results['peaks'])
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
             annotation_json = request.embed(file_json['dataset'])
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
-                log.warn(list(hit.keys()))
                 chrom = '{}'.format(row['_index'])
                 assembly = '{}'.format(row['_type'])
                 start = int('{}'.format(hit['_source']['start']))
@@ -209,7 +213,6 @@ def peak_metadata(context, request):
                 val = '{}'.format(hit['_source']['val'])
                 file_accession = file_json['accession']
                 annotation_accession = annotation_json['accession']
-                #total = '{}'.format(hit['total'])
                 coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
                 annotation = annotation_json['annotation_type']
                 biosample_term = annotation_json['biosample_term_name']
@@ -249,6 +252,70 @@ def peak_metadata(context, request):
         body=fout.getvalue(),
         content_disposition='attachment;filename="%s"' % 'peak_metadata.tsv'
     )
+@view_config(route_name='region_metadata', request_method='GET')
+def region_metadata(context, request):
+    param_list = parse_qs(request.matchdict['search_params'])
+    param_list['field'] = []
+    header = ['annotation_type', 'source', 'coordinates', 'file.accession', 'annotation.accession']
+    param_list['limit'] = ['all']
+    path = '/region-search/?{}&{}'.format(urlencode(param_list, True),'referrer=region_metadata')
+    results = request.embed(path, as_user=True)
+    uuids_in_results = get_file_uuids(results)
+    rows = []
+    json_doc = {}
+    for row in results['peaks']:
+        if row['_id'] in uuids_in_results:
+            file_json = request.embed(row['_id'])
+            annotation_json = request.embed(file_json['dataset'])
+            for hit in row['inner_hits']['positions']['hits']['hits']:
+                data_row = []
+                chrom = '{}'.format(row['_index'])
+                assembly = '{}'.format(row['_type'])
+                start = int('{}'.format(hit['_source']['start']))
+                stop = int('{}'.format(hit['_source']['end']))
+                state = '{}'.format(hit['_source']['state'])
+                val = '{}'.format(hit['_source']['val'])
+                file_accession = file_json['accession']
+                annotation_accession = annotation_json['accession']
+                coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
+                annotation = annotation_json['annotation_type']
+                biosample_term = annotation_json['biosample_term_name']
+                data_row.extend([annotation, biosample_term, coordinates, annotation_accession])
+                rows.append(data_row)
+                if annotation not in json_doc:
+                    json_doc[annotation] = []
+                    json_doc[annotation].append({
+                        'annotation_type': annotation,
+                        'coordinates':coordinates,
+                        'state': state,
+                        'value': val,
+                        'biosample_term_name': biosample_term,
+                        'genome': assembly,
+                        'accession': annotation_accession
+                    })
+                else:
+                    json_doc[annotation].append({
+                        'annotation_type': annotation,
+                        'coordinates':coordinates,
+                        'state': state,
+                        'value': val,
+                        'biosample_term_name': biosample_term,
+                        'genome': assembly,
+                        'accession': annotation_accession
+                })
+    return Response(
+        content_type='text/plain',
+        body=json.dumps(json_doc,indent=2,sort_keys=True)
+        )
+    fout = io.StringIO()
+    writer = csv.writer(fout, delimiter='\t')
+    writer.writerow(header)
+    writer.writerows(rows)
+    return Response(
+        content_type='text/tsv',
+        body=fout.getvalue(),
+        content_disposition='attachment;filename="%s"' % 'region_metadata.tsv'
+    )
 @view_config(route_name='metadata', request_method='GET')
 def metadata_tsv(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
@@ -269,7 +336,6 @@ def metadata_tsv(context, request):
     results = request.embed(path, as_user=True)
     rows = []
     for experiment_json in results['@graph']:
-        log.warn(experiment_json)
         if experiment_json['files']:
             exp_data_row = []
             for column in header:
@@ -319,7 +385,7 @@ def metadata_tsv(context, request):
         body=fout.getvalue(),
         content_disposition='attachment;filename="%s"' % 'metadata.tsv'
     )
-@view_config(route_name='experiment_metadata', request_method='GET')
+@view_config(route_name= 'experiment_metadata', request_method='GET')
 def experiment_metadata(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
     if 'referrer' in param_list:
@@ -337,36 +403,45 @@ def experiment_metadata(context, request):
     results = request.embed(path, as_user=True)
     json_doc = {}
     for experiment_json in results['@graph']:
-        if experiment_json['files']:
-            for f in experiment_json['files']:
-                lab = f['lab']['title']
-                file_id = f['title']
-                file_type = f['file_type']
-            assay_id = experiment_json['accession']
-            assay = experiment_json['assay_term_name']
-            biosample_term = experiment_json['biosample_term_name']
-            #biosample_summary = '{}'.format(experiment_json['biosample_summary'])
-            replicate = experiment_json['replicates']
-            if assay not in json_doc:
-                json_doc[assay] = []
-                json_doc[assay].append({
-                    'assay_term_name': assay,
-                    'assay_id': assay_id,
-                    'biosample_term': biosample_term,
-                    'lab': lab,
-                    'file_id': file_id,
-                    'file_type': file_type,
-                    'replicates': replicate
-                })  
+        files = {}
+        for f in experiment_json['files']:
+            title = f['title']
+            lab = f['lab']['title']
+            href = request.host_url + f['href']
+            status = f['status']
+            if title not in files:
+                files[title] = []
+                files[title].append({
+                    'href': href,
+                    'status': status,
+                    'lab': lab
+                    })
             else:
-                json_doc[assay].append({
-                    'assay': assay,
-                    'assay id': assay_id,
-                    'biosample_term': biosample_term,
-                    'lab': lab,
-                    'file_id': file_id,
-                    'file_type': file_type,
-                    'replicates': replicate
+                files[title].append({
+                    'href': href,
+                    'status': status,
+                    'lab': lab
+                    })                
+        assay_id = experiment_json['accession']
+        assay = experiment_json['assay_term_name']
+        biosample_term = experiment_json['biosample_term_name']
+        replicate = experiment_json['replicates']
+        if assay not in json_doc:
+            json_doc[assay] = []
+            json_doc[assay].append({
+                'assay_term_name': assay,
+                'assay_id': assay_id,
+                'biosample_term': biosample_term,
+                'file_download': files,
+                'replicates': replicate
+                })  
+        else:
+            json_doc[assay].append({
+                'assay': assay,
+                'assay id': assay_id,
+                'biosample_term': biosample_term,
+                'file_download': files,
+                'replicates': replicate
                 })  
     if 'experiment_metadata.json' in request.url:
         return Response(
@@ -374,62 +449,7 @@ def experiment_metadata(context, request):
             body=json.dumps(json_doc,indent=2,sort_keys=True),
             content_disposition='attachment;filename="%s"' % 'experiment_metadata.json'
     )
-@view_config(route_name= 'experiment_bigWig_metadata', request_method='GET')
-def experiment_bigWig_metadata(context, request):
-    param_list = parse_qs(request.matchdict['search_params'])
-    if 'referrer' in param_list:
-        search_path = '/{}/'.format(param_list.pop('referrer')[0])
-    else:
-        search_path = '/search/'
-    param_list['field'] = []
-    file_attributes = []
-    for prop in _tsv_mapping:
-        param_list['field'] = param_list['field'] + _tsv_mapping[prop]
-        if _tsv_mapping[prop][0].startswith('files'):
-            file_attributes = file_attributes + [_tsv_mapping[prop][0]]
-    param_list['limit'] = ['all']
-    path = '{}?{}'.format(search_path, urlencode(param_list, True))
-    results = request.embed(path, as_user=True)
-    json_doc = {}
-    for experiment_json in results['@graph']:
-        if experiment_json['files']:
-            for f in experiment_json['files']:
-                if f['file_type'] == 'bigWig':
-                    lab = f['lab']['title']
-                    file_id = f['title']
-                    file_type = f['file_type']
-                    assay_id = experiment_json['accession']
-                    assay = experiment_json['assay_term_name']
-                    biosample_term = experiment_json['biosample_term_name']
-                    replicate = experiment_json['replicates']
-                    if assay not in json_doc:
-                        json_doc[assay] = []
-                        json_doc[assay].append({
-                            'assay_term_name': assay,
-                            'assay_id': assay_id,
-                            'biosample_term': biosample_term,
-                            'lab': lab,
-                            'file_id': file_id,
-                            'file_type': file_type,
-                            'replicates': replicate
-                        })  
-                    else:
-                        json_doc[assay].append({
-                            'assay': assay,
-                            'assay id': assay_id,
-                            'biosample_term': biosample_term,
-                            'lab': lab,
-                            'file_id': file_id,
-                            'file_type': file_type,
-                            'replicates': replicate
-                        })  
-    if 'experiment_bigWig_metadata.json' in request.url:
-        return Response(
-            content_type='text/plain',
-            body=json.dumps(json_doc,indent=2,sort_keys=True),
-            content_disposition='attachment;filename="%s"' % 'experiment_bigWig_metadata.json'
-    )
-@view_config(route_name='annotation_metadata', request_method='GET')
+@view_config(route_name= 'annotation_metadata', request_method='GET')
 def annotation_metadata(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
     if 'referrer' in param_list:
@@ -447,33 +467,42 @@ def annotation_metadata(context, request):
     results = request.embed(path, as_user=True)
     json_doc = {}
     for annotation_json in results['@graph']:
-        log.warn(list(annotation_json.keys()))
-        if annotation_json['files']:
-            for f in annotation_json['files']:
-                assay_id = '{}'.format(annotation_json['accession'])
-                annotation = '{}'.format(annotation_json['annotation_type'])
-                biosample_type = '{}'.format(annotation_json['biosample_type'])
-                lab = '{}'.format(f['lab']['title'])
-                file_id = '{}'.format(f['title'])
-                file_type = '{}'.format(f['file_type'])
-                if annotation not in json_doc:
-                    json_doc[annotation] = []
-                    json_doc[annotation].append({
-                        'annotation': annotation,
-                        'assay id': assay_id,
-                        'biosample_type': biosample_type,
-                        'lab': lab,
-                        'file_id': file_id,
-                        'file_type': file_type
-                    })  
-                else:
-                    json_doc[annotation].append({
-                        'annotation': annotation,
-                        'assay id': assay_id,
-                        'biosample_type': biosample_type,
-                        'lab': lab,
-                        'file_id': file_id,
-                        'file_type': file_type
+        files = {}
+        for f in annotation_json['files']:
+            title = f['title']
+            lab = f['lab']['title']
+            href = request.host_url + f['href']
+            status = f['status']
+            if title not in files:
+                files[title] = []
+                files[title].append({
+                    'href': href,
+                    'status': status,
+                    'lab': lab
+                    })
+            else:
+                files[title].append({
+                    'href': href,
+                    'status': status,
+                    'lab': lab
+                    })
+        annotation_id = annotation_json['accession']
+        annotation = annotation_json['annotation_type']
+        biosample_term = annotation_json['biosample_term_name']
+        if annotation not in json_doc:
+            json_doc[annotation] = []
+            json_doc[annotation].append({
+                'annotation_term_name': annotation,
+                'annotation_id': annotation_id,
+                'biosample_term': biosample_term,
+                'file_download': files
+                })  
+        else:
+            json_doc[annotation].append({
+                'annotation_term_name': annotation,
+                'annotation id': annotation_id,
+                'biosample_term': biosample_term,
+                'file_download': files
                 })  
     if 'annotation_metadata.json' in request.url:
         return Response(
@@ -481,65 +510,32 @@ def annotation_metadata(context, request):
             body=json.dumps(json_doc,indent=2,sort_keys=True),
             content_disposition='attachment;filename="%s"' % 'annotation_metadata.json'
     )
-@view_config(route_name='annotation_metadata_bucket', request_method='GET')
-def annotation_metadata_bucket(context, request):
+@view_config(route_name='data_filters', request_method='GET')
+def data_filters(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
     if 'referrer' in param_list:
         search_path = '/{}/'.format(param_list.pop('referrer')[0])
     else:
         search_path = '/search/'
     param_list['field'] = []
-    file_attributes = []
-    for prop in _tsv_mapping:
-        param_list['field'] = param_list['field'] + _tsv_mapping[prop]
-        if _tsv_mapping[prop][0].startswith('files'):
-            file_attributes = file_attributes + [_tsv_mapping[prop][0]]
     param_list['limit'] = ['all']
     path = '{}?{}'.format(search_path, urlencode(param_list, True))
     results = request.embed(path, as_user=True)
     json_doc = {}
-    for annotation1_json in results['@graph']:
-        #log.warn(list(experiment_json.keys()))
-        if annotation1_json['files']:
-            for f in annotation1_json['files']:
-                if f['file_type'] == 'bigWig':
-                    assay_id = '{}'.format(annotation1_json['accession'])
-                    annotation = '{}'.format(annotation1_json['annotation_type'])
-                    biosample_type = '{}'.format(annotation1_json['biosample_type'])
-                    lab = '{}'.format(f['lab']['title'])
-                    file_id = '{}'.format(f['title'])
-                    file_type = '{}'.format(f['file_type'])
-                    s3path = subprocess.check_output('aws s3 ls s3://t2depi-files-dev --recursive | grep {}.{} | cut -c 32-' .format(f['title'],'bigWig'),shell=True)
-                    s3path1 = s3path.decode('ascii')
-                    file_type = '{}'.format(f['file_type'])
-                    s3path_final = s3path1.strip()
-                    s3_path = 'https://s3-us-west-2.amazonaws.com/t2depi-files-dev/{}'.format(s3path_final)
-                    if annotation not in json_doc:
-                        json_doc[annotation] = []
-                        json_doc[annotation].append({
-                            'annotation': annotation,
-                            'assay id': assay_id,
-                            'biosample_type': biosample_type,
-                            'lab': lab,
-                            'file_id': file_id,
-                            's3_path': s3_path,
-                            'file_type': file_type
-                        })  
-                    else:
-                        json_doc[annotation].append({
-                            'annotation': annotation,
-                            'assay id': assay_id,
-                            'biosample_type': biosample_type,
-                            'lab': lab,
-                            'file_id': file_id,
-                            's3_path': s3_path,
-                            'file_type': file_type
-                        })
-    if 'annotation_metadata_bucket.json' in request.url:
+    for dataFilter_json in results['facets']:
+        field = dataFilter_json['field']
+        for term in dataFilter_json['terms']:
+            if term['doc_count'] != 0:
+                if field not in json_doc:
+                    json_doc[field] = []
+                    json_doc[field].append({term['key']:term['doc_count']})
+                else:
+                    json_doc[field].append({term['key']:term['doc_count']})
+    if 'data_filters.json' in request.url:
         return Response(
             content_type='text/plain',
             body=json.dumps(json_doc,indent=2,sort_keys=True),
-            content_disposition='attachment;filename="%s"' % 'annotation_metadata_bucket.json'
+            content_disposition='attachment;filename="%s"' % 'data_filters.json'
         )
 @view_config(route_name='batch_download', request_method='GET')
 def batch_download(context, request):
