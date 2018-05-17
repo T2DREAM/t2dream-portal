@@ -97,7 +97,7 @@ def get_mapping(assembly_name='hg19'):
 def index_settings():
     return {
         'index': {
-            'number_of_shards': 1
+            'number_of_shards': 12
         }
     }
 
