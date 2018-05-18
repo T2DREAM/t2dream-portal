@@ -276,7 +276,7 @@ def run(wale_s3_prefix, image_id, instance_type, elasticsearch, spot_instance, s
         if cluster_name:
             data_insert['CLUSTER_NAME'] = cluster_name
         user_data = user_data % data_insert
-        security_groups = ['ssh','http','https']
+        security_groups = ['ssh-http-https']
         iam_role = 'encoded-instance'
         count = 1
     else:
