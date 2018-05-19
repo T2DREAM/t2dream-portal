@@ -37,6 +37,8 @@ ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com (each time will be different 
 Login to instance to check status of installation:
 ssh ubuntu@ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com
 
+https://www.elastic.co/guide/en/elasticsearch/guide/current/distributed-cluster.html
+
 View cluster health on master
 ```
 curl localhost:9200/_cluster/health?pretty
