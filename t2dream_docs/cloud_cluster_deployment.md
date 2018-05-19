@@ -109,4 +109,4 @@ sudo tail /var/log/elasticsearch/v6-cluster_index_indexing_slowlog.log
 * Install security cert https://certbot.eff.org/lets-encrypt/ubuntutrusty-apache
 * Size down master c2.8xlarge to c2.4xlarge(not recommended though)
 
-At last online!
+Finally online!
