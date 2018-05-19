@@ -3,7 +3,7 @@
 
 Reference - https://github.com/ENCODE-DCC/encoded/blob/dev/docs/aws-deployment.rst
 
-This will launch the elastic search and indexing in cluster mode to accomodate large datasets and meet computational demands. Needed for production and upload (demo) machines.
+This will launch the elastic search and indexing in cluster mode to accomodate large datasets and meet computational demands. Needed for production and upload (demo) machines. The cluster node has only elasticsearch (for indexing & searching) and the master node runs python codebase 
 
 **Deploy to AWS instance:**
 
