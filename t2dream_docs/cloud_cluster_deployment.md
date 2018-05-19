@@ -104,9 +104,11 @@ check indexing on cluster nodes
 sudo tail /var/log/elasticsearch/v6-cluster_index_indexing_slowlog.log
 ```
 
-* Complete indexing (as of May 18th 2018) takes ~ hours
+* Complete indexing (as of May 18th 2018) takes ~ hours (while indexing is in-progress check logs for errors)
 * Attach elastic ip for demo (data upload server) and production server after compelete indexing
 * Install security cert https://certbot.eff.org/lets-encrypt/ubuntutrusty-apache
 * Size down master c2.8xlarge to c2.4xlarge(not recommended though)
+* For Demo create and schedule wal backups (at 6pm daily)
 
+https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/database-backup-retrievals.md
 Finally online!
