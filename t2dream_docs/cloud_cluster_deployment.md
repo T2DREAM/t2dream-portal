@@ -27,7 +27,7 @@ Launch cluster nodes
 bin/deploy --cluster-name vX-cluster --profile-name production --candidate --n vX-master --instance-type c4.8xlarge
 ```
 
-Note: X is the instance version
+Note: *X is the instance version*
 
 Go to AWS console, check cluster nodes and master nodes running
 
@@ -79,6 +79,8 @@ On cluster instance
 }
 ```
 
+Note: *Security groups elasticsearch-https and ssh-http-https should open for the cluser instances*
+
 View progress:
 ```
 tail -f /var/log/cloud-init-output.log
@@ -86,8 +88,25 @@ tail -f /var/log/cloud-init-output.log
 
 Usually runs without any errors, errors encountered only when modules/dependecies are deprecated
 
-The master server should automatically reboot after installation is complete
+* The master server should automatically reboot after installation is complete
+* Going to the URL http://ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com should return the homepage
+* This retrieves the latest wal backups (during installation process) - required for demo and production
+* Initiates indexing
 
-Going to the URL http://ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com should return the homepage
+Check logs on master
 
+```
+tail /var/log/apache2/error.logs
+```
 
+check indexing on cluster nodes
+```
+sudo tail /var/log/elasticsearch/v6-cluster_index_indexing_slowlog.log
+```
+
+* Complete indexing (as of May 18th 2018) takes ~ hours
+* Attach elastic ip for demo (data upload server) and production server after compelete indexing
+* Install security cert https://certbot.eff.org/lets-encrypt/ubuntutrusty-apache
+* Size down master c2.8xlarge to c2.4xlarge(not recommended though)
+
+At last online!
