@@ -1373,7 +1373,7 @@ const FileGalleryRenderer = createReactClass({
         session_properties: PropTypes.object,
         location_href: PropTypes.string,
     },
-
+    
     getInitialState: function () {
         return {
             infoNodeId: '', // @id of node whose info panel is open
@@ -1452,9 +1452,9 @@ const FileGalleryRenderer = createReactClass({
 
         // Get a list of files for the graph (filters out archived files)
         const graphFiles = _(files).filter(file => file.status !== 'archived');
-
+	const singleCell = context.assay_term_name === 'single cell isolation followed by RNA-seq'
         // Build node graph of the files and analysis steps with this experiment
-        if (graphFiles && graphFiles.length && !hideGraph) {
+        if (graphFiles && graphFiles.length && !hideGraph && !singleCell) {
             try {
                 const { graph, graphedFiles } = assembleGraph(context, this.context.session, this.state.infoNodeId, graphFiles, selectedAssembly, selectedAnnotation);
                 jsonGraph = graph;
@@ -1477,8 +1477,9 @@ const FileGalleryRenderer = createReactClass({
                     </div>
                 </PanelHeading>
 		{/* Display the strip of filgering controls */}
+	    
 	    <FilterControls selectedFilterValue={this.state.selectedFilterValue} filterOptions={filterOptions} handleFilterChange={this.handleFilterChange} />
-		<TabPanel tabs={{ graph: 'Association graph', tables: 'File details' }}>
+		<TabPanel tabs={{ graph: 'Association graph', tables: 'File details' }}>	        
 		<TabPanelPane key="graph">
 		{!hideGraph ?
 		 <FileGraph
@@ -1497,9 +1498,8 @@ const FileGalleryRenderer = createReactClass({
 		 forceRedraw
 		 />
 		 : null}
-	    </TabPanelPane>
-		
-	    <TabPanelPane key="tables">
+	        </TabPanelPane>
+		<TabPanelPane key="tables">
 		{
 		    /* If logged in and dataset is released, need to combine search of files that reference
 		        this dataset to get released and unreleased ones. If not logged in, then just get
@@ -1814,6 +1814,7 @@ const FileGraphComponent = createReactClass({
                 return <p className="browser-error">Choose an assembly to see file association graph</p>;
             }
             return <p className="browser-error">Graph not applicable for the selected assembly/annotation.</p>;
+	  
         }
         return null;
     },
