@@ -1,8 +1,6 @@
 
 ## Workflow to deploy database on cloud in cluster mode
 
-Reference - https://github.com/ENCODE-DCC/encoded/blob/dev/docs/aws-deployment.rst
-
 This will launch the elastic search and indexing in cluster mode to accomodate large datasets and meet computational demands. Needed for production and upload (demo) machines. The cluster node has only elasticsearch (for indexing & searching) and the master node runs python codebase 
 
 **Deploy to AWS instance:**
@@ -114,5 +112,9 @@ sudo tail /var/log/elasticsearch/v6-cluster_index_indexing_slowlog.log
 
 https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/database-backup-retrievals.md
 
+Debuging cluster state and shard allocation
+https://www.datadoghq.com/blog/elasticsearch-unassigned-shards/
+
+Reference - https://github.com/ENCODE-DCC/encoded/blob/dev/docs/aws-deployment.rst
 
 Finally online!
