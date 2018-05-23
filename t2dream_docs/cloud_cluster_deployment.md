@@ -26,6 +26,7 @@ bin/deploy --cluster-name vX-cluster --profile-name production --candidate --n v
 ```
 
 Note: *X is the instance version*
+Ensure the --cluster-name for launching cluster nodes and master node is same
 
 Go to AWS console, check cluster nodes and master nodes running
 
