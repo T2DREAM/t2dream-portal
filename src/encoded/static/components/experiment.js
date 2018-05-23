@@ -2,6 +2,7 @@
 var React = require('react');
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
+import { collapseIcon } from '../libs/svg-icons';
 var panel = require('../libs/bootstrap/panel');
 var button = require('../libs/bootstrap/button');
 var dropdownMenu = require('../libs/bootstrap/dropdown-menu');
@@ -58,6 +59,22 @@ var PanelLookup = function (props) {
     return <PanelView {...props} />;
 };
 
+const CollapsingTitle = createReactClass({
+    propTypes: {
+	title: PropTypes.string.isRequired, // Title to display in the title bar 
+	handleCollapse: PropTypes.func.isRequired, // Function to call to handle click in collapse button
+	collapsed: PropTypes.bool, // T if the panel this is over has been collapsed
+	},
+    render: function () {
+	const { title, handleCollapse, collapsed } = this.props;
+	return (
+	    <div className="collapsing-title">
+		<button className="collapsing-title-trigger pull-left" data-trigger onClick={handleCollapse}>{collapseIcon(collapsed, 'collapsing-title-icon')}</button>
+		<h4>{title}</h4>
+	</div>
+		);
+	},
+    });
 
 var ExperimentComponent = createReactClass({
     contextTypes: {
@@ -71,6 +88,7 @@ var ExperimentComponent = createReactClass({
         const adminUser = !!(this.context.session_properties && this.context.session_properties.admin);
         var itemClass = globals.itemClass(context, 'view-item');
         var replicates = context.replicates;
+	const singleCell = context.assay_term_name === 'single cell isolation followed by RNA-seq';
         if (replicates) {
             var condensedReplicatesKeyed = _(replicates).groupBy(replicate => replicate.library ? replicate.library['@id'] : replicate.uuid);
             if (Object.keys(condensedReplicatesKeyed).length) {
@@ -620,6 +638,27 @@ var ReplicateTable = createReactClass({
             getValue: condensedReplicate => condensedReplicate[0].library ? condensedReplicate[0].library.accession : ''
         }
     },
+    handleCollapse: function (table) {
+	// Handle a click on a collapse button by toggling the corresponding tableCollapse state var
+	const collapsed = _.clone(this.state.collapsed);
+	collapsed[table] = !collapsed[table];
+	this.setState({ collapsed: collapsed });
+	},
+    handleCollapseProc: function () {
+	this.handleCollapse('proc');
+	},
+    handleCollapseRef: function () {
+	this.handleCollapse('ref');
+	},
+    getInitialState: function () {
+	return {
+	    maxWidth: 'auto',
+	    collapsed: {
+		condensedReplicates: true,
+		},
+	    };
+	},
+
 
     render: function() {
         var tableTitle;
@@ -638,8 +677,9 @@ var ReplicateTable = createReactClass({
         }
 
         return (
-            <SortTablePanel title={tableTitle}>
-                <SortTable list={condensedReplicates} columns={this.replicateColumns} />
+            <SortTablePanel> 
+		<CollapsingTitle title={tableTitle} collapsed={this.state.collapsed.ref} handleCollapse={this.handleCollapseRef} />
+                <SortTable collapsed={this.state.collapsed.ref} list={condensedReplicates} columns={this.replicateColumns} />
             </SortTablePanel>
         );
     }
