@@ -38,6 +38,23 @@ ssh ubuntu@ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com
 
 https://www.elastic.co/guide/en/elasticsearch/guide/current/distributed-cluster.html
 
+Add Replicas
+```
+curl -XPUT 'localhost:9200/_all/_settings' -d '{"index": {"number_of_replicas": 2}}'
+```
+
+**Why Replicas and shard**
+
+**Sharding is important for two primary reasons**
+* It allows you to horizontally split/scale your content volume
+* It allows you to distribute and parallelize operations across shards (potentially on multiple nodes) thus increasing performance/throughput 
+
+**Replication is important for two primary reasons:**
+
+* It provides high availability in case a shard/node fails. For this reason, it is important to note that a replica shard is never allocated on the same node as the original/primary shard that it was copied from. 
+* It allows you to scale out your search volume/throughput since searches can be executed on all replicas in parallel. 
+
+
 View cluster health on master
 ```
 curl localhost:9200/_cluster/health?pretty
