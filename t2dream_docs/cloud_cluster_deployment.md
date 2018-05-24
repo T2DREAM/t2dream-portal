@@ -43,7 +43,7 @@ Add Replicas
 curl -XPUT 'localhost:9200/_all/_settings' -d '{"index": {"number_of_replicas": 2}}'
 ```
 
-**Why Replicas and shard**
+**Why Replicas and shard??**
 
 **Sharding is important for two primary reasons**
 * It allows you to horizontally split/scale your content volume
