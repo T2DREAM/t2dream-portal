@@ -130,6 +130,10 @@ sudo tail /var/log/elasticsearch/v6-cluster_index_indexing_slowlog.log
 
 https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/database-backup-retrievals.md
 
+ES best practice 
+https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started.html
+https://medium.com/@abhidrona/elasticsearch-deployment-best-practices-d6c1323b25d7
+
 Debuging cluster state and shard allocation
 https://www.datadoghq.com/blog/elasticsearch-unassigned-shards/
 
