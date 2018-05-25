@@ -26,6 +26,7 @@ bin/deploy --cluster-name vX-cluster --profile-name production --candidate --n v
 ```
 
 Note: *X is the instance version*
+Ensure the --cluster-name for launching cluster nodes and master node is same
 
 Go to AWS console, check cluster nodes and master nodes running
 
@@ -36,6 +37,23 @@ Login to instance to check status of installation:
 ssh ubuntu@ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com
 
 https://www.elastic.co/guide/en/elasticsearch/guide/current/distributed-cluster.html
+
+Add Replicas
+```
+curl -XPUT 'localhost:9200/_all/_settings' -d '{"index": {"number_of_replicas": 2}}'
+```
+
+**Why Replicas and shard??**
+
+**Sharding is important for two primary reasons**
+* It allows you to horizontally split/scale your content volume
+* It allows you to distribute and parallelize operations across shards (potentially on multiple nodes) thus increasing performance/throughput 
+
+**Replication is important for two primary reasons:**
+
+* It provides high availability in case a shard/node fails. For this reason, it is important to note that a replica shard is never allocated on the same node as the original/primary shard that it was copied from. 
+* It allows you to scale out your search volume/throughput since searches can be executed on all replicas in parallel. 
+
 
 View cluster health on master
 ```
@@ -111,6 +129,11 @@ sudo tail /var/log/elasticsearch/v6-cluster_index_indexing_slowlog.log
 * For Demo create and schedule wal backups (at 6pm daily)
 
 https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/database-backup-retrievals.md
+
+ES best practice 
+https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started.html
+
+https://medium.com/@abhidrona/elasticsearch-deployment-best-practices-d6c1323b25d7
 
 Debuging cluster state and shard allocation
 https://www.datadoghq.com/blog/elasticsearch-unassigned-shards/
