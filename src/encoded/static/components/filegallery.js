@@ -15,10 +15,9 @@ import { softwareVersionList } from './software';
 import { FetchedData, Param } from './fetched';
 import { collapseIcon } from '../libs/svg-icons';
 import { SortTablePanel, SortTable } from './sorttable';
-
+var button = require('../libs/bootstrap/button');
 
 const MINIMUM_COALESCE_COUNT = 5; // Minimum number of files in a coalescing group
-
 
 // Get the audit icon for the highest audit level in the given file.
 function fileAuditStatus(file) {
@@ -32,6 +31,8 @@ function fileAuditStatus(file) {
     }
     return <AuditIcon level={highestAuditLevel} addClasses="file-audit-status" />;
 }
+
+//var download_url = '/batch_download/?type=Experiment&accession=' + context.accession;
 
 
 // Sort callback to compare the accession/external_accession of two files.
@@ -217,6 +218,10 @@ export const FileTable = createReactClass({
     hoverDL: (hovering, fileUuid) => {
         this.setState({ restrictedTip: hovering ? fileUuid : '' });
     },
+    handleCollapse: function () {
+	// Handle a click on a collapse button by toggling the corresponding tableCollapse state var                                                                                          
+	this.setState({ collapsed: !this.state.collapsed });
+    },
 
     render: function () {
         const {
@@ -258,7 +263,6 @@ export const FileTable = createReactClass({
                 return true;
             });
             const filteredCount = datasetFiles.length;
-
             // Extract four kinds of file arrays
             const files = _(datasetFiles).groupBy((file) => {
                 if (file.output_category === 'raw data') {
@@ -274,7 +278,10 @@ export const FileTable = createReactClass({
                 <div>
                     {showFileCount ? <div className="file-gallery-counts">Displaying {filteredCount} of {unfilteredCount} files</div> : null}
                     <SortTablePanel header={filePanelHeader} noDefaultClasses={this.props.noDefaultClasses}>
+		    <TabPanel tabs={{ rawFile: 'Raw Files', processedFile: 'Processed Files' }}>
+                    <TabPanelPane key="rawFile">
                         <RawSequencingTable
+                            collapsed={this.state.collapsed}
                             files={files.raw}
                             meta={{
                                 encodevers: encodevers,
@@ -287,6 +294,7 @@ export const FileTable = createReactClass({
                             }}
                         />
                         <RawFileTable
+		            collapsed={this.state.collapsed}
                             files={files.rawArray}
                             meta={{
                                 encodevers: encodevers,
@@ -298,15 +306,17 @@ export const FileTable = createReactClass({
                                 adminUser: adminUser,
                             }}
                         />
+		    </TabPanelPane>
+		    <TabPanelPane key="processedFile">
                         <SortTable
                             title={
                                 <CollapsingTitle
-                                    title="Processed data" collapsed={this.state.collapsed.proc}
-                                    handleCollapse={this.handleCollapseProc}
+                                    title="Processed data" collapsed={this.state.collapsed}
+                                    handleCollapse={this.handleCollapse}
                                 />
                             }
                             rowClasses={this.rowClasses}
-                            collapsed={this.state.collapsed.proc}
+                            collapsed={this.state.collapsed}
                             list={files.proc}
                             columns={this.procTableColumns}
                             sortColumn="biological_replicates"
@@ -344,6 +354,8 @@ export const FileTable = createReactClass({
                                 adminUser: adminUser,
                             }}
                         />
+		    </TabPanelPane>
+		    </TabPanel>
                     </SortTablePanel>
                 </div>
             );
@@ -392,7 +404,7 @@ const RawSequencingTable = createReactClass({
 
     getInitialState: function () {
         return {
-            collapsed: false, // Collapsed/uncollapsed state of table
+            collapsed: true, // Collapsed/uncollapsed state of table
             restrictedTip: '', // UUID of file with tooltip showing
         };
     },
@@ -1470,7 +1482,7 @@ const FileGalleryRenderer = createReactClass({
             <Panel>
                 <PanelHeading addClasses="file-gallery-heading">
                     <h4>Files</h4>
-                    <div className="file-gallery-visualize">
+		    <div className="file-gallery-visualize">
                         {context.visualize ?
 			 <BrowserSelector visualizeCfg={context.visualize} />
                         : null}
