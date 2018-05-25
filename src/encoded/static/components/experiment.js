@@ -5,6 +5,7 @@ import createReactClass from 'create-react-class';
 import { collapseIcon } from '../libs/svg-icons';
 var panel = require('../libs/bootstrap/panel');
 var button = require('../libs/bootstrap/button');
+var {Modal, ModalHeader, ModalBody, ModalFooter} = require('../libs/bootstrap/modal');
 var dropdownMenu = require('../libs/bootstrap/dropdown-menu');
 var _ = require('underscore');
 import { auditDecor } from './audit';
@@ -24,7 +25,7 @@ var doc = require('./doc');
 var {FileGallery} = require('./filegallery');
 var {GeneticModificationSummary} = require('./genetic_modification');
 var { BiosampleSummaryString, BiosampleOrganismNames, CollectBiosampleDocs, AwardRef } = require('./typeutils');
-
+var {Modal, ModalHeader, ModalBody, ModalFooter} = require('../libs/bootstrap/modal');
 var Breadcrumbs = navigation.Breadcrumbs;
 var DbxrefList = dbxref.DbxrefList;
 var FetchedItems = fetched.FetchedItems;
@@ -46,8 +47,6 @@ var anisogenicValues = [
     'anisogenic, sex-matched',
     'anisogenic'
 ];
-
-
 var PanelLookup = function (props) {
     // XXX not all panels have the same markup
     var context;
@@ -58,7 +57,34 @@ var PanelLookup = function (props) {
     var PanelView = globals.panel_views.lookup(props.context);
     return <PanelView {...props} />;
 };
-
+var DownloadComponent = createReactClass({
+    contextTypes: {
+        session: PropTypes.object,
+        session_properties: PropTypes.object,
+    },
+    render: function() {
+	var context = this.props.context;
+	var download_url = '/batch_download/type=Experiment&accession=' + context.accession;
+	return (
+	     <Modal actuator={<button className="btn btn-info btn-sm">Download</button>}>
+		<ModalHeader title="Using batch download" closeModal />
+		<ModalBody>
+		<p>Click the &ldquo;Download&rdquo; button below to download a &ldquo;files.txt&rdquo; file that contains a list of URLs to a file containing all the experimental metadata and links to download the file.
+		The first line of the file will always be the URL to download the metadata file. </p><br />
+		 <p>The &ldquo;files.txt&rdquo; file can be copied to any server.<br />
+		The following command using cURL can be used to download all the files in the list:</p><br />
+		<code>xargs -n 1 curl -O -L &lt; files.txt</code><br />
+		</ModalBody>
+		<ModalFooter
+	        closeModal={<a className="btn btn-info btn-sm">Close</a>}
+	        submitBtn={<a data-bypass="true" target="_self" className="btn btn-info btn-sm" href={download_url}>{'Download'}</a>}
+	        dontClose
+	        />
+		</Modal>
+		);
+	},
+    });
+	
 const CollapsingTitle = createReactClass({
     propTypes: {
 	title: PropTypes.string.isRequired, // Title to display in the title bar 
@@ -334,7 +360,6 @@ var ExperimentComponent = createReactClass({
         if (context.internal_tags && context.internal_tags.length) {
             tagBadges = context.internal_tags.map(tag => <img key={tag} src={'/static/img/tag-' + tag + '.png'} alt={tag + ' tag'} />);
         }
-
         return (
             <div className={itemClass}>
                 <header className="row">
@@ -416,7 +441,10 @@ var ExperimentComponent = createReactClass({
                                             <dd>{context.description}</dd>
                                         </div>
                                     : null}
-
+	                             <div data-test="download">
+		                     <dt> Download Files </dt>
+                                     <DownloadComponent context={context} />
+                                    </div>
                                     {AssayDetails(replicates, libraryValues, librarySpecials, libraryComponents)}
 
                                     {Object.keys(platforms).length ?
@@ -432,7 +460,6 @@ var ExperimentComponent = createReactClass({
                                             </dd>
                                         </div>
                                     : null}
-
                                     {context.possible_controls && context.possible_controls.length ?
                                         <div data-test="possible-controls">
                                             <dt>Controls</dt>
@@ -549,6 +576,143 @@ const Experiment = module.exports.Experiment = auditDecor(ExperimentComponent);
 
 globals.content_views.register(Experiment, 'Experiment');
 
+// Display the table of cell count for single cell assays
+var SingleCellTable = createReactClass({
+    propTypes: {
+        condensedReplicates: PropTypes.array.isRequired, // Condensed 'array' of replicate objects
+        replicationType: PropTypes.string // Type of replicate so we can tell what's isongenic/anisogenic/whatnot
+    },
+
+    replicateColumns: {
+        'biological_replicate_number': {
+            title: 'Biological replicate',
+            getValue: condensedReplicate => condensedReplicate[0].biological_replicate_number
+        },
+        'technical_replicate_number': {
+            title: 'Technical replicate',
+            getValue: condensedReplicate => condensedReplicate.map(replicate => replicate.technical_replicate_number).sort().join()
+        },
+        'summary': {
+            title: 'Summary',
+            display: condensedReplicate => {
+                var replicate = condensedReplicate[0];
+
+                // Display protein concentration if it exists
+                if (typeof replicate.rbns_protein_concentration === 'number') {
+                    return (
+                        <span>
+                            Protein concentration {replicate.rbns_protein_concentration}
+                            <span className="unit">{replicate.rbns_protein_concentration_units}</span>
+                        </span>
+                    );
+                }
+
+                // Else, display biosample summary if the biosample exists
+                if (replicate.library && replicate.library.biosample) {
+                    return <span>{BiosampleSummaryString(replicate.library.biosample, true)}</span>;
+                }
+
+                // Else, display nothing
+                return null;
+            },
+            sorter: false
+        },
+        'biosample_accession': {
+            title: 'Biosample',
+            display: condensedReplicate => {
+                var replicate = condensedReplicate[0];
+                if (replicate.library && replicate.library.biosample) {
+                    var biosample = replicate.library.biosample;
+                    return <a href={biosample['@id']} title={'View biosample ' + biosample.accession}>{biosample.accession}</a>;
+                }
+                return null;
+            },
+            objSorter: (a, b) => {
+                var aReplicate = a[0];
+                var bReplicate = b[0];
+                if ((aReplicate.library && aReplicate.library.biosample) && (bReplicate.library && bReplicate.library.biosample)) {
+                    var aAccession = aReplicate.library.biosample.accession;
+                    var bAccession = bReplicate.library.biosample.accession;
+                    return (aAccession < bAccession) ? -1 : ((aAccession > bAccession) ? 1 : 0);
+                }
+                return (aReplicate.library && aReplicate.library.biosample) ? -1 : ((bReplicate.library && bReplicate.library.biosample) ? 1 : 0);
+            }
+        },
+        'antibody_accession': {
+            title: 'Antibody',
+            display: condensedReplicate => {
+                var replicate = condensedReplicate[0];
+                if (replicate.antibody) {
+                    return <a href={replicate.antibody['@id']} title={'View antibody ' + replicate.antibody.accession}>{replicate.antibody.accession}</a>;
+                }
+                return null;
+            },
+            objSorter: (a, b) => {
+                var aReplicate = a[0];
+                var bReplicate = b[0];
+                if (aReplicate.antibody && bReplicate.antibody) {
+                    return (aReplicate.antibody.accession < bReplicate.antibody.accession) ? -1 : ((aReplicate.antibody.accession > bReplicate.antibody.accession) ? 1 : 0);
+                }
+                return (aReplicate.antibody) ? -1 : ((bReplicate.antibody) ? 1 : 0);
+            },
+            hide: (list, columns, meta) => {
+                return _(list).all(condensedReplicate => !condensedReplicate[0].antibody);
+            }
+        },
+        'library': {
+            title: 'Library',
+            getValue: condensedReplicate => condensedReplicate[0].library ? condensedReplicate[0].library.accession : ''
+        }
+    },
+    handleCollapse: function (table) {
+	// Handle a click on a collapse button by toggling the corresponding tableCollapse state var
+	const collapsed = _.clone(this.state.collapsed);
+	collapsed[table] = !collapsed[table];
+	this.setState({ collapsed: collapsed });
+	},
+    handleCollapseProc: function () {
+	this.handleCollapse('proc');
+	},
+    handleCollapseRef: function () {
+	this.handleCollapse('ref');
+	},
+    getInitialState: function () {
+	return {
+	    maxWidth: 'auto',
+	    collapsed: true,
+	    };
+	},
+    handleCollapse: function () {
+	// Handle a click on a collapse button by toggling the corresponding tableCollapse state var
+	this.setState({ collapsed: !this.state.collapsed });
+	},
+
+    render: function() {
+        var tableTitle;
+        var {condensedReplicates, replicationType} = this.props;
+
+        // Determine replicate table title based on the replicate type. Also override the biosample replicate column title
+        if (replicationType === 'anisogenic') {
+            tableTitle = 'Anisogenic replicates';
+            this.replicateColumns.biological_replicate_number.title = 'Anisogenic replicate';
+        } else if (replicationType === 'isogenic') {
+            tableTitle = 'Isogenic replicates';
+            this.replicateColumns.biological_replicate_number.title = 'Isogenic replicate';
+        } else {
+            tableTitle = 'Replicates';
+            this.replicateColumns.biological_replicate_number.title = 'Biological replicate';
+        }
+
+        return (
+            <SortTablePanel> 
+		<CollapsingTitle title={tableTitle} collapsed={this.state.collapsed} handleCollapse={this.handleCollapse} />
+                <SortTable collapsed={this.state.collapsed} list={condensedReplicates} columns={this.replicateColumns} />
+            </SortTablePanel>
+        );
+    }
+});
+
+
 
 // Display the table of replicates
 var ReplicateTable = createReactClass({
@@ -653,12 +817,13 @@ var ReplicateTable = createReactClass({
     getInitialState: function () {
 	return {
 	    maxWidth: 'auto',
-	    collapsed: {
-		condensedReplicates: true,
-		},
+	    collapsed: true,
 	    };
 	},
-
+    handleCollapse: function () {
+	// Handle a click on a collapse button by toggling the corresponding tableCollapse state var
+	this.setState({ collapsed: !this.state.collapsed });
+	},
 
     render: function() {
         var tableTitle;
@@ -678,8 +843,8 @@ var ReplicateTable = createReactClass({
 
         return (
             <SortTablePanel> 
-		<CollapsingTitle title={tableTitle} collapsed={this.state.collapsed.ref} handleCollapse={this.handleCollapseRef} />
-                <SortTable collapsed={this.state.collapsed.ref} list={condensedReplicates} columns={this.replicateColumns} />
+		<CollapsingTitle title={tableTitle} collapsed={this.state.collapsed} handleCollapse={this.handleCollapse} />
+                <SortTable collapsed={this.state.collapsed} list={condensedReplicates} columns={this.replicateColumns} />
             </SortTablePanel>
         );
     }
