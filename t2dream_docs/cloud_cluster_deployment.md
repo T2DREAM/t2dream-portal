@@ -123,12 +123,35 @@ sudo tail /var/log/elasticsearch/v6-cluster_index_indexing_slowlog.log
 ```
 
 * Complete indexing (as of May 18th 2018) takes ~ hours (while indexing is in-progress check logs for errors)
+
+After indexing -
+* For production send email to t2dream-l@mailman.ucsd.edu notifying downtime (current downtime - )
+* Wait for /_indexer snapshot on new instance to match snapshot on old instance (both should be status: "waiting" and recovery: true)
+```
+echo "include 'master.conf'" | sudo tee -a /etc/postgresql/9.3/main/postgresql.conf
+```
+```
+sudo pg_ctlcluster 9.3 main reload
+```
+```
+sudo pg_ctlcluster 9.3 main promote
+```
+```
+cd /srv/encoded
+
+sudo -i -u encoded bin/batchupgrade production.ini --app-name app
+```
 * Attach elastic ip for demo (data upload server) and production server after compelete indexing
 * Install security cert https://certbot.eff.org/lets-encrypt/ubuntutrusty-apache
 * Size down master c2.8xlarge to c2.4xlarge(not recommended though)
 * For Demo create and schedule wal backups (at 6pm daily)
 
 https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/database-backup-retrievals.md
+
+
+
+
+
 
 ES best practice 
 https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started.html
