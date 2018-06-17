@@ -122,13 +122,13 @@ check indexing on cluster nodes
 sudo tail /var/log/elasticsearch/v6-cluster_index_indexing_slowlog.log
 ```
 
-* Complete indexing (as of May 18th 2018) takes ~ hours (while indexing is in-progress check logs for errors)
+* Complete indexing (as of May 18th 2018) takes ~24 hours (while indexing is in-progress check logs for errors)
 
 After indexing -
 * For production send email to t2dream-l@mailman.ucsd.edu notifying downtime (current downtime - )
 * Wait for /_indexer snapshot on new instance to match snapshot on old instance (both should be status: "waiting" and recovery: true)
 ```
-echo "include 'master.conf'" | sudo tee -a /etc/postgresql/9.3/main/postgresql.conf
+echo "include 'demo.conf'" | sudo tee -a /etc/postgresql/9.3/main/postgresql.conf
 ```
 ```
 sudo pg_ctlcluster 9.3 main reload
