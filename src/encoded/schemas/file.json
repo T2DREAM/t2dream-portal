@@ -170,7 +170,7 @@
                 {
                     "allOf": [
                         {
-                            "required": ["replicate", "run_type"],
+                            "required": ["run_type"],
                             "properties": {
                                 "file_format": {
                                     "enum": ["fastq","sra"]
