@@ -279,9 +279,8 @@ export const FileTable = createReactClass({
                     {showFileCount ? <div className="file-gallery-counts">Displaying {filteredCount} of {unfilteredCount} files</div> : null}
                     <SortTablePanel header={filePanelHeader} noDefaultClasses={this.props.noDefaultClasses}>
 		    <TabPanel tabs={{ rawFile: 'Raw Files', processedFile: 'Processed Files' }}>
-                    <TabPanelPane key="rawFile">
-                        <RawSequencingTable
-                            collapsed={this.state.collapsed}
+		    <TabPanelPane key="rawFile">
+                      <RawSequencingTable
                             files={files.raw}
                             meta={{
                                 encodevers: encodevers,
@@ -294,7 +293,6 @@ export const FileTable = createReactClass({
                             }}
                         />
                         <RawFileTable
-		            collapsed={this.state.collapsed}
                             files={files.rawArray}
                             meta={{
                                 encodevers: encodevers,
@@ -311,12 +309,12 @@ export const FileTable = createReactClass({
                         <SortTable
                             title={
                                 <CollapsingTitle
-                                    title="Processed data" collapsed={this.state.collapsed}
-                                    handleCollapse={this.handleCollapse}
+                                    title="Processed data" collapsed={this.state.collapsed.proc}
+                                    handleCollapse={this.handleCollapseProc}
                                 />
                             }
                             rowClasses={this.rowClasses}
-                            collapsed={this.state.collapsed}
+                            collapsed={this.state.collapsed.proc}
                             list={files.proc}
                             columns={this.procTableColumns}
                             sortColumn="biological_replicates"
@@ -404,15 +402,11 @@ const RawSequencingTable = createReactClass({
 
     getInitialState: function () {
         return {
-            collapsed: true, // Collapsed/uncollapsed state of table
+            collapsed: false, // Collapsed/uncollapsed state of table
             restrictedTip: '', // UUID of file with tooltip showing
         };
     },
 
-    handleCollapse: function () {
-        // Handle a click on a collapse button by toggling the corresponding tableCollapse state var
-        this.setState({ collapsed: !this.state.collapsed });
-    },
 
     hoverDL: function (hovering, fileUuid) {
         this.setState({ restrictedTip: hovering ? fileUuid : '' });
@@ -1464,9 +1458,9 @@ const FileGalleryRenderer = createReactClass({
 
         // Get a list of files for the graph (filters out archived files)
         const graphFiles = _(files).filter(file => file.status !== 'archived');
-	const singleCell = context.assay_term_name === 'single cell isolation followed by RNA-seq'
+	// const singleCell = context.assay_term_name === 'single cell isolation followed by RNA-seq'
         // Build node graph of the files and analysis steps with this experiment
-        if (graphFiles && graphFiles.length && !hideGraph && !singleCell) {
+        if (graphFiles && graphFiles.length && !hideGraph) {
             try {
                 const { graph, graphedFiles } = assembleGraph(context, this.context.session, this.state.infoNodeId, graphFiles, selectedAssembly, selectedAnnotation);
                 jsonGraph = graph;
