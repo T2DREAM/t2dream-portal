@@ -219,6 +219,9 @@
        "biosample_type": {
             "title": "Biosample type"
         },
+       "biosample_term_name": {
+            "title": "Biosample term"
+        },
         "organ_slims": {
             "title": "Organ"
         },

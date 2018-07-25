@@ -135,7 +135,7 @@ def get_peak_metadata_links(request):
 
     peak_metadata_tsv_link = '{host_url}/peak_metadata/{search_params}/peak_metadata.tsv'.format(
         host_url=request.host_url,
-        search_params=search_params
+        search_params= search_params
     )
     return [peak_metadata_tsv_link]
 
@@ -570,8 +570,6 @@ def batch_download(context, request):
         body='\n'.join(files),
         content_disposition='attachment; filename="%s"' % 'files.txt'
     )
-
-
 def lookup_column_value(value, path):
     nodes = [value]
     names = path.split('.')
