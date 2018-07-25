@@ -32,8 +32,8 @@ _INDEXED_DATA = {
     'accessible chromatin': {
         'output_type': ['peaks']
     },
-    'binding footprints': {
-        'output_type': ['peaks']
+    'binding sites': {
+        'output_type': ['signal']
     },
     'chromatin state': {
         'file_type': ['bed bed3+']
@@ -114,7 +114,7 @@ def get_annotation_type(accession, request):
 
 
 def all_bed_file_uuids(request):
-    stmt = text("select distinct(resources.rid) from resources, propsheets where resources.rid = propsheets.rid and resources.item_type='file' and propsheets.properties->>'file_format' = 'bed' and properties->>'status' = 'released';")
+    stmt = text("select distinct(resources.rid) from resources, propsheets where resources.rid = propsheets.rid and resources.item_type='file' and propsheets.properties->>'file_format' = 'bed';")
     connection = request.registry[DBSESSION].connection()
     uuids = connection.execute(stmt)
     return [str(item[0]) for item in uuids]
@@ -138,8 +138,8 @@ def index_peaks(uuid, request):
     if 'File' not in context['@type'] or 'dataset' not in context:
         return
 
-    if 'status' not in context or context['status'] != 'released':
-        return
+    # if 'status' not in context or context['status'] != 'released':
+    #    return
 
     # Index human data for now
     if assembly not in _ASSEMBLIES:
