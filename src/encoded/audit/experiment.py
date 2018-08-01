@@ -1966,6 +1966,11 @@ def audit_experiment_replicated(value, system, excluded_types):
     if value['status'] not in ['released', 'ready for review']:
         return
     '''
+    exclude single cell from audit
+    '''
+    if value['biosample_type'] == 'single cell':
+        return
+    '''
     Excluding single cell isolation experiments from the replication requirement
     Excluding RNA-bind-and-Seq from the replication requirment
     '''
