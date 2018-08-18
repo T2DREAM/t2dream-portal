@@ -2,7 +2,7 @@
 -------------------------------------------------------
 
 
-![Build status](https://travis-ci.org/T2DREAM/encoded.svg?branch=master)
+![Build status](https://travis-ci.org/T2DREAM/t2dream-portal)
 
 ## Setting Up Your Environment
 
