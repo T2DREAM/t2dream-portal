@@ -106,7 +106,7 @@ export default class Home extends React.Component {
                                  <div className="social">
                                 <div className="social-news">
                                   <div className="news-header">
-                                        <h3>News <a href="/news/" title="Diabetes Genome Atlas news" className="search-ref">View all news...</a></h3>
+                                        <h3>News <a href="/news/" title="Diabetes Epigenome Atlas news" className="search-ref">View all news...</a></h3>
                                     </div>
                                     <NewsLoader newsLoaded={this.newsLoaded} />
 
@@ -186,7 +186,7 @@ class AssayClicking extends React.Component {
 		        <p></p>
 		 </div>
                             <div className="site-banner-intro-content">
-				<p style={{'margin': '20px'}}>The Diabetes Genome Atlas project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
+				<p style={{'margin': '20px'}}>The Diabetes Epigenome Atlas project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
                             </div>
                         </div>
 		       <div className="site-banner-search">
