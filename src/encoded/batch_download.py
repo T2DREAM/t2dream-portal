@@ -29,6 +29,7 @@ def includeme(config):
     config.add_route('batch_download', '/batch_download/{search_params}')
     config.add_route('metadata', '/metadata/{search_params}/{tsv}')
     config.add_route('peak_metadata', '/peak_metadata/{search_params}/{tsv}')
+    config.add_route('peak_download', '/peak_download/{search_params}/{tsv}')
     config.add_route('region_metadata', '/region_metadata/{search_params}/{tsv}')
     config.add_route('report_download', '/report.tsv')
     config.add_route('experiment_metadata', '/experiment_metadata/{search_params}/{tsv}')
@@ -133,11 +134,11 @@ def get_peak_metadata_links(request):
     else:
         search_params = request.query_string
 
-    peak_metadata_tsv_link = '{host_url}/peak_metadata/{search_params}/peak_metadata.tsv'.format(
+    peak_download_tsv_link = '{host_url}/peak_download/{search_params}/peak_download.tsv'.format(
         host_url=request.host_url,
         search_params= search_params
     )
-    return [peak_metadata_tsv_link]
+    return [peak_download_tsv_link]
 
 def get_region_metadata_links(request):
     if request.matchdict.get('search_params'):
@@ -250,8 +251,70 @@ def peak_metadata(context, request):
     return Response(
         content_type='text/tsv',
         body=fout.getvalue(),
+        content_disposition='attachment;filename="%s"' % 'peak_download.tsv'
+    )
+
+@view_config(route_name='peak_download', request_method='GET')
+def peak_download(context, request):
+    param_list = parse_qs(request.matchdict['search_params'])
+    param_list['field'] = []
+    header = ['annotation_type', 'source', 'coordinates', 'file.accession', 'annotation.accession']
+    param_list['limit'] = ['all']
+    path = '/variant-search/?{}&{}'.format(urlencode(param_list, True),'referrer=download_metadata')
+    results = request.embed(path, as_user=True)
+    uuids_in_results = get_file_uuids(results)
+    rows = []
+    json_doc = {}
+    for row in results['peaks']:
+        if row['_id'] in uuids_in_results:
+            file_json = request.embed(row['_id'])
+            annotation_json = request.embed(file_json['dataset'])
+            for hit in row['inner_hits']['positions']['hits']['hits']:
+                data_row = []
+                chrom = '{}'.format(row['_index'])
+                assembly = '{}'.format(row['_type'])
+                start = int('{}'.format(hit['_source']['start']))
+                stop = int('{}'.format(hit['_source']['end']))
+                state = '{}'.format(hit['_source']['state'])
+                val = '{}'.format(hit['_source']['val'])
+                file_accession = file_json['accession']
+                annotation_accession = annotation_json['accession']
+                coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
+                annotation = annotation_json['annotation_type']
+                biosample_term = annotation_json['biosample_term_name']
+                data_row.extend([annotation, biosample_term, coordinates, annotation_accession])
+                rows.append(data_row)
+                if annotation not in json_doc:
+                    json_doc[annotation] = []
+                    json_doc[annotation].append({
+                        'annotation_type': annotation,
+                        'coordinates':coordinates,
+                        'state': state,
+                        'value': val,
+                        'biosample_term_name': biosample_term,
+                        'genome': assembly,
+                        'accession': annotation_accession
+                    })
+                else:
+                    json_doc[annotation].append({
+                        'annotation_type': annotation,
+                        'coordinates':coordinates,
+                        'state': state,
+                        'value': val,
+                        'biosample_term_name': biosample_term,
+                        'genome': assembly,
+                        'accession': annotation_accession
+                })
+    fout = io.StringIO()
+    writer = csv.writer(fout, delimiter='\t')
+    writer.writerow(header)
+    writer.writerows(rows)
+    return Response(
+        content_type='text/tsv',
+        body=fout.getvalue(),
         content_disposition='attachment;filename="%s"' % 'peak_metadata.tsv'
     )
+
 @view_config(route_name='region_metadata', request_method='GET')
 def region_metadata(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
