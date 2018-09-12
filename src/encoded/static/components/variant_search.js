@@ -2,6 +2,9 @@
 var React = require('react');
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
+var queryString = require('query-string');
+var button = require('../libs/bootstrap/button');
+var {Modal, ModalHeader, ModalBody, ModalFooter} = require('../libs/bootstrap/modal');
 var panel = require('../libs/bootstrap/panel');
 var globals = require('./globals');
 var fetched = require('./fetched');
@@ -20,12 +23,10 @@ var DropdownButton = button.DropdownButton;
 var DropdownMenu = dropdownMenu.DropdownMenu;
 var {Panel, PanelBody, PanelHeading} = panel;
 
-
 var regionGenomes = [
     {value: 'GRCh37', display: 'hg19'},
     {value: 'GRCh38', display: 'GRCh38'}
 ];
-
 
 var AutocompleteBox = createReactClass({
     render: function() {
@@ -203,7 +204,6 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
                 return (aLower > bLower) ? 1 : ((aLower < bLower) ? -1 : 0);
             });
         }
-
         return (
             <div>
                 <h2>Search variants</h2>
@@ -245,6 +245,8 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 		      </DropdownMenu>
 		      </DropdownButton>
 		      : null}
+		     <a className="btn btn-info btn-sm" target = "_blank" href="http://www.variant-nw-t2depigenome.org/">Variant Visualization Network</a>
+		     
 </div>
 </div> 
                                   <hr />
