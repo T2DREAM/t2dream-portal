@@ -184,6 +184,8 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
         var filters = context['filters'];
         var facets = context['facets'];
         var total = context['total'];
+	var kp = context['query'];
+	const domain = 'http://www.type2diabetesgenetics.org/variantInfo/variantInfo/';
         var visualize_disabled = total > visualizeLimit;
 	const listing = module.exports.listing = function (reactProps) {
 	    let context;
@@ -245,8 +247,8 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 		      </DropdownMenu>
 		      </DropdownButton>
 		      : null}
-		     <a className="btn btn-info btn-sm" target = "_blank" href="http://www.variant-nw-t2depigenome.org/">Variant Visualization Network</a>
-		     
+		     <a className="btn btn-info btn-sm" target = "_blank" href="http://www.variant-nw-t2depigenome.org/">Variant Visualization Network<span className="beta-badge">BETA</span></a>
+		     <a className="btn btn-info btn-sm" target = "_blank" href = { `${domain}${kp}` }>Knowledge Portal</a>
 </div>
 </div> 
                                   <hr />
