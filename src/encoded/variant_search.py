@@ -262,7 +262,8 @@ def variant_search(context, request):
         'peaks': [],
         'columns': OrderedDict(),
         'notification': '',
-        'filters': []
+        'filters': [],
+        'query': ''
     }
     principals = effective_principals(request)
     es = request.registry[ELASTIC_SEARCH]
@@ -304,7 +305,7 @@ def variant_search(context, request):
             chromosome, start, end = sanitize_coordinates(region)
     else:
         chromosome, start, end = ('', '', '')
-
+    result['query'] = region
     # Check if there are valid coordinates
     if not chromosome or not start or not end:
         result['notification'] = 'No annotations found'
