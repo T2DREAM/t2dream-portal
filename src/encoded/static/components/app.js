@@ -43,7 +43,6 @@ const portal = {
             title: 'Tools',
             children: [
                 {id: 'variant', title: 'Variant Search', url: '/variant-search/'},
-		{id: 'variantvz', title: 'Variant Network', url: 'http://www.variant-nw-t2depigenome.org/'},
             ],
         },
        
