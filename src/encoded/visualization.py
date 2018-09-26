@@ -2243,10 +2243,10 @@ def vis_format_url(browser, path, assembly, position=None):
             # BDGP5:    http://dec2014.archive.ensembl.org/Trackhub?url=https://www.encodeproject.org/experiments/ENCSR040UNE@@hub/hub.txt;species=Drosophila_melanogaster
             # ce11/WBcel235: http://www.ensembl.org/Trackhub?url=https://www.encodeproject.org/experiments/ENCSR475TDY@@hub/hub.txt;species=Caenorhabditis_elegans
             return external_url
-        elif browser == "quickview":
-            file_formats = '&file_format=bigBed&file_format=bigWig'
-            file_inclusions = '&status=released&status=in+progress'
-            return ('/search/?type=File&assembly=%s&dataset=%s%s%s#browser' % (assembly,path,file_formats,file_inclusions))
+    elif browser == "quickview":
+        file_formats = '&file_format=bigBed&file_format=bigWig'
+        file_inclusions = '&status=released&status=in+progress'
+        return ('/search/?type=File&assembly=%s&dataset=%s%s%s#browser' % (assembly,path,file_formats,file_inclusions))
 
     #else:
         # ERROR: not supported at this time
