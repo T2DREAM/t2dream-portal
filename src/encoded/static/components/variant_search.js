@@ -247,7 +247,6 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 		      </DropdownMenu>
 		      </DropdownButton>
 		      : null}
-		     <a className="btn btn-info btn-sm" target = "_blank" href="http://www.variant-nw-t2depigenome.org/">Variant Visualization Network<span className="beta-badge">BETA</span></a>
 		     <a className="btn btn-info btn-sm" target = "_blank" href = { `${domain}${kp}` }>Knowledge Portal</a>
 </div>
 </div> 
