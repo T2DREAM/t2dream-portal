@@ -1269,7 +1269,7 @@ const ResultTable = search.ResultTable = createReactClass({
 
 const BrowserTabQuickView = createReactClass({
     render: function () {
-        return <div>Quick View <span className="beta-badge">BETA</span></div>;
+        return <div>Genome Browser</div>;
     },
 });
 
@@ -1316,14 +1316,14 @@ const ResultBrowser = createReactClass({
         }
         if (datasetCount === 1) {
             // /datasets/{ENCSR000AEI}/@@hub/{hg19}/jsonout/trackDb.txt
-            visUrl = `${this.props.datasets[0]}/@@hub/${this.props.assembly}/jsonout/trackDb.txt`;
+            visUrl = `${this.props.datasets[0]}/@@hub/${this.props.assembly}/jsonout/trackDb.json`;
         } else if (datasetCount > 1) {
             // /batch_hub/type%3DExperiment%2C%2Caccession%3D{ENCSR000AAA}%2C%2Caccession%3D{ENCSR000AEI}%2C%2Caccjson/{hg19}/trackDb.txt
             for (let ix = 0; ix < datasetCount; ix += 1) {
                 const accession = this.props.datasets[ix].split('/')[2];
                 visUrl += `accession=${accession}%2C%2C`;
             }
-            visUrl = `batch_hub/type=Experiment/${visUrl}&accjson/${this.props.assembly}/trackDb.txt`;
+            visUrl = `batch_hub/type=Experiment/${visUrl}&accjson/${this.props.assembly}/trackDb.json`;
         }
         if (datasetCount > 0) {
             return (
