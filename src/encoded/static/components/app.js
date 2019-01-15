@@ -52,6 +52,7 @@ const portal = {
             children: [
                 { id: 'gettingstarted', title: 'Getting started', url: '/help/getting-started/' },
                 { id: 'restapi', title: 'REST API', url: '/help/rest-api/' },
+		{ id: 'profiles', title: 'Schema', url: '/profiles/' },
             ],
         },
     ],

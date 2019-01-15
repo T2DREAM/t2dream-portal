@@ -10,6 +10,7 @@ from .search import (
     format_facets,
     search_result_actions
 )
+
 from .batch_download import get_peak_metadata_links
 from collections import OrderedDict
 import requests
@@ -260,6 +261,7 @@ def variant_search(context, request):
         '@graph': [],
         'regions': [],
         'peaks': [],
+        'viz': OrderedDict(),
         'columns': OrderedDict(),
         'notification': '',
         'filters': [],
@@ -273,14 +275,14 @@ def variant_search(context, request):
 
 
     # handling limit
-    size = request.params.get('limit', 25)
+    size = request.params.get('limit', 100)
     if size in ('all', ''):
         size = 99999
     else:
         try:
             size = int(size)
         except ValueError:
-            size = 25
+            size = 100
     if region == '':
         region = '*'
 
@@ -335,7 +337,7 @@ def variant_search(context, request):
             file_uuids.append(hit['_id'])
     file_uuids = list(set(file_uuids))
     result['notification'] = 'No results found'
-    # if more than one peak found return the experiments with those peak files
+    # if more than one peak found return the annotations with those peak files
     if len(file_uuids):
         query = get_filtered_query('', [], set(), principals, ['Annotation'])
         del query['query']
@@ -356,6 +358,11 @@ def variant_search(context, request):
         result['facets'] = format_facets(es_results, _FACETS, used_filters, schemas, total, principals)
         result['peaks'] = list(peak_results['hits']['hits'])
         result['regions'] = rows = []
+        # Plug filters for annotation visulizatiom tool, filter on @graph accession ids
+        rows_accesions = []
+        for row in result['@graph']:
+            accessions = row['accession']
+            rows_accesions.append(accessions)
         for row in result['peaks']:
             if row['_id'] in file_uuids:
                 file_json = request.embed(row['_id'])
@@ -373,6 +380,32 @@ def variant_search(context, request):
                     biosample_term = annotation_json['biosample_term_name']
                     data_row.update({'annotation_type':annotation, 'biosample_term_name':biosample_term, 'coordinates':coordinates, 'state':state, 'value':val, '@id':annotation_accession, 'description':description})
                     rows.append(data_row)
+        # Annotation Visulization clutser by annotation type, render state, biosample 
+        result['viz'] = rows = []
+        for row in result['peaks']:
+            if row['_id'] in file_uuids:
+                file_json = request.embed(row['_id'])
+                annotation_json = request.embed(file_json['dataset'])
+                for hit in row['inner_hits']['positions']['hits']['hits']:
+                    data_row = []
+                    chrom = '{}'.format(row['_index'])
+                    assembly = '{}'.format(row['_type'])
+                    start = int('{}'.format(hit['_source']['start']))
+                    stop = int('{}'.format(hit['_source']['end']))
+                    state = '{}'.format(hit['_source']['state'])
+                    val = '{}'.format(hit['_source']['val'])
+                    file_accession = file_json['accession']
+                    annotation_accession = annotation_json['accession']
+                    coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
+                    annotation = annotation_json['annotation_type']
+                    biosample_term = annotation_json['biosample_term_name']
+                    for row1 in rows_accesions:
+                        if row1 in annotation_json['accession']:
+                            if annotation in {item['id'] for item in rows}:
+                                index = tuple(item['id'] for item in rows).index(annotation)
+                                rows[index]['value'].append(biosample_term + ' : ' + state)
+                            else:
+                                rows.append({'id': annotation, 'value': [biosample_term + ' : ' + state]})
         result['download_elements'] = get_peak_metadata_links(request)
         if result['total'] > 0:
             result['notification'] = 'Success'
