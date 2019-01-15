@@ -12,7 +12,7 @@ var url = require('url');
 var search = require('./search');
 var button = require('../libs/bootstrap/button');
 var dropdownMenu = require('../libs/bootstrap/dropdown-menu');
-
+import { TabPanel, TabPanelPane } from '../libs/bootstrap/panel';
 var FacetList = search.FacetList;
 var Facet = search.Facet;
 var TextFilter = search.TextFilter;
@@ -22,7 +22,7 @@ var Param = fetched.Param;
 var DropdownButton = button.DropdownButton;
 var DropdownMenu = dropdownMenu.DropdownMenu;
 var {Panel, PanelBody, PanelHeading} = panel;
-
+var { FileGallery } = require('./anno_viz');
 var regionGenomes = [
     {value: 'GRCh37', display: 'hg19'},
     {value: 'GRCh38', display: 'GRCh38'}
@@ -180,12 +180,14 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
         var id = url.parse(this.context.location_href, true);
         var region = context['region'] || '';
         var searchBase = url.parse(this.context.location_href).search || '';
+	console.log(searchBase)
         var trimmedSearchBase = searchBase.replace(/[\?|\&]limit=all/, "");
         var filters = context['filters'];
         var facets = context['facets'];
         var total = context['total'];
 	var kp = context['query'];
 	const domain = 'http://www.type2diabetesgenetics.org/variantInfo/variantInfo/';
+	const loggedIn = this.context.session && this.context.session['auth.userid'];
         var visualize_disabled = total > visualizeLimit;
 	const listing = module.exports.listing = function (reactProps) {
 	    let context;
@@ -198,7 +200,7 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 	    return <ListingView {...viewProps} />;
 	    };
         // Get a sorted list of batch hubs keys with case-insensitive sort
-        var visualizeKeys = [];
+        var visualizeKeys = []; 
         if (context.visualize_batch && Object.keys(context.visualize_batch).length) {
             visualizeKeys = Object.keys(context.visualize_batch).sort((a, b) => {
                 var aLower = a.toLowerCase();
@@ -220,22 +222,10 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
                                 <div className="col-sm-7 col-md-8 col-lg-9">
                                     <div>
                                         <h4>
-                                            Showing {results.length} of {total}
+                                            Showing {results.length} overlapping annotations
                                         </h4>
                                         <div className="results-table-control">
-                                            {total > results.length && searchBase.indexOf('limit=all') === -1 ?
-                                                    <a rel="nofollow" className="btn btn-info btn-sm"
-                                                         href={searchBase ? searchBase + '&limit=all' : '?limit=all'}
-                                                         onClick={this.onFilter}>View All</a>
-                                            :
-                                                <span>
-                                                    {results.length > 25 ?
-                                                            <a className="btn btn-info btn-sm"
-                                                               href={trimmedSearchBase ? trimmedSearchBase : "/variant-search/"}
-                                                               onClick={this.onFilter}>View 25</a>
-                                                    : null}
-                                                </span>
-                                            }
+
 		     {context['download_elements'] ?
 		     <DropdownButton title='Download Elements' label="downloadelements" wrapperClasses="results-table-button">
 		      <DropdownMenu>
@@ -251,6 +241,9 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 </div>
 </div> 
                                   <hr />
+		                  <Panel>
+		                  <TabPanel tabs={{ table: <h5> Results </h5>, graph: 'Variant Network'?<h5> Variant Network <span className="beta-badge">BETA</span></h5> : null }}>
+                                  <TabPanelPane key="table">
                                   <ul className="nav result-table" id="result-table">
                                       {results.map(function (result) {
                                           return (
@@ -278,6 +271,13 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 					  );
 					  })}
 					  </ul>
+                                          </TabPanelPane>
+                                          <TabPanelPane key="graph">
+						      <FileGallery context={context} session={this.context.session} />
+						    
+                                          </TabPanelPane>
+                                          </TabPanel>
+                                          </Panel>
                                 </div>
                             </div>
                         </div>
