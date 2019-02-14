@@ -1,4 +1,5 @@
 'use strict';
+import Iframe from 'react-iframe';
 var React = require('react');
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
@@ -165,7 +166,8 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
     },
     contextTypes: {
         location_href: PropTypes.string,
-        navigate: PropTypes.func
+        navigate: PropTypes.func,
+        session: PropTypes.object,
     },
     render: function() {
         const visualizeLimit = 100;
@@ -186,6 +188,10 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
         var facets = context['facets'];
         var total = context['total'];
 	var kp = context['query'];
+	var genome = context['genome'];
+	var chromosome = context['chromosome']
+	var start = context['start'] - 5000
+	var end = context['end'] + 5000
 	const domain = 'http://www.type2diabetesgenetics.org/variantInfo/variantInfo/';
 	const loggedIn = this.context.session && this.context.session['auth.userid'];
         var visualize_disabled = total > visualizeLimit;
@@ -237,12 +243,26 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 		      </DropdownMenu>
 		      </DropdownButton>
 		      : null}
+		     {visualizeKeys ?
+		      <DropdownButton disabled={visualize_disabled} title={visualize_disabled ? 'Filter to ' + visualizeLimit + ' to visualize' : 'Visualize'} label="batchhubs" wrapperClasses="results-table-button">
+		                                                          <DropdownMenu>
+                                                        {visualizeKeys.map(assembly =>
+                                                            Object.keys(context.visualize_batch[assembly]).sort().map(browser =>
+                                                                <a key={[assembly, '_', browser].join()} data-bypass="true" target="_blank" private-browsing="true" href={context.visualize_batch[assembly][browser]}>
+                                                                    {assembly} {browser}
+                                                                </a>
+                                                            )
+                                                        )}
+                                                    </DropdownMenu>
+                                                </DropdownButton>
+: null}
 		     <a className="btn btn-info btn-sm" target = "_blank" href = { `${domain}${kp}` }>Knowledge Portal</a>
+		     
 </div>
 </div> 
                                   <hr />
 		                  <Panel>
-		                  <TabPanel tabs={{ table: <h5> Results </h5>, graph: 'Variant Network'?<h5> Variant Network <span className="beta-badge">BETA</span></h5> : null }}>
+		                  <TabPanel tabs={{ table: <h5> Results </h5>, graph: 'Variant Network'?<h5> Variant Network <span className="beta-badge">BETA</span></h5>: null, browser: 'Epigenome Browser'? <h5> Epigenome Browser  <span className="beta-badge">BETA</span> </h5> : null }}>
                                   <TabPanelPane key="table">
                                   <ul className="nav result-table" id="result-table">
                                       {results.map(function (result) {
@@ -276,6 +296,13 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 						      <FileGallery context={context} session={this.context.session} />
 						    
                                           </TabPanelPane>
+		                          <TabPanelPane key="browser">
+		                          {loggedIn ?
+		                          <div style={{'height': '800px'}}>
+                                          <Iframe url={'https://www.browser.t2depigenome.org/browser/?genome=' + assembly + '&position=' + chromosome +':' +start + '-' + end +'&hub=https://t2depigenome-test.org/batch_hub/region,,' +  kp + '-genome,,' + genome +'/' + genome + '/trackDb.json'} height="680px" width="100%" />
+                                          </div>
+					   : <p className="browser-error">Your account is not allowed to view this page. Please sign in to view this page.</p> }
+                                    </TabPanelPane>
                                           </TabPanel>
                                           </Panel>
                                 </div>

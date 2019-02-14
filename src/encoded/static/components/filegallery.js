@@ -15,6 +15,7 @@ import { softwareVersionList } from './software';
 import { FetchedData, Param } from './fetched';
 import { collapseIcon } from '../libs/svg-icons';
 import { SortTablePanel, SortTable } from './sorttable';
+import Iframe from 'react-iframe';
 var button = require('../libs/bootstrap/button');
 
 const MINIMUM_COALESCE_COUNT = 5; // Minimum number of files in a coalescing group
@@ -1363,8 +1364,8 @@ FilterControls.defaultProps = {
     selectedFilterValue: "0",
 };
 
-// Function to render the file gallery, and it gets called after the file search results (for files associated with
-// the displayed experiment) return.
+// Function to render the file gallery & Epigenome Browser and it gets called after the file search results (for files associated with
+// the displayed experiment) return. 
 const FileGalleryRenderer = createReactClass({
     propTypes: {
         context: PropTypes.object, // Dataset whose files we're rendering
@@ -1437,17 +1438,18 @@ const FileGalleryRenderer = createReactClass({
     handleFilterChange: function (e) {
         this.setFilter(e.target.value);
     },
-
     render: function () {
         const { context, data, schemas, hideGraph } = this.props;
         let selectedAssembly = '';
         let selectedAnnotation = '';
         let jsonGraph;
         let allGraphedFiles;
+	const assay = context['@id'];
         const files = (data ? data['@graph'] : []).concat(this.state.relatedFiles); // Array of searched files arrives in data.@graph result
         if (files.length === 0) {
             return null;
         }
+	const loggedIn = this.context.session && this.context.session['auth.userid'];
 
         const filterOptions = files.length ? collectAssembliesAnnotations(files) : [];
 
@@ -1455,7 +1457,6 @@ const FileGalleryRenderer = createReactClass({
             selectedAssembly = filterOptions[this.state.selectedFilterValue].assembly;
             selectedAnnotation = filterOptions[this.state.selectedFilterValue].annotation;
         }
-
         // Get a list of files for the graph (filters out archived files)
         const graphFiles = _(files).filter(file => file.status !== 'archived');
 	// const singleCell = context.assay_term_name === 'single cell isolation followed by RNA-seq'
@@ -1471,7 +1472,6 @@ const FileGalleryRenderer = createReactClass({
                 console.warn(e.message + (e.file0 ? ` -- file0:${e.file0}` : '') + (e.file1 ? ` -- file1:${e.file1}` : ''));
             }
         }
-
         return (
             <Panel>
                 <PanelHeading addClasses="file-gallery-heading">
@@ -1485,7 +1485,7 @@ const FileGalleryRenderer = createReactClass({
 		{/* Display the strip of filgering controls */}
 	    
 	    <FilterControls selectedFilterValue={this.state.selectedFilterValue} filterOptions={filterOptions} handleFilterChange={this.handleFilterChange} />
-		<TabPanel tabs={{ graph: 'Association graph', tables: 'File details' }}>	        
+	    <TabPanel tabs={{ graph: 'Association graph', tables: 'File details', browser: 'Epigenome Browser'?<h8>Epigenome Browser <span className="beta-badge">BETA</span></h8> : null }}>	        
 		<TabPanelPane key="graph">
 		{!hideGraph ?
 		 <FileGraph
@@ -1527,8 +1527,18 @@ const FileGalleryRenderer = createReactClass({
 	    noDefaultClasses
 	    adminUser={!!(this.context.session_properties && this.context.session_properties.admin)}
 	    />
-		</TabPanelPane>
-		</TabPanel>
+	    </TabPanelPane>
+	    <TabPanelPane key="browser">
+	  
+	    {loggedIn ?
+	    <div style={{'height': '800px'}}>
+            {context.visualize ?
+	              <Iframe url={'https://www.browser.t2depigenome.org/browser/?genome=' + selectedAssembly + '&hub=https://t2depigenome-test.org' + assay + '@@hub/' + selectedAssembly + '/jsonout/trackDb.json'} height="680px" width="1140px" />
+	     : <p className="browser-error">Files must be in bigBed or bigWig file format to be visualized on Epigenome Browser</p> }
+             </div>
+	     : <p className="browser-error">Your account is not allowed to view this page. Please sign in to view this page.</p> }
+	    </TabPanelPane>
+	    </TabPanel>
             </Panel>
         );
     },

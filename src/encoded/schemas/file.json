@@ -220,10 +220,18 @@
                     }
                 },
                 {
+                    "required": ["assembly"],
+                    "properties": {
+                        "file_format": {
+                            "enum": ["bam", "sam", "gtf", "hic"]
+                        }
+                    }
+                },
+                {
                     "not": {
                         "properties": {
                             "file_format": {
-                                "enum": ["fastq", "gff", "gtf", "bed", "bigBed", "bam", "sam", "sra", "bigWig"]
+                                "enum": ["fastq", "gff", "gtf", "bed", "hic", "bigBed", "bam", "sam", "sra", "bigWig"]
                             }
                         }
                     }

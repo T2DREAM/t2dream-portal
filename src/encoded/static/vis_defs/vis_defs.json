@@ -30,7 +30,7 @@
         "sortOrder": [ "Biosample", "Targets", "Replicates", "Views" ],
         "Views":  {
             "tag": "view",
-            "group_order": [ "Peaks", "Signals" ],
+            "group_order": [ "Peaks", "Signals", "Lri" ],
             "groups": {
                 "Peaks": {
                     "tag": "PK",
@@ -45,6 +45,11 @@
                     "autoScale": "on",
                     "maxHeightPixels": "64:18:8",
                     "windowingFunction": "mean+whiskers"
+                },
+                "Lri": {
+                    "tag": "LRI",
+                    "visibility": "full",
+                    "type": "hic"
                 }
             }
         },
