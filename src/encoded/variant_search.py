@@ -265,7 +265,11 @@ def variant_search(context, request):
         'columns': OrderedDict(),
         'notification': '',
         'filters': [],
-        'query': ''
+        'query': '',
+        'genome':'',
+        'chromosome':'',
+        'start':'',
+        'end':''
     }
     principals = effective_principals(request)
     es = request.registry[ELASTIC_SEARCH]
@@ -289,7 +293,7 @@ def variant_search(context, request):
     assembly = request.params.get('genome', '*')
     annotation = request.params.get('annotation', '*')
     chromosome, start, end = ('', '', '')
-
+    result['genome'] = assembly
     if annotation != '*':
         if annotation.lower().startswith('ens'):
             chromosome, start, end = get_ensemblid_coordinates(annotation, assembly)
@@ -337,6 +341,9 @@ def variant_search(context, request):
             file_uuids.append(hit['_id'])
     file_uuids = list(set(file_uuids))
     result['notification'] = 'No results found'
+    result['chromosome'] = chromosome
+    result['start'] = start
+    result['end'] = end
     # if more than one peak found return the annotations with those peak files
     if len(file_uuids):
         query = get_filtered_query('', [], set(), principals, ['Annotation'])

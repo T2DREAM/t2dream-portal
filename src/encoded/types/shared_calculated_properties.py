@@ -6,7 +6,10 @@ from ..visualization import (
     vis_format_url,
     browsers_available
 )
-
+import logging
+log = logging.getLogger(__name__)
+#log.setLevel(logging.DEBUG)                                                                                                                               
+log.setLevel(logging.INFO)
 class CalculatedBiosampleSlims:
     @calculated_property(condition='biosample_term_id', schema={
         "title": "Organ slims",
@@ -286,14 +289,10 @@ class CalculatedVisualize:
             if assembly_name in viz:
                 continue
             browser_urls = {}
-            # if 'ucsc' in browsers:
-            #    ucsc_url = vis_format_url("ucsc", hub_url, assembly_name)
-            #    if ucsc_url is not None:
-            #        browser_urls['UCSC'] = ucsc_url
-            # if 'ensembl' in browsers:
-            #    ensembl_url = vis_format_url("ensembl", hub_url, assembly_name)
-            #    if ensembl_url is not None:
-            #        browser_urls['Ensembl'] = ensembl_url
+            if 'epigenomebrowser' in browsers:
+                epigenomebrowser_url = vis_format_url("epigenomebrowser", request.path, assembly_name)
+                if epigenomebrowser_url is not None:
+                    browser_urls['Epigenome Browser'] = epigenomebrowser_url
             if 'quickview' in browsers:
                 quickview_url = vis_format_url("quickview", request.path, assembly_name)
                 if quickview_url is not None:
@@ -301,6 +300,7 @@ class CalculatedVisualize:
             if browser_urls:
                 viz[assembly_name] = browser_urls
         if viz:
+            log.warn(viz)
             return viz
         else:
             return None

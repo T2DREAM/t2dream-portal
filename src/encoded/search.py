@@ -481,6 +481,7 @@ def format_results(request, hits, result=None):
     #if not any_released and result is not None and 'batch_hub' in result:
     #    del result['batch_hub']
     if not any_released and result is not None and 'visualize_batch' in result:
+        log.warn(result['visualize_batch'])
         del result['visualize_batch']
 
 
@@ -489,7 +490,7 @@ def search_result_actions(request, doc_types, es_results, position=None):
     aggregations = es_results['aggregations']
 
     # generate batch hub URL for experiments
-    # TODO we could enable them for Datasets as well here, but not sure how well it will work
+    # TODO we could enabl them for Datasets as well here, but not sure how well it will work
     if doc_types == ['Experiment'] or doc_types == ['Annotation']:
         viz = {}
         for bucket in aggregations['assembly']['assembly']['buckets']:
@@ -517,6 +518,7 @@ def search_result_actions(request, doc_types, es_results, position=None):
                         viz[assembly] = browser_urls
                         #actions.setdefault('visualize_batch', {})[assembly] = browser_urls  # formerly 'batch_hub'
         if viz:
+            log.warn(viz)
             actions.setdefault('visualize_batch',viz)
 
     # generate batch download URL for experiments

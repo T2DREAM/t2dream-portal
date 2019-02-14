@@ -37,6 +37,8 @@ def calculate_assembly(request, files_list, status):
     assembly = set()
     viewable_file_formats = ['bigWig',
                              'bigBed',
+                             'hic',
+                             'long range chromatin interactions',
                              'narrowPeak',
                              'broadPeak',
                              'bedRnaElements',

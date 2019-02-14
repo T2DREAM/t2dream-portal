@@ -435,6 +435,7 @@ export const BrowserSelector = createReactClass({
         visualizeCfg: PropTypes.object.isRequired, // Assemblies, browsers, and browser URLs; visualize and visualize_batch contents
         disabled: PropTypes.bool, // `true` if button should be disabled; usually because more search results than we can handle
         title: PropTypes.string, // Title of Visualize button if "Visualize" isn't desired
+	
     },
 
     getInitialState: function () {
@@ -485,7 +486,7 @@ export const BrowserSelector = createReactClass({
 
                                         // Only for v55; see http://redmine.encodedcc.org/issues/4533#note-48
                                         const flyWormException = ['ce10', 'ce11', 'dm3', 'dm6', 'mm9'].indexOf(assembly) !== -1;
-
+					const loggedIn = this.context.session && this.context.session['auth.userid'];
                                         return (
                                             <div key={assembly} className="browser-selector__assembly-option">
                                                 <div className="browser-selector__assembly">
@@ -494,9 +495,9 @@ export const BrowserSelector = createReactClass({
                                                 <div className="browser-selector__browsers">
                                                     {browserList.map(browser =>
                                                         <div key={browser} className="browser-selector__browser">
-                                                            <a href={assemblyBrowsers[browser]} onClick={this.handleClick} disabled={(this.props.annotationSource)  && browser === 'Quick View'}rel="noopener noreferrer" target="_blank">
+                                                            <a href={assemblyBrowsers[browser]} disabled={loggedIn && browser === 'Epigenome Browser'} onClick={this.handleClick} rel="noopener noreferrer" target="_blank">
                                                                 {browser}
-                                                                {browser === 'Quick View' ? <span className="beta-badge">BETA</span> : null}
+                                                                {browser === 'Epigenome Browser' ? <span className="beta-badge">BETA</span> : null}
                                                             </a>
                                                         </div>
                                                     )}

@@ -392,7 +392,7 @@ const GenomeBrowser = createReactClass({
 
          // Probably not worth a define in globals.js for visualizable types and statuses.
         // Extract only bigWig and bigBed files from the list:
-        let files = this.props.files.filter(file => file.file_format === 'bigWig' || file.file_format === 'bigBed');
+        let files = this.props.files.filter(file => file.file_format === 'bigWig' || file.file_format === 'bigBed'  || file.file_format === 'hic');
         files = files.filter(file =>
                     ['released', 'in progress', 'archived'].indexOf(file.status) > -1
                 );
@@ -428,7 +428,7 @@ const GenomeBrowser = createReactClass({
                             },
                         },
                     ],
-                });
+                })
             } else if (file.file_format === 'bigBed') {
                 this.browserFiles.push({
                     name: trackLabels.shortLabel,
@@ -442,8 +442,26 @@ const GenomeBrowser = createReactClass({
                         },
                     ],
                 });
+		}
+	    else if (file.file_format === 'hic') {
+		this.browserFiles.push({
+		    name: trackLabels.shortLabel,
+                    desc: trackLabels.longLabel,
+                    bwgURI: `${domain}${file.href}`,
+                    style: [
+                        {
+                            type: 'default',
+                            style: {
+                                HEIGHT: 30,
+                            },
+                        },
+                    ],
+                });
             }
-        });
+});
+		
+        
+
         if (this.browserFiles.length) {
             browserCfg.sources = browserCfg.sources.concat(this.browserFiles);
         }
@@ -511,6 +529,24 @@ const GenomeBrowser = createReactClass({
                             },
                         ],
                     });
+		    }
+		else if (file.file_format === 'hic') {
+		    this.browser.addTier({
+			name: trackLabels.shortLabel,
+                        desc: trackLabels.longLabel,
+                        bwgURI: `${domain}${file.href}`,
+                        style: [
+                            {
+                                type: 'default',
+                                style: {
+                                    glyph: 'HISTOGRAM',
+                                    HEIGHT: 30,
+                                    BGCOLOR: 'rgb(166,71,71)',
+                                },
+                            },
+                        ],
+                    });
+ 
                 } else if (file.file_format === 'bigBed') {
                     this.browser.addTier({
                         name: trackLabels.shortLabel,

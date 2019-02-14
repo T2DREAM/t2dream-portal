@@ -10,13 +10,19 @@
         "sortOrder": [ "Biosample", "Targets", "Replicates", "Views" ],
         "Views": {
             "tag": "view",
-            "group_order": [ "Topologically associated domains", "Nested TADs", "Genome compartments" ],
+            "group_order": ["long range chromatin interactions", "Topologically associated domains", "Nested TADs", "Genome compartments" ],
             "groups": {
                 "Topologically associated domains": {
                     "tag": "aTADS",
                     "visibility": "dense",
                     "type": "bigBed 3 +",
                     "output_type": [ "topologically associated domains" ]
+                },
+                "long range chromatin interactions": {
+                    "tag": "lrci",
+                    "visibility": "full",
+                    "type": "hic",
+                    "output_type": [ "long range chromatin interactions" ]
                 },
                 "Nested TADs": {
                     "tag": "bTADS",

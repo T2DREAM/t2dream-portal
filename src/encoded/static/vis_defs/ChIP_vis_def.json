@@ -94,11 +94,11 @@
                     }
                 },
                 "Biosample": {
-                    "tag": "BS",
+                    "tag": "sample",
                     "groups": { "one": { "title_mask": "{biosample_term_name}"} }
                 },
                 "Targets": {
-                    "tag": "TARG",
+                    "tag": "target",
                     "groups": { "one": { "title_mask": "{target.label}", "url_mask": "targets/{target.name}"} }
                 }
             }
