@@ -1533,7 +1533,7 @@ const FileGalleryRenderer = createReactClass({
 	    {loggedIn ?
 	    <div style={{'height': '800px'}}>
             {context.visualize ?
-	              <Iframe url={'https://www.browser.t2depigenome.org/browser/?genome=' + selectedAssembly + '&hub=https://t2depigenome-test.org' + assay + '@@hub/' + selectedAssembly + '/jsonout/trackDb.json'} height="680px" width="1140px" />
+	              <Iframe url={'https://www.browser.t2depigenome.org/browser/?genome=' + selectedAssembly + '&hub=https://www.t2depigenome.org' + assay + '@@hub/' + selectedAssembly + '/jsonout/trackDb.json'} height="680px" width="1140px" />
 	     : <p className="browser-error">Files must be in bigBed or bigWig file format to be visualized on Epigenome Browser</p> }
              </div>
 	     : <p className="browser-error">Your account is not allowed to view this page. Please sign in to view this page.</p> }

@@ -631,6 +631,7 @@
                         "plus strand signal of unique reads",
                         "signal of unique reads",
                         "signal p-value",
+			"signal",
                         "fold change over control",
                         
                         "exon quantifications",

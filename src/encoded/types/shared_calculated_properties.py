@@ -8,7 +8,7 @@ from ..visualization import (
 )
 import logging
 log = logging.getLogger(__name__)
-#log.setLevel(logging.DEBUG)                                                                                                                               
+                                                                                                                               
 log.setLevel(logging.INFO)
 class CalculatedBiosampleSlims:
     @calculated_property(condition='biosample_term_id', schema={
@@ -300,7 +300,6 @@ class CalculatedVisualize:
             if browser_urls:
                 viz[assembly_name] = browser_urls
         if viz:
-            log.warn(viz)
             return viz
         else:
             return None

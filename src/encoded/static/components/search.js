@@ -1228,11 +1228,10 @@ const ResultTable = search.ResultTable = createReactClass({
                                             : null}
                                         </span>
                                     }
-
+			 {loggedIn ? <a className="btn btn-info btn-sm" target = "_blank" href = { 'https://www.browser.t2depigenome.org/browser/' }>Epigenome Browser <span className="beta-badge">BETA</span></a> : null}			 
                                     {context.batch_download ?
                                         <BatchDownload context={context} />
                                     : null}
-
                                     {visualizeKeys && context.visualize_batch ?
                                         <BrowserSelector
                                             visualizeCfg={context.visualize_batch}
@@ -1242,6 +1241,7 @@ const ResultTable = search.ResultTable = createReactClass({
                                     : null}
                                 </div>
                                 <hr />
+
                                 {browserAvail ?
                                     <TabPanel tabs={{ listpane: 'List', browserpane: <BrowserTabQuickView /> }} selectedTab={this.state.selectedTab} handleTabClick={this.handleTabClick} tabFlange>
                                         <TabPanelPane key="listpane">
