@@ -525,6 +525,7 @@ OUTPUT_TYPE_8CHARS = {
     # "raw minus strand signal":"raw -",   # these are all now minus signal of all reads
     # "raw plus strand signal":"raw +",    # these are all now plus signal of all reads
     "raw signal":                           "raw sig",
+    "signal":                               "sig",
     "raw normalized signal":                "nraw",
     "read-depth normalized signal":         "rdnorm",
     "control normalized signal":            "ctlnorm",
@@ -940,7 +941,6 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
     ucsc_assembly = composite['ucsc_assembly']
     # first time through just to get rep_tech
     group_order = composite["view"].get("group_order", [])
-    #log.warn(group_order)
     for view_tag in group_order:
         view = composite["view"]["groups"][view_tag]
         output_types = view.get("output_type", [])
@@ -968,9 +968,8 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
                 rep_tech = a_file["rep_tech"]
             rep_techs[rep_tech] = rep_tech
             files.append(a_file)
-            
     if len(files) == 0:
-        #log.warn("No visualizable files for %s" % (dataset["accession"]))
+        log.warn("No visualizable files for %s" % (dataset["accession"]))
         return None
 
     # convert rep_techs to simple reps
@@ -1059,7 +1058,6 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
                     assert(group_tag == "Don't know this group!")
             track["metadata"] = membership
             tracks.append(track)
-    #log.warn(tracks)
     return tracks
 
 
@@ -1069,7 +1067,6 @@ def make_acc_composite(dataset, assembly, host=None, hide=False):
         log.debug("%s can't be visualized because it's not unreleased status:%s." %
                   (dataset["accession"], dataset["status"]))
         return {}
-    #log.warn(get_vis_type(dataset))
     vis_type = get_vis_type(dataset)
     vis_defs = lookup_vis_defs(vis_type)
     if vis_defs is None:
@@ -1130,7 +1127,6 @@ def make_acc_composite(dataset, assembly, host=None, hide=False):
         # Already warned about files log.debug("No tracks for %s" % dataset["accession"])
         return {}
     composite[""] = tracks
-    #log.warn(json.dumps(tracks, indent=4, sort_keys=True))
     return tracks
 
 
@@ -1156,9 +1152,9 @@ def remodel_acc_to_set_composites(acc_composites, hide_after=None):
             else:
                 hide_after -= 1
         # If set_composite of this vis_type doesn't exist, create it
-        #log.warn(acc_composite)
+        
         #vis_type = acc_composite["vis_type"]
-        #log.warn(vis_type)
+        
         #vis_defs = lookup_vis_defs(vis_type)
         #assert(vis_type is not None)
         #if vis_type not in set_composites.keys():  # First one so just drop in place
@@ -1205,7 +1201,7 @@ def remodel_acc_to_set_composites(acc_composites, hide_after=None):
             #            if subgroup_tag not in set_group.get("groups", {}).keys():
                             # Adding biosamples, targets, and reps
             #                insert_live_group(set_group, subgroup_tag, acc_subgroups[subgroup_tag])
-    #log.warn(set_composites)
+    
     return set_composites
 
 
@@ -1418,7 +1414,7 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
                 ihec_view.append(ihec_track)
             if len(ihec_view) > 0:
                 browser[view["title"]] = ihec_view
-    #log.warn(ihec_json)
+    
     return ihec_json
 
 
@@ -1439,7 +1435,7 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
         host=request.host_url
         if host is None or host.find("localhost") > -1:
             host = "https://www.t2depigenome.org"
-        #log.warn(dataset)
+        
         acc_composite = make_acc_composite(dataset, assembly, host=host, hide=hide)
         if USE_CACHE:
             add_to_es(request, es_key, acc_composite)
@@ -1447,8 +1443,6 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
 
         if request_dataset:  # Manage meomory
             del dataset
-    #log.warn(found_or_made) made
-    #log.warn(acc_composite) 
     return (found_or_made, acc_composite)
 
 
@@ -1466,7 +1460,7 @@ def generate_trackDb(request, dataset, assembly, hide=False, regen=False):
         regen = ('regen' in cmd)
         if not regen: # TODO temporary
             regen = ihec_out
-    #log.warn(ihec_out)
+    
     acc = dataset['accession']
     ucsc_assembly = _ASSEMBLY_MAPPER.get(assembly, assembly)
     (found_or_made, acc_composite) = find_or_make_acc_composite(request, ucsc_assembly,
@@ -1510,10 +1504,9 @@ def generate_batch_trackDb(request, hide=False, regen=False):
     assembly = str(request.matchdict['assembly'])
     log.debug("Request for %s trackDb begins   %.3f secs" %
               (assembly, (time.time() - PROFILE_START_TIME)))
-    #log.warn((request.matchdict['search_params']))
+    # for track hubs on epigenome browser
     param_list1 = (request.matchdict['search_params'].replace(',,', '='))
-    param_list = parse_qs(param_list1.replace('-', '&'))
-    #log.warn(param_list1)
+    param_list = parse_qs(param_list1.replace('|', '&'))
     set_composites = None
     # Have to make it.
     assemblies = ASSEMBLY_MAPPINGS.get(assembly, [assembly])
@@ -1572,8 +1565,6 @@ def generate_batch_trackDb(request, hide=False, regen=False):
             made += 1
             acc_composites = acc_composite
             acc_composites1.extend(acc_composites)
-            #log.warn(acc_composite)
-            #log.warn(made)
         #else:       # will have to fetch embedded dataset
         #    for acc in missing_accs:
         #        (found_or_made, acc_composite) = find_or_make_acc_composite(request, assembly, acc,
@@ -1585,19 +1576,16 @@ def generate_batch_trackDb(request, hide=False, regen=False):
         #        else:
         #            found += 1
         #        acc_composites[acc] = acc_composite
-                #log.warn(acc_composite)
 
     blob = ""
     set_composites = {}
-    #log.warn(acc_composites)
-    #log.warn(made)
     if made > 0:
         if ihec_out:
             ihec_json = remodel_acc_to_ihec_json(acc_composites, request)
             blob = json.dumps(ihec_json, indent=4, sort_keys=True)
         if json_out:
             blob = json.dumps(acc_composites1, indent=4, sort_keys=True)
-            #log.warn(blob)
+            
         #else:
         #    set_composites = remodel_acc_to_set_composites(acc_composites, hide_after=100)
 
@@ -1611,7 +1599,7 @@ def generate_batch_trackDb(request, hide=False, regen=False):
     else:
         log.debug("acc_composites: %s generated, %d found, %d set(s). len(txt):%s  %.3f secs" %
                   (made, found, len(set_composites), len(blob), (time.time() - PROFILE_START_TIME)))
-    #log.warn(blob)
+    
     return blob
 
 
@@ -1796,7 +1784,7 @@ def vis_format_url(browser, path, assembly, position=None):
     # http://www.epigenome-browser.t2depigenome.org:3000/browser/?genome=hg19&hicUrl=https://www.t2depigenome.org/files/DFF873SGR/@@download/DFF873SGR.hic
     elif browser == "epigenomebrowser":
         external_url = 'https://www.browser.t2depigenome.org/browser/?genome='
-        external_url += assembly + '&hub=https://t2depigenome-test.org' + path + '@@hub/' + assembly + '/jsonout/trackDb.json'
+        external_url += assembly + '&hub=https://www.t2depigenome.org' + path + '@@hub/' + assembly + '/jsonout/trackDb.json'
         if position is not None:
             external_url += '&position={}'.format(position)
         return external_url

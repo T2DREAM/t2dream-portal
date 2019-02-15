@@ -243,19 +243,7 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 		      </DropdownMenu>
 		      </DropdownButton>
 		      : null}
-		     {visualizeKeys ?
-		      <DropdownButton disabled={visualize_disabled} title={visualize_disabled ? 'Filter to ' + visualizeLimit + ' to visualize' : 'Visualize'} label="batchhubs" wrapperClasses="results-table-button">
-		                                                          <DropdownMenu>
-                                                        {visualizeKeys.map(assembly =>
-                                                            Object.keys(context.visualize_batch[assembly]).sort().map(browser =>
-                                                                <a key={[assembly, '_', browser].join()} data-bypass="true" target="_blank" private-browsing="true" href={context.visualize_batch[assembly][browser]}>
-                                                                    {assembly} {browser}
-                                                                </a>
-                                                            )
-                                                        )}
-                                                    </DropdownMenu>
-                                                </DropdownButton>
-: null}
+                     {loggedIn ? <a className="btn btn-info btn-sm" target = "_blank" href = { 'https://www.browser.t2depigenome.org/browser/?genome=' + assembly + '&position=' + chromosome +':' +start + '-' + end + '&hub=https://www.t2depigenome.org/batch_hub/region,,' +  kp + '|genome,,' + genome +'/' + genome + '/trackDb.json' }>Epigenome Browser <span className="beta-badge">BETA</span></a> : null}
 		     <a className="btn btn-info btn-sm" target = "_blank" href = { `${domain}${kp}` }>Knowledge Portal</a>
 		     
 </div>
@@ -299,7 +287,7 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 		                          <TabPanelPane key="browser">
 		                          {loggedIn ?
 		                          <div style={{'height': '800px'}}>
-                                          <Iframe url={'https://www.browser.t2depigenome.org/browser/?genome=' + assembly + '&position=' + chromosome +':' +start + '-' + end +'&hub=https://t2depigenome-test.org/batch_hub/region,,' +  kp + '-genome,,' + genome +'/' + genome + '/trackDb.json'} height="680px" width="100%" />
+                                          <Iframe url={'https://www.browser.t2depigenome.org/browser/?genome=' + assembly + '&position=' + chromosome +':' +start + '-' + end +'&hub=https://www.t2depigenome.org/batch_hub/region,,' +  kp + '|genome,,' + genome +'/' + genome + '/trackDb.json'} height="680px" width="100%" />
                                           </div>
 					   : <p className="browser-error">Your account is not allowed to view this page. Please sign in to view this page.</p> }
                                     </TabPanelPane>
