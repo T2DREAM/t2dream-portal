@@ -138,6 +138,8 @@ _ASSEMBLY_MAPPER_FULL = {
 def includeme(config):
     config.add_route('batch_hub', '/batch_hub/{search_params}/{txt}')
     config.add_route('batch_hub:trackdb', '/batch_hub/{search_params}/{assembly}/{txt}')
+    config.add_route('browser_hub', '/browser_hub/{search_params}/{txt}')
+    config.add_route('browser_hub:trackdb', '/browser_hub/{search_params}/{assembly}/{txt}')
     config.add_route('index-vis', '/index-vis')
     config.scan(__name__)
 
@@ -1061,6 +1063,134 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
     return tracks
 
 
+def acc_composite_extend_with_tracks1(composite, vis_defs, dataset, assembly, host= None):
+    '''Extends live experiment composite object with track definitions'''
+    tracks = []
+    rep_techs = {}
+    files = []
+    ucsc_assembly = composite['ucsc_assembly']
+    # first time through just to get rep_tech
+    group_order = composite["view"].get("group_order", [])
+    for view_tag in group_order:
+        view = composite["view"]["groups"][view_tag]
+        output_types = view.get("output_type", [])
+        file_format_types = view.get("file_format_type", [])
+        file_format = view["type"].split()[0]
+        #if file_format == "bigBed":
+        #    view["type"] = "bigBed"  # scoreFilter implies score so 6 +
+        #    format_type = view.get('file_format_type','')
+        #log.warn("%d files looking for type %s" % ((len(dataset["files"]),view["type"]))
+        for a_file in dataset["files"]:
+            if a_file['status'] not in VISIBLE_FILE_STATUSES:
+                continue
+            if file_format != a_file['file_format']:
+                continue
+            if len(output_types) > 0 and a_file.get('output_type', 'unknown') not in output_types:
+                continue
+            if len(file_format_types) > 0 and a_file.get('file_format_type', 'unknown') not in file_format_types:
+                continue
+            if 'assembly' not in a_file or _ASSEMBLY_MAPPER.get(a_file['assembly'], a_file['assembly']) != ucsc_assembly:
+                continue
+            if "rep_tech" not in a_file:
+                rep_tech = rep_for_file(a_file)
+                a_file["rep_tech"] = rep_tech
+            else:
+                rep_tech = a_file["rep_tech"]
+            rep_techs[rep_tech] = rep_tech
+            files.append(a_file)
+    if len(files) == 0:
+        log.warn("No visualizable files for %s" % (dataset["accession"]))
+        return None
+
+    # convert rep_techs to simple reps
+    rep_ix = 1
+    rep_tags = []
+    for rep_tech in sorted(rep_techs.keys()):  # ordered by a simple sort
+        if rep_tech == "combined":
+            rep_tag = "pool"
+        else:
+            rep_tag = "rep%02d" % rep_ix
+            rep_ix += 1
+        rep_techs[rep_tech] = rep_tag
+        rep_tags.append(rep_tag)
+
+    # Now we can fill in "Replicate" subgroups with with "replicate"
+    other_groups = vis_defs.get("other_groups", []).get("groups", [])
+    if "Replicates" in other_groups:
+        group = other_groups["Replicates"]
+        group_tag = group["tag"]
+        subgroups = group["groups"]
+        if "replicate" in subgroups:
+            (repgroup_tag, repgroup) = generate_live_groups(composite, "replicate",
+                                                            subgroups["replicate"], dataset,
+                                                            rep_tags)
+
+    # second pass once all rep_techs are known
+    if host is None:
+        host ="https://www.t2depigenome.org"
+    for view_tag in composite["view"].get("group_order", []):
+        view = composite["view"]["groups"][view_tag]
+        output_types = view.get("output_type", [])
+        file_format_types = view.get("file_format_type", [])
+        file_format = view["type"].split()[0]
+        for a_file in files:
+            if a_file['file_format'] not in [file_format, "bed"]:
+                continue
+            if len(output_types) > 0 and a_file.get('output_type', 'unknown') not in output_types:
+                continue
+            if len(file_format_types) > 0 and a_file.get('file_format_type',
+                                                         'unknown') not in file_format_types:
+                continue
+            rep_tech = a_file["rep_tech"]
+            rep_tag = rep_techs[rep_tech]
+            a_file["rep_tag"] = rep_tag
+            track = {}
+            track["type"] = view["type"]
+            track["url"] = "%s%s" % (host,a_file["href"])
+            track["showOnHubLoad"] = False
+            # longLabel = vis_defs.get('file_defs', {}).get('longLabel')
+            longLabel = ("{assay_title} of {biosample_term_name} {output_type}"
+                             "{biological_replicate_number}")
+            longLabel += " {experiment.accession} - {file.accession}"  # Always add the accessions
+            track["name"] = sanitize_label(convert_mask(longLabel, dataset, a_file))
+            
+            # Expecting short label to change when making assay based composites
+            #shortLabel = vis_defs.get('file_defs', {}).get('shortLabel',
+                                                          # "{replicate} {output_type_short_label}")
+            #track["shortLabel"] = sanitize_label(convert_mask(shortLabel, dataset, a_file))
+
+            # How about subgroups!
+            membership = {}
+            membership["view"] = view["tag"]
+            # view["tracks"].append(track)  # <==== This is how we connect them to the views
+            for (group_tag, group) in composite["groups"].items():
+                # "Replicates", "Biosample", "Targets", "Assay", ... member?
+                group_title = group["title"]
+                subgroups = group["groups"]
+                if group_title == "Replicates":
+                    # Must figure out membership
+                    # Generate rep_tag for track, then
+                    subgroup = subgroups.get(rep_tag)
+                    # if subgroup is None:
+                    #    subgroup = { "tag": rep_tag, "title": rep_tag }
+                    #    group["groups"][rep_tag] = subgroup
+                    if subgroup is not None:
+                        membership[group_tag] = rep_tag
+                        if "tracks" not in subgroup:
+                            subgroup["tracks"] = []
+                        subgroup["tracks"].append(track)  # <==== also connected to replicate
+                elif group_title in ["Biosample", "Targets", "Assay", EXP_GROUP]:
+                    assert(len(subgroups) == 1)
+                    # if len(subgroups) == 1:
+                    for (subgroup_tag, subgroup) in subgroups.items():
+                        membership[group_tag] = subgroup["tag"]
+                else:
+                    assert(group_tag == "Don't know this group!")
+            track["metadata"] = membership
+            tracks.append(track)
+    return tracks
+
+
 def make_acc_composite(dataset, assembly, host=None, hide=False):
     '''Converts experiment composite static definitions to live composite object'''
     if dataset["status"] not in VISIBLE_DATASET_STATUSES:
@@ -1123,6 +1253,74 @@ def make_acc_composite(dataset, assembly, host=None, hide=False):
                 composite1["groups"][subgroup_tag] = subgroup
                 composite1["group_order"].append(subgroup_tag)
     tracks = acc_composite_extend_with_tracks(composite1, vis_defs, dataset, assembly, host=host)
+    if tracks is None or len(tracks) == 0:
+        # Already warned about files log.debug("No tracks for %s" % dataset["accession"])
+        return {}
+    composite[""] = tracks
+    return tracks
+
+def make_acc_composite1(dataset, assembly, host=None, hide=False):
+    '''Converts experiment composite static definitions to live composite object'''
+    if dataset["status"] not in VISIBLE_DATASET_STATUSES:
+        log.debug("%s can't be visualized because it's not unreleased status:%s." %
+                  (dataset["accession"], dataset["status"]))
+        return {}
+    vis_type = get_vis_type(dataset)
+    vis_defs = lookup_vis_defs(vis_type)
+    if vis_defs is None:
+        log.debug("%s (vis_type: %s) has undiscoverable vis_defs." %
+                 (dataset["accession"], vis_type))
+        return {}
+    composite = {}
+    composite1 = {} #temp variable for epigenome browser
+    log.debug("%s has vis_type: %s." % (dataset["accession"],vis_type))
+
+    ucsc_assembly = _ASSEMBLY_MAPPER.get(assembly, assembly)
+    if assembly != ucsc_assembly:  # Sometimes 'assembly' is hg38 already.
+        composite1['assembly'] = assembly
+    composite1['ucsc_assembly'] = ucsc_assembly
+
+    # plumbing for ihec, among other things:
+    # for term in ['biosample_term_name', 'biosample_term_id', 'biosample_summary',
+    #             'biosample_type', 'assay_term_id', 'assay_term_name']:
+    #    if term in dataset:
+    #        composite[term] = dataset[term]
+    replicates = dataset.get("replicates", [])
+ 
+    longLabel = vis_defs.get('longLabel',
+                             '{assay_term_name} of {biosample_term_name} - {accession}')
+    # views are always subGroup1
+    composite1["view"] = {}
+    title_to_tag = {}
+    if "Views" in vis_defs:
+        (tag, views) = generate_live_groups(composite1, "Views", vis_defs["Views"], dataset)
+        composite1[tag] = views
+        title_to_tag["Views"] = tag
+
+    if "other_groups" in vis_defs:
+        groups = vis_defs["other_groups"].get("groups", {})
+        new_dimensions = {}
+        new_filters = {}
+        composite1["group_order"] = []
+        composite1["groups"] = {}  # subgroups def by groups and group_order directly off composite
+        group_order = vis_defs["other_groups"].get("group_order")
+        preferred_order = []  # have to create preferred order based upon tags, not titles
+        if group_order is None or not isinstance(group_order, list):
+            group_order = sorted(groups.keys())
+            preferred_order = "sorted"
+        for subgroup_title in group_order:  # Replicates, Targets, Biosamples
+            if subgroup_title not in groups:
+                continue
+            assert(subgroup_title in SUPPORTED_SUBGROUPS)
+            (subgroup_tag, subgroup) = generate_live_groups(composite1, subgroup_title,
+                                                            groups[subgroup_title], dataset)
+            if isinstance(preferred_order, list):
+                preferred_order.append(subgroup_tag)
+            if "groups" in subgroup and len(subgroup["groups"]) > 0:
+                title_to_tag[subgroup_title] = subgroup_tag
+                composite1["groups"][subgroup_tag] = subgroup
+                composite1["group_order"].append(subgroup_tag)
+    tracks = acc_composite_extend_with_tracks1(composite1, vis_defs, dataset, assembly, host=host)
     if tracks is None or len(tracks) == 0:
         # Already warned about files log.debug("No tracks for %s" % dataset["accession"])
         return {}
@@ -1445,6 +1643,33 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
             del dataset
     return (found_or_made, acc_composite)
 
+def find_or_make_acc_composite1(request, assembly, acc, dataset=None, hide=False, regen=False):
+    '''Returns json for a single experiment 'acc_composite'.'''
+    acc_composite = None
+    es_key = acc + "_" + assembly
+    found_or_made = "found"
+    if USE_CACHE and not regen:  # Find composite?
+        acc_composite = get_from_es(request, es_key)
+
+    if acc_composite is None:
+        request_dataset = (dataset is None)
+        if request_dataset:
+            dataset = request.embed("/datasets/" + acc + '/', as_user=True)
+            # log.debug("find_or_make_acc_composite len(results) = %d   %.3f secs" %
+            #           (len(results),(time.time() - PROFILE_START_TIME)))
+        host=request.host_url
+        if host is None or host.find("localhost") > -1:
+            host = "https://www.t2depigenome.org"
+        
+        acc_composite = make_acc_composite1(dataset, assembly, host=host, hide=hide)
+        if USE_CACHE:
+            add_to_es(request, es_key, acc_composite)
+        found_or_made = "made"
+
+        if request_dataset:  # Manage meomory
+            del dataset
+    return (found_or_made, acc_composite)
+
 
 def generate_trackDb(request, dataset, assembly, hide=False, regen=False):
     '''Returns string content for a requested  single experiment trackDb.txt.'''
@@ -1560,6 +1785,120 @@ def generate_batch_trackDb(request, hide=False, regen=False):
         for dataset in results:
             acc = dataset['accession']
             (found_or_made, acc_composite) = find_or_make_acc_composite(request, assembly, acc,
+                                                                            dataset, hide=hide,
+                                                                            regen=True)
+            made += 1
+            acc_composites = acc_composite
+            acc_composites1.extend(acc_composites)
+        #else:       # will have to fetch embedded dataset
+        #    for acc in missing_accs:
+        #        (found_or_made, acc_composite) = find_or_make_acc_composite(request, assembly, acc,
+        #                                                                    None, hide=hide,
+        #                                                                    regen=regen)
+        #        if found_or_made == "made":
+        #            made += 1
+                    # log.debug("%s composite %s" % (found_or_made,acc))
+        #        else:
+        #            found += 1
+        #        acc_composites[acc] = acc_composite
+
+    blob = ""
+    set_composites = {}
+    if made > 0:
+        if ihec_out:
+            ihec_json = remodel_acc_to_ihec_json(acc_composites, request)
+            blob = json.dumps(ihec_json, indent=4, sort_keys=True)
+        if json_out:
+            blob = json.dumps(acc_composites1, indent=4, sort_keys=True)
+            
+        #else:
+        #    set_composites = remodel_acc_to_set_composites(acc_composites, hide_after=100)
+
+        #    json_out = (request.url.find("jsonout") > -1)  # ...&bly=hg19&jsonout/hg19/trackDb.txt
+        #    if json_out:
+        #        blob = json.dumps(set_composites, indent=4, sort_keys=True)
+
+    if regen:  # Want to see message if regen was requested
+        log.info("acc_composites: %s generated, %d found, %d set(s). len(txt):%s  %.3f secs" %
+                 (made, found, len(set_composites), len(blob), (time.time() - PROFILE_START_TIME)))
+    else:
+        log.debug("acc_composites: %s generated, %d found, %d set(s). len(txt):%s  %.3f secs" %
+                  (made, found, len(set_composites), len(blob), (time.time() - PROFILE_START_TIME)))
+    
+    return blob
+
+
+def generate_batch_trackDb1(request, hide=False, regen=False):
+    '''Returns string content for a requested multi-experiment for DGA epigenome hub.'''
+    # local test: RNA-seq: curl https://../batch_hub/type=Experiment,,assay_title=RNA-seq,,award.rfa=ENCODE3,,status=released,,assembly=GRCh38,,replicates.library.biosample.biosample_type=induced+pluripotent+stem+cell+line/GRCh38/trackDb.txt
+
+    (page,suffix,cmd) = urlpage(request.url)
+    json_out = (suffix == 'json')
+    vis_json = (page == 'vis_blob' and json_out)  # ...&bly=hg19&accjson/hg19/trackDb.txt
+    ihec_out = (page == 'ihec' and json_out)
+    if not regen:
+        regen = ('regen' in cmd)
+        if not regen: # TODO temporary
+            regen = ihec_out
+    assembly = str(request.matchdict['assembly'])
+    log.debug("Request for %s trackDb begins   %.3f secs" %
+              (assembly, (time.time() - PROFILE_START_TIME)))
+    # for track hubs on epigenome browser
+    param_list1 = (request.matchdict['search_params'].replace(',,', '='))
+    param_list = parse_qs(param_list1.replace('|', '&'))
+    set_composites = None
+    # Have to make it.
+    assemblies = ASSEMBLY_MAPPINGS.get(assembly, [assembly])
+    params = {
+        'files.file_format': BIGBED_FILE_TYPES + HIC_FILE_TYPES + BIGWIG_FILE_TYPES,
+    }
+    params.update(param_list)
+    params.update({
+        'assembly': assemblies,
+        'limit': ['all'],
+    })
+    if USE_CACHE:
+        params['frame'] = ['object']
+    else:
+        params['frame'] = ['embedded']
+        
+    view = 'search'
+    if 'region' in param_list:
+        view = 'variant-search'
+    path = '/%s/?%s' % (view, urlencode(params, True))
+    results = request.embed(path, as_user=True)['@graph']
+    
+    if not USE_CACHE:
+        log.debug("len(results) = %d   %.3f secs" %
+                  (len(results), (time.time() - PROFILE_START_TIME)))
+    else:
+        # Note: better memory usage to get acc array from non-embedded results,
+        # since acc_composites should be in cache
+        accs = [result['accession'] for result in results]
+        del results
+
+    acc_composites = {}
+    acc_composites1 = []
+    found = 0
+    made = 0
+    if USE_CACHE and not regen:
+        es_keys = [acc + "_" + assembly for acc in accs]
+        acc_composites = search_es(request, es_keys)
+        found = len(acc_composites.keys())
+    accs = [result['accession'] for result in results]
+    
+    missing_accs = []
+    if found == 0:
+        missing_accs = accs
+    # Don't bother if cache is primed.
+    elif found < (len(accs) * 3 / 4):  # some heuristic to decide when too few means regenerate
+        missing_accs = list(set(accs) - set(acc_composites.keys()))
+
+    if len(missing_accs) > 0:  # if 0 were found in cache try generating (for pre-primed-cache access)
+        #if not USE_CACHE: # already have dataset
+        for dataset in results:
+            acc = dataset['accession']
+            (found_or_made, acc_composite) = find_or_make_acc_composite1(request, assembly, acc,
                                                                             dataset, hide=hide,
                                                                             regen=True)
             made += 1
@@ -1918,6 +2257,70 @@ def generate_batch_hubs(context, request):
         data_policy = ('<br /><a href="http://encodeproject.org/ENCODE/terms.html">'
                        'ENCODE data use policy</p>')
         return generate_html(context, request) + data_policy
+def generate_batch_hubs1(context, request):
+    '''search for the input params and return the trackhub'''
+    global PROFILE_START_TIME
+    PROFILE_START_TIME = time.time()
+
+    results = {}
+    (page,suffix,cmd) = urlpage(request.url)
+    log.debug('Requesting %s.%s#%s' % (page,suffix,cmd))
+    if (suffix == 'txt' and page == 'trackDb') or (suffix == 'json' and page in ['trackDb','ihec','vis_blob']):
+        return generate_batch_trackDb1(request)
+        
+    elif page == 'hub' and suffix == 'txt':
+        terms = request.matchdict['search_params'].replace(',,', '&')
+        pairs = terms.split('&')
+        label = "search:"
+        for pair in sorted(pairs):
+            (var, val) = pair.split('=')
+            if var not in ["type", "assembly", "status", "limit"]:
+                label += " %s" % val.replace('+', ' ')
+        return NEWLINE.join(get_hub(label, request.url))
+    elif page == 'genomes' and suffix == 'txt':
+        search_params = request.matchdict['search_params']
+        if search_params.find('bed6+') > -1:
+            search_params = search_params.replace('bed6+,,','bed6%2B,,')
+        log.debug('search_params: %s' % (search_params))
+        #param_list = parse_qs(request.matchdict['search_params'].replace(',,', '&'))
+        param_list = parse_qs(search_params.replace(',,', '&'))
+        log.debug('parse_qs: %s' % (param_list))
+        view = 'search'
+        if 'region' in param_list:
+            view = 'variant-search'
+        path = '/%s/?%s' % (view, urlencode(param_list, True))
+        log.debug('Path in hunt for assembly %s' % (path))
+        results = request.embed(path, as_user=True)
+        # log.debug("generate_batch(genomes) len(results) = %d   %.3f secs" %
+        #           (len(results),(time.time() - PROFILE_START_TIME)))
+        g_text = ''
+        if 'assembly' in param_list:
+            g_text = get_genomes_txt(param_list.get('assembly'))
+        else:
+            for facet in results['facets']:
+                if facet['field'] == 'assembly':
+                    assemblies = []
+                    for term in facet['terms']:
+                        if term['doc_count'] != 0:
+                            assemblies.append(term['key'])
+                    if len(assemblies) > 0:
+                        g_text = get_genomes_txt(assemblies)
+            if g_text == '':
+                log.debug('Requesting %s.%s#%s NO ASSEMBLY !!!' % (page,suffix,cmd))
+                g_text = json.dumps(results,indent=4)
+                assemblies = [result['assemblies'] for result in results['@graph']]
+                assembly_set = set(assemblies)
+                assemblies = list(assembly_set)
+                log.debug('Found %d ASSEMBLY !!!' % len(assemblies))
+#/search/?type=Experiment&lab.title=Ali+Mortazavi%2C+UCI&assay_title=microRNA+counts&status=released&replicates.library.biosample.donor.organism.scientific_name=Mus+musculus&files.file_type=bigBed+bed6%2B&organ_slims=intestine
+#/search/?type=Experimentlab.title=Ali+Mortazavi%2C+UCI&&assay_title=microRNA+counts&status=released&replicates.library.biosample.donor.organism.scientific_name=Mus+musculus&files.file_type=bigBed+bed6+organ_slims=intestine&
+#/search/?assay_title=microRNA+counts&organ_slims=intestine&replicates.library.biosample.donor.organism.scientific_name=Mus+musculus&type=Experiment&files.file_type=bigBed+bed6+&lab.title=Ali+Mortazavi%2C+UCI&status=released
+        return g_text
+    else:
+        # Should generate a HTML page for requests other than those supported
+        data_policy = ('<br /><a href="http://encodeproject.org/ENCODE/terms.html">'
+                       'ENCODE data use policy</p>')
+        return generate_html(context, request) + data_policy
 
 def respond_with_text(request, text, content_mime):
     '''Resonse that can handle range requests.'''
@@ -1985,4 +2388,12 @@ def batch_hub(context, request):
     ''' View for batch track hubs '''
 
     text = generate_batch_hubs(context, request)
+    return respond_with_text(request, text, 'text/plain')
+
+@view_config(route_name='browser_hub')
+@view_config(route_name='browser_hub:trackdb')
+def browser_hub(context, request):
+    ''' View for batch track hubs '''
+
+    text = generate_batch_hubs1(context, request)
     return respond_with_text(request, text, 'text/plain')
