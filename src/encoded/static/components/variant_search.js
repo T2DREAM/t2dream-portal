@@ -250,7 +250,7 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 </div> 
                                   <hr />
 		                  <Panel>
-		                  <TabPanel tabs={{ table: <h5> Results </h5>, graph: 'Variant Network'?<h5> Variant Network <span className="beta-badge">BETA</span></h5>: null, browser: 'Epigenome Browser'? <h5> Epigenome Browser  <span className="beta-badge">BETA</span> </h5> : null }}>
+		                  <TabPanel tabs={{ table: <h5> Results </h5>, graph: <h5> Variant Network </h5>, browser: 'Epigenome Browser'? <h5> Epigenome Browser  <span className="beta-badge">BETA</span> </h5> : null }}>
                                   <TabPanelPane key="table">
                                   <ul className="nav result-table" id="result-table">
                                       {results.map(function (result) {

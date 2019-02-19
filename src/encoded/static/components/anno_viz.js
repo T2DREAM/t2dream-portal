@@ -119,12 +119,11 @@ const FileGalleryRenderer = createReactClass({
 	const loggedIn = this.context.session && this.context.session['auth.userid'];
 
         // Build node graph of the files and analysis steps with this experiment
-        if ( regions && regions.length && loggedIn ) {
+        if ( regions && regions.length ) {
 	    const { graph } = assembleGraph(context, this.context.session, this.state.infoNodeId, query, regions, viz);
             jsonGraph = graph;
 	    return (
             <Panel>
-            <div> <h4> We appreciate your feedback - <a href= 'https://goo.gl/forms/A6Xdj0kzl7AYZcre2' target='_blank'>https://goo.gl/forms/A6Xdj0kzl7AYZcre2</a> </h4> </div>             
 		{/* Display the strip of filgering controls */}
    	    
 		{!hideGraph ?
@@ -147,7 +146,7 @@ const FileGalleryRenderer = createReactClass({
 	    );
 	    }
 	else {
-	    return <div className="browser-error"> Your account is not allowed to view this page. Please sign in to view this page or  <a href='mailto:t2depigenome-help@gmail.com'>Request an account.</a></div>;
+	    return <div className="browser-error"> No viewable data. </div>;
 	    }
     }
 });
