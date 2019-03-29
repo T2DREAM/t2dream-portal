@@ -30,6 +30,7 @@ def includeme(config):
     config.add_route('metadata', '/metadata/{search_params}/{tsv}')
     config.add_route('peak_metadata', '/peak_metadata/{search_params}/{tsv}')
     config.add_route('peak_download', '/peak_download/{search_params}/{tsv}')
+    config.add_route('variant_graph', '/variant_graph/{search_params}/{json}')
     config.add_route('region_metadata', '/region_metadata/{search_params}/{tsv}')
     config.add_route('report_download', '/report.tsv')
     config.add_route('experiment_metadata', '/experiment_metadata/{search_params}/{tsv}')
@@ -107,8 +108,15 @@ _audit_mapping = OrderedDict([
                      'audit.ERROR.category',
                      'audit.ERROR.detail'])
 ])
-
-
+_biosample_color = {
+    'liver':'#fdd993',
+    'HepG2':'#2bb0d1',
+    'islet of Langerhans':'#f28080',
+    'adipocyte': '#f98900',
+    'ESC derived cell line':'#ab93fd',
+    'subcutaneous adipose': '#21a041',
+    'pancreas':'#78ff02'
+}
 def get_file_uuids(result_dict):
     file_uuids = []
     for item in result_dict['@graph']:
@@ -253,6 +261,48 @@ def peak_metadata(context, request):
         body=fout.getvalue(),
         content_disposition='attachment;filename="%s"' % 'peak_download.tsv'
     )
+
+
+@view_config(route_name='variant_graph', request_method='GET')
+def variant_graph(context, request):
+    param_list = parse_qs(request.matchdict['search_params'])
+    param_list['field'] = []
+    param_list['limit'] = ['all']
+    path = '/variant-search/?{}&{}'.format(urlencode(param_list, True),'referrer=peak_metadata')
+    results = request.embed(path, as_user=True)
+    uuids_in_results = get_file_uuids(results)
+    rows = []
+    json_doc = {}
+    json_doc['nodes'] = []
+    query = results['query']
+    json_doc['nodes'].append({'path':query,'id':"", 'color':"#dcdcdc", "link":"region=" + query + "&genome=GRCh37","label":query})
+    for row in results['peaks']:
+        if row['_id'] in uuids_in_results:
+            file_json = request.embed(row['_id'])
+            annotation_json = request.embed(file_json['dataset'])
+            for hit in row['inner_hits']['positions']['hits']['hits']:
+                data_row = []
+                chrom = '{}'.format(row['_index'])
+                assembly = '{}'.format(row['_type'])
+                start = int('{}'.format(hit['_source']['start']))
+                stop = int('{}'.format(hit['_source']['end']))
+                state = '{}'.format(hit['_source']['state'])
+                val = '{}'.format(hit['_source']['val'])
+                file_accession = file_json['accession']
+                annotation_accession = annotation_json['accession']
+                coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
+                annotation = annotation_json['annotation_type']
+                biosample_term = annotation_json['biosample_term_name']
+                biosample_term_list = ['liver', 'pancreas', 'adipocyte', 'islet of Langerhans', 'HepG2', 'ESC derived cell line', 'subcutaneous adipose']
+                if biosample_term in biosample_term_list:
+                    json_doc['nodes'].append({'path':query + '/' + biosample_term,'id':"", 'color': _biosample_color[biosample_term], "link":"biosample_term_name=" + biosample_term ,"label":biosample_term})
+                    json_doc['nodes'].append({'path':query + '/' + biosample_term + '/' + state, 'id':"", 'color': _biosample_color[biosample_term], "link": "accession=" + annotation_accession, "label": annotation_accession})  
+    if 'variant_graph.json' in request.url:
+        return Response(
+            content_type='text/plain',
+            body=json.dumps(json_doc,indent=2,sort_keys=True),
+           
+        )
 
 @view_config(route_name='peak_download', request_method='GET')
 def peak_download(context, request):
