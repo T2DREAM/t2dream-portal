@@ -1532,7 +1532,7 @@ const FileGalleryRenderer = createReactClass({
 	  
 	    {loggedIn ?
 	    <div style={{'height': '800px'}}>
-            {context.visualize && (!(context.assay_title['single cell RNA-seq'])) ?
+            {context.visualize ?
 	              <Iframe url={'https://www.browser.t2depigenome.org/browser-slim/?genome=' + selectedAssembly + '&hub=https://www.t2depigenome.org' + assay + '@@hub/' + selectedAssembly + '/jsonout/trackDb.json'} height="450px" width="1140px" />
 	     : <p className="browser-error">Files must be in bigBed or bigWig file format to be visualized on Epigenome Browser</p> }
              </div>

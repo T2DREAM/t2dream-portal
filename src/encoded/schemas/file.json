@@ -220,18 +220,10 @@
                     }
                 },
                 {
-                    "required": ["assembly"],
-                    "properties": {
-                        "file_format": {
-                            "enum": ["bam", "sam", "gtf", "hic"]
-                        }
-                    }
-                },
-                {
                     "not": {
                         "properties": {
                             "file_format": {
-                                "enum": ["fastq", "gff", "gtf", "bed", "hic", "bigBed", "bam", "sam", "sra", "bigWig"]
+                                "enum": ["fastq", "gff", "gtf", "bed", "bigBed", "bam", "sam", "sra", "bigWig"]
                             }
                         }
                     }
@@ -631,7 +623,6 @@
                         "plus strand signal of unique reads",
                         "signal of unique reads",
                         "signal p-value",
-			"signal",
                         "fold change over control",
                         
                         "exon quantifications",
@@ -710,6 +701,8 @@
                     "enum": [
                         "rejected reads",
                         "raw data",
+			"redacted alignments",
+			"redacted unfiltered alignments",
                         "tRNA reference",
                         "miRNA reference",
                         "snRNA reference",
@@ -1001,6 +994,8 @@
 
         "alignments": "alignment",
         "unfiltered alignments": "alignment",
+	"redacted alignments": "alignment",
+	"redacted unfiltered alignments": "alignment",
         "transcriptome alignments": "alignment",
         "spike-in alignments": "alignment",
         "maternal haplotype mapping": "alignment",

@@ -971,7 +971,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             rep_techs[rep_tech] = rep_tech
             files.append(a_file)
     if len(files) == 0:
-        log.warn("No visualizable files for %s" % (dataset["accession"]))
+        #log.warn("No visualizable files for %s" % (dataset["accession"]))
         return None
 
     # convert rep_techs to simple reps

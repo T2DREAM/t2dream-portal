@@ -3048,7 +3048,7 @@ def get_chip_seq_bam_read_depth(bam_file):
     if bam_file['status'] in ['deleted', 'replaced']:
         return False
 
-    if bam_file['file_format'] != 'bam' or bam_file['output_type'] != 'alignments':
+    if bam_file['file_format'] != 'bam' or bam_file['output_type'] != ['alignments', 'redacted alignments']:
         return False
 
     # Check to see if bam is from ENCODE or modERN pipelines
@@ -3107,11 +3107,15 @@ def create_files_mapping(files_list, excluded):
                     to_return['fastq_files'][file_object['@id']] = file_object
 
                 if file_format and file_format == 'bam' and \
-                        file_output and file_output == 'alignments':
+                        file_output and (
+                            file_output == 'alignments' or
+                            file_output and file_output == 'redacted alignments'):
                     to_return['alignments'][file_object['@id']] = file_object
 
                 if file_format and file_format == 'bam' and \
-                        file_output and file_output == 'unfiltered alignments':
+                        file_output and (
+                            file_output == 'unfiltered alignments' or
+                            file_output == 'redacted unfiltered alignments'):
                     to_return['unfiltered_alignments'][file_object['@id']
                                                        ] = file_object
 
