@@ -1,5 +1,9 @@
 ## Changelog for annotation.json
 
+### Schema version 12
+
+* Added target gene predictions & variant allelic effects to annotation type
+
 ### Schema version 11
 
 * *aliases* now must be properly namespaced according lab.name:alphanumeric characters with no leading or trailing spaces
