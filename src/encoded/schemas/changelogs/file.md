@@ -1,5 +1,8 @@
 ## Changelog for file.json
 
+### Minor changes version 10
+*  output_types: "redacted alignments" and "redacted unfiltered alignments"; both enumerations are categorized as "alignments".
+
 ### Schema version 10
 
 * *aliases* now must be properly namespaced according lab.name:alphanumeric characters with no leading or trailing spaces

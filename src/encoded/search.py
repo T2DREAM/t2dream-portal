@@ -519,7 +519,7 @@ def search_result_actions(request, doc_types, es_results, position=None):
                         browser_urls1['EpigenomeSlim'] = epigenome_url_slim
                     if browser_urls:
                         viz[assembly] = browser_urls
-                        actions.setdefault('visualize_batch', {})[assembly] = browser_urls  # formerly 'batch_hub'
+                        # actions.setdefault('visualize_batch', {})[assembly] = browser_urls  # formerly 'batch_hub'
                         actions.setdefault('visualize_batch1', {})[assembly] = browser_urls1  # formerly 'batch_hub' 
         if viz:
             actions.setdefault('visualize_batch',viz)

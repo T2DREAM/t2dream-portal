@@ -30,8 +30,14 @@ log.setLevel(logging.INFO)
 # hashmap of assays and corresponding file types that are being indexed
 _INDEXED_DATA = {
     'accessible chromatin': {
-        'output_type': ['peaks']
+        'file_type': ['bed bed3+']
     },
+    'variant calls': {
+        'file_type': ['bed bed6+']
+        },
+    'long-range chromatin interactions': {
+        'file_type': ['bed bed3+']
+        },
     'binding sites': {
         'output_type': ['signal']
     },

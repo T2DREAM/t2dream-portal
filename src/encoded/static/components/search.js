@@ -1302,12 +1302,12 @@ const ResultTableList = createReactClass({
 	                </ul>
 			</TabPanelPane>
 			<TabPanelPane key="browser1">                        
-			{visualize_batch_hg19 && visualizeDisabled && loggedIn && (!(singleCell)) ?
+			{visualize_batch_hg19 && visualizeDisabled && loggedIn ?
 			 <Iframe url={ visualize_batch_hg19 } height="1000px" width="100%" />
 			 : <p className="browser-error">Your account is not allowed to view this page. Please sign in to view this page. The browser allows selection upto 25 assays</p> }
                         </TabPanelPane>
 			<TabPanelPane key="browser2">
-			{visualize_batch_hg38 && visualizeDisabled && loggedIn && (!(singleCell)) ?
+			{visualize_batch_hg38 && visualizeDisabled && loggedIn ?
 			 <Iframe url={ visualize_batch_hg38 } height="1000px" width="100%" />
 			 : <p className="browser-error">Your account is not allowed to view this page. Please sign in to view this page. The browser allows selection upto 25 assays</p> }
 		        </TabPanelPane>
@@ -1331,7 +1331,7 @@ const ResultTableList = createReactClass({
 	                </ul>
 			</TabPanelPane>
 			<TabPanelPane key="browser1">
-			{visualize_batch_hg19 && visualizeDisabled && loggedIn && (!(singleCell)) ?
+			{visualize_batch_hg19 && visualizeDisabled && loggedIn ?
 			 <Iframe url={ visualize_batch_hg19 } height="1000px" width="100%" />
 			 : <p className="browser-error">Your account is not allowed to view this page. Please sign in to view this page. The browser allows selection upto 25 assays</p> }
                         </TabPanelPane>
@@ -1355,7 +1355,7 @@ const ResultTableList = createReactClass({
 	                </ul>
 			</TabPanelPane>
 			<TabPanelPane key="browser">
-			{visualize_batch_hg38 && visualizeDisabled && loggedIn && (!(singleCell)) ?
+			{visualize_batch_hg38 && visualizeDisabled && loggedIn ?
 			 <Iframe url={ visualize_batch_hg38 } height="1000px" width="100%" />
 			 : <p className="browser-error">Your account is not allowed to view this page. Please sign in to view this page. The browser allows selection upto 25 assays</p> }
                         </TabPanelPane>

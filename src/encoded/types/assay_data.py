@@ -46,5 +46,7 @@ assay_terms = {
       'BruChase-seq': 'OBI:0002114',
       'genetic modification followed by DNase-seq': 'NTR:0004774',
       'CRISPRi followed by RNA-seq': 'NTR:0004619',
+      'single-nuclei ATAC-seq': 'NTR:0000438',
+      'single-cell ATAC-seq': 'NTR:0000444',
       'genotyping by Hi-C': 'NTR:0004875'
 }
