@@ -1,5 +1,9 @@
 ## Changelog for experiment.json
 
+### Schema version 12
+
+* added single-cell ATAC seq & single-nuclei ATAC seq to the schema
+
 ### Schema version 11
 
 * *aliases* now must be properly namespaced according lab.name:alphanumeric characters with no leading or trailing spaces

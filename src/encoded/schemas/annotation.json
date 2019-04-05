@@ -74,6 +74,8 @@
                 "transcript expression",
                 "validated enhancers",
                 "variant calls",
+		"target gene predictions",
+		"variant allelic effects",
                 "overlap",
                 "other"
             ]

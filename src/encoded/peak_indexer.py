@@ -32,10 +32,10 @@ _INDEXED_DATA = {
     'accessible chromatin': {
         'file_type': ['bed bed3+']
     },
-    'variant calls': {
+    'variant allelic effects': {
         'file_type': ['bed bed6+']
         },
-    'long-range chromatin interactions': {
+    'target gene predictions': {
         'file_type': ['bed bed3+']
         },
     'binding sites': {
