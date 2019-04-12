@@ -394,7 +394,7 @@ const GenomeBrowser = createReactClass({
         // Extract only bigWig and bigBed files from the list:
         let files = this.props.files.filter(file => file.file_format === 'bigWig' || file.file_format === 'bigBed'  || file.file_format === 'hic');
         files = files.filter(file =>
-                    ['released', 'in progress', 'archived'].indexOf(file.status) > -1
+                    ['released', 'in progress', 'archived', 'uploading'].indexOf(file.status) > -1
                 );
 
 

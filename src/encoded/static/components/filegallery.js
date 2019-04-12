@@ -1445,12 +1445,15 @@ const FileGalleryRenderer = createReactClass({
         let jsonGraph;
         let allGraphedFiles;
 	const assay = context['@id'];
+	const proposedStatus = context.status === 'proposed';
+	const cellBrowser = 'https://www.browser.t2depigenome.org/CellBrowser/index.html';
+	const genomeBrowser = 'https://www.t2depigenome.org/search/?type=File&dataset=' + context['@id'] + '&file_format=bigWig&&file_format=bigBed&status=uploading&assembly=hg19';
         const files = (data ? data['@graph'] : []).concat(this.state.relatedFiles); // Array of searched files arrives in data.@graph result
         if (files.length === 0) {
             return null;
         }
 	const loggedIn = this.context.session && this.context.session['auth.userid'];
-
+	const singleCell = context.assay_term_name === 'single-nuclei ATAC-seq';
         const filterOptions = files.length ? collectAssembliesAnnotations(files) : [];
 
         if (this.state.selectedFilterValue && filterOptions[this.state.selectedFilterValue]) {
@@ -1481,11 +1484,21 @@ const FileGalleryRenderer = createReactClass({
 			 <BrowserSelector visualizeCfg={context.visualize} />
                         : null}
                     </div>
+                    <div className="file-gallery-visualize">
+                        {proposedStatus ?
+                         <a className="btn btn-info btn-sm" target = "_blank" href = { `${genomeBrowser}` }>Genome Browser</a>
+                        : null}
+                    </div>
+		   <div className="file-gallery-visualize-cell">
+		   {singleCell ?
+                   <a className="btn btn-info btn-sm" target = "_blank" href = { `${cellBrowser}` }>Cell Browser</a>
+                   : null}
+                  </div>
                 </PanelHeading>
 		{/* Display the strip of filgering controls */}
 	    
 	    <FilterControls selectedFilterValue={this.state.selectedFilterValue} filterOptions={filterOptions} handleFilterChange={this.handleFilterChange} />
-	    <TabPanel tabs={{ graph: 'Association graph', tables: 'File details', browser: 'Epigenome Browser'?<h8>Epigenome Browser <span className="beta-badge">BETA</span></h8> : null }}>	        
+	    <TabPanel tabs={{ graph: 'Association graph', tables: 'File details', browser: 'Epigenome Browser' && context.visualize ?<h8>Epigenome Browser <span className="beta-badge">BETA</span></h8> : null }}>	        
 		<TabPanelPane key="graph">
 		{!hideGraph ?
 		 <FileGraph

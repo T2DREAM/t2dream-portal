@@ -33,7 +33,7 @@ _INDEXED_DATA = {
         'file_type': ['bed bed3+']
     },
     'variant allelic effects': {
-        'file_type': ['bed bed6+']
+        'output_type': ['variant calls']
         },
     'target gene predictions': {
         'file_type': ['bed bed3+']
