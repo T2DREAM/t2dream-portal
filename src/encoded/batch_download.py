@@ -86,6 +86,7 @@ _tsv_mapping = OrderedDict([
     ('Size', ['files.file_size']),
     ('Lab', ['files.lab.title']),
     ('md5sum', ['files.md5sum']),
+    ('files.date_created', ['files.date_created']),
     ('dbxrefs', ['files.dbxrefs']),
     ('File download URL', ['files.href']),
     ('Assembly', ['files.assembly']),
@@ -583,18 +584,24 @@ def annotation_metadata(context, request):
         files = {}
         for f in annotation_json['files']:
             title = f['title']
+            md5sum = f['md5sum']
+            date_created = f['date_created']
             lab = f['lab']['title']
             href = request.host_url + f['href']
             status = f['status']
             if title not in files:
                 files[title] = []
                 files[title].append({
+                    'md5sum': md5sum,
+                    'date_created': date_created,
                     'href': href,
                     'status': status,
                     'lab': lab
                     })
             else:
                 files[title].append({
+                    'md5sum': md5sum,
+                    'date_created': date_created,
                     'href': href,
                     'status': status,
                     'lab': lab
@@ -613,7 +620,7 @@ def annotation_metadata(context, request):
         else:
             json_doc[annotation].append({
                 'annotation_term_name': annotation,
-                'annotation id': annotation_id,
+                'annotation_id': annotation_id,
                 'biosample_term': biosample_term,
                 'file_download': files
                 })  

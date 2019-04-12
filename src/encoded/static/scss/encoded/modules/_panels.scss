@@ -279,6 +279,18 @@ a[href^="http://encodedcc.sdsc.edu/warehouse/"]:after {
     }
 }
 
+.file-gallery-visualize-cell {
+    margin-top: 5px;
+
+    @media screen and (min-width: $screen-sm-min) {
+        position: absolute;
+top: 5px;
+        right: 150px;
+        bottom: 5px;
+        margin-top: 0;
+    }
+}
+
 .file-gallery-controls {
    padding: 5px 0;
    background-color: #c0c0c0;

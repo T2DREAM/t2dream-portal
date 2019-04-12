@@ -1146,7 +1146,7 @@ const ResultTable = search.ResultTable = createReactClass({
                 browserFiles = results.filter(file => ['bigBed', 'bigWig', 'hic'].indexOf(file.file_format) > -1);
                 if (browserFiles.length > 0) {
                     browserFiles = browserFiles.filter(file =>
-                        ['released', 'in progress', 'archived'].indexOf(file.status) > -1
+                        ['released', 'in progress', 'archived', 'uploading'].indexOf(file.status) > -1
                     );
                 }
                 browserAvail = (browserFiles.length > 0);
