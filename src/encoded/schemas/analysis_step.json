@@ -142,6 +142,7 @@
                     "filtered regions",
                     "DHS peaks",
                     "peaks",
+		    "peaks and background as input for IDR",
                     "replicated peaks",
                     "RNA-binding protein associated mRNAs",
                     "splice junctions",
