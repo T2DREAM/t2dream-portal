@@ -607,6 +607,7 @@
                         "transcriptome alignments",
                         "maternal haplotype mapping",
                         "paternal haplotype mapping",
+			"peaks and background as input for IDR",
                         "phased mapping",
 
                         "minus strand signal of all reads",
@@ -1052,6 +1053,7 @@
         "filtered regions":"annotation",
         "DHS peaks": "annotation",
         "peaks": "annotation",
+	"peaks and background as input for IDR": "annotation",
         "replicated peaks": "annotation",
         "RNA-binding protein associated mRNAs": "annotation",
         "splice junctions": "annotation",
