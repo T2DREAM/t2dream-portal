@@ -58,6 +58,7 @@ def includeme(config):
 
 def tsvreader(file):
     reader = csv.reader(file, delimiter='\t')
+    next(reader)
     for row in reader:
         yield row
 
