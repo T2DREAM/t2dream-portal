@@ -161,10 +161,11 @@ runcmd:
 # permissions
 - set -ex
 # Manually install java
+- sudo -u ubuntu aws s3 cp --region=us-west-2 --recursive s3:///t2depi-conf-prod/.aws ~ubuntu/.aws
 - sudo mkdir -p /usr/lib/jvm
 - sudo chmod 777 /usr/lib/jvm
-- [ wget, --no-cookies, --no-check-certificate, --header, "Cookie: oraclelicense=accept-securebackup-cookie", "https://download.oracle.com/otn/java/jdk/8u211-b12/478a62b7d4e34b78b671c754eaaf38ab/jdk-8u211-linux-x64.tar.gz", -O , /usr/lib/jvm/jdk-8u211-linux-x64.tar.gz ]
-- sudo tar -xzvf /usr/lib/jvm/jdk-8u211-linux-x64.tar.gz --directory /usr/lib/jvm/
+- sudo tar -xzvf /home/ubuntu/.aws/jdk-8u211-linux-x64.tar.gz --directory /usr/lib/jvm/
+- sudo -u ubuntu rm -r /home/ubuntu/.aws
 - sudo chmod 755 /usr/lib/jvm
 - sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_211/bin/java 100
 - update-rc.d elasticsearch defaults
