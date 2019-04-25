@@ -58,6 +58,7 @@ bootcmd:
 package_upgrade: true
 
 packages:
+- awscli
 - build-essential
 - elasticsearch
 - libssl-dev
