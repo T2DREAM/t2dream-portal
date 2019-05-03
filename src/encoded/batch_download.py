@@ -86,6 +86,9 @@ _tsv_mapping = OrderedDict([
     ('Size', ['files.file_size']),
     ('Lab', ['files.lab.title']),
     ('md5sum', ['files.md5sum']),
+    ('bed_file_state', ['files.bed_file_state']),
+    ('bed_file_value', ['files.bed_file_value']),
+    ('file_format', ['files.file_format']),
     ('files.date_created', ['files.date_created']),
     ('dbxrefs', ['files.dbxrefs']),
     ('File download URL', ['files.href']),
@@ -111,7 +114,7 @@ _audit_mapping = OrderedDict([
 ])
 _biosample_color = {
     'liver':'#fdd993',
-    'HepG2':'#2bb0d1',
+    'HepG2':'#8b0000',
     'islet of Langerhans':'#f28080',
     'adipocyte': '#f98900',
     'ESC derived cell line':'#ab93fd',
@@ -276,11 +279,16 @@ def variant_graph(context, request):
     json_doc = {}
     json_doc['nodes'] = []
     query = results['query']
-    json_doc['nodes'].append({'path':query,'id':"", 'color':"#dcdcdc", "link":"region=" + query + "&genome=GRCh37","label":query})
+    json_doc['nodes'].append({'path':query,'id':"", 'color':"#170451", "link":"region=" + query + "&genome=GRCh37","label":query})
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
             annotation_json = request.embed(file_json['dataset'])
+            biosample_term_list = ['liver', 'pancreas', 'adipocyte', 'islet of Langerhans', 'HepG2', 'ESC derived cell line', 'subcutaneous adipose']
+            biosample = annotation_json['biosample_term_name']
+            biosample_term_list = ['liver', 'pancreas', 'adipocyte', 'islet of Langerhans', 'HepG2', 'ESC derived cell line', 'subcutaneous adipose']
+            if biosample in biosample_term_list:
+                json_doc['nodes'].append({'path':query + '|' + biosample,'id':biosample, 'color': _biosample_color[biosample], "link":"biosample_term_name=" + biosample ,"label":biosample, "name": biosample})
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
                 chrom = '{}'.format(row['_index'])
@@ -296,13 +304,11 @@ def variant_graph(context, request):
                 biosample_term = annotation_json['biosample_term_name']
                 biosample_term_list = ['liver', 'pancreas', 'adipocyte', 'islet of Langerhans', 'HepG2', 'ESC derived cell line', 'subcutaneous adipose']
                 if biosample_term in biosample_term_list:
-                    json_doc['nodes'].append({'path':query + '/' + biosample_term,'id':"", 'color': _biosample_color[biosample_term], "link":"biosample_term_name=" + biosample_term ,"label":biosample_term})
-                    json_doc['nodes'].append({'path':query + '/' + biosample_term + '/' + state, 'id':"", 'color': _biosample_color[biosample_term], "link": "accession=" + annotation_accession, "label": annotation_accession})  
+                    json_doc['nodes'].append({'path':query + '|' + biosample_term + '|' + state + '_' + coordinates, 'id':state, 'color': _biosample_color[biosample_term], "link": "accession=" + annotation_accession, "label": state, "name":annotation_accession})  
     if 'variant_graph.json' in request.url:
         return Response(
             content_type='text/plain',
             body=json.dumps(json_doc,indent=2,sort_keys=True),
-           
         )
 
 @view_config(route_name='peak_download', request_method='GET')
@@ -589,40 +595,57 @@ def annotation_metadata(context, request):
             lab = f['lab']['title']
             href = request.host_url + f['href']
             status = f['status']
-            if title not in files:
-                files[title] = []
-                files[title].append({
-                    'md5sum': md5sum,
-                    'date_created': date_created,
-                    'href': href,
-                    'status': status,
-                    'lab': lab
-                    })
+            assembly = f['assembly']
+            state_key = 'bed_file_state'
+            value_key = 'bed_file_value'
+            if state_key and value_key in f:
+                state_descriptor = f['bed_file_state']
+                value_descriptor = f['bed_file_value']
             else:
-                files[title].append({
-                    'md5sum': md5sum,
-                    'date_created': date_created,
-                    'href': href,
-                    'status': status,
-                    'lab': lab
+                state_descriptor = 'none'
+                value_descriptor = 'none'
+            if f['file_format'] == 'bed':
+                if title not in files:
+                    files[title] = []
+                    files[title].append({
+                        'md5sum': md5sum,
+                        'date_created': date_created,
+                        'href': href,
+                        'status': status,
+                        'lab': lab,
+                        'assembly': assembly,
+                        'value_descriptor': value_descriptor,
+                        'state_descriptor': state_descriptor
+                    })
+                else:
+                    files[title].append({
+                        'md5sum': md5sum,
+                        'date_created': date_created,
+                        'href': href,
+                        'status': status,
+                        'lab': lab,
+                        'assembly': assembly,
+                        'value_descriptor': value_descriptor,
+                        'state_descriptor': state_descriptor
                     })
         annotation_id = annotation_json['accession']
-        annotation = annotation_json['annotation_type']
-        biosample_term = annotation_json['biosample_term_name']
-        if annotation not in json_doc:
-            json_doc[annotation] = []
-            json_doc[annotation].append({
-                'annotation_term_name': annotation,
-                'annotation_id': annotation_id,
-                'biosample_term': biosample_term,
-                'file_download': files
+        annotation_type = annotation_json['annotation_type']
+        biosample_term_name = annotation_json['biosample_term_name']
+        if files:
+            if annotation_type not in json_doc:
+                json_doc[annotation_type] = []
+                json_doc[annotation_type].append({
+                    'annotation_type': annotation_type,
+                    'annotation_id': annotation_id,
+                    'biosample_term_name': biosample_term_name,
+                    'file_download': files
                 })  
-        else:
-            json_doc[annotation].append({
-                'annotation_term_name': annotation,
-                'annotation_id': annotation_id,
-                'biosample_term': biosample_term,
-                'file_download': files
+            else:
+                json_doc[annotation_type].append({
+                    'annotation_type': annotation_type,
+                    'annotation_id': annotation_id,
+                    'biosample_term_name': biosample_term_name,
+                    'file_download': files
                 })  
     if 'annotation_metadata.json' in request.url:
         return Response(
