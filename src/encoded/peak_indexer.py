@@ -42,7 +42,7 @@ _INDEXED_DATA = {
         'output_type': ['signal']
     },
     'chromatin state': {
-        'file_type': ['bed bed3+']
+        'file_type': ['bed bed3+', 'bed bed9']
     }
 }
 

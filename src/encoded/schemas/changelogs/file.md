@@ -1,5 +1,41 @@
 ## Changelog for file.json
 
+### Schema version 11
+
+* added bed_file_state to describe name and score field in bed file
+
+       "bed_file_state": {
+            "title": "Name/State for bed file format (column 4)",
+            "description": "Detail description name field in bed file (column 4)",
+            "comment": "This field is required for annotation bed file.",
+            "type": "string",
+            "enum": [
+                "peak number",
+                "cell type",
+                "gene name of linked promoter",
+                "variant name",
+                "chromatin state",
+                "gene name of linked binding sites",
+                "no assigned name"
+            ]
+        },
+
+* bed_file_value to describe name and score field in bed file
+
+        "bed_file_value": {
+            "title": "Value/Score for bed file format (column 5)",
+            "description": "Detail description of score field in bed file (column 5)",
+            "comment": "This field is required for annotaion bed file.",
+            "type": "string",
+            "enum": [
+                "number of samples peak present",
+                "peak darkness",
+                "co-accesibility score",
+                "deltaSVM score",
+                "no assigned value"
+            ]
+        },
+
 ### Minor changes version 10
 *  output_types: "redacted alignments" and "redacted unfiltered alignments"; both enumerations are categorized as "alignments".
 

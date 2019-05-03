@@ -482,8 +482,8 @@ def set_to_midnight(date_string):
     return '{:%Y-%m-%dT%H:%M:%S.%f+00:00}'.format(min_pub_date_time)
 
 
-@upgrade_step('file', '9', '10')
-def file_9_10(value, system):
+@upgrade_step('file', '10', '11')
+def file_10_11(value, system):
     # http://redmine.encodedcc.org/issues/5021
     # http://redmine.encodedcc.org/issues/4929
     # http://redmine.encodedcc.org/issues/4927
