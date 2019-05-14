@@ -50,6 +50,9 @@ _tsv_mapping = OrderedDict([
     ('Biosample term id', ['biosample_term_id']),
     ('Biosample term name', ['biosample_term_name']),
     ('Biosample type', ['biosample_type']),
+    ('Biosample synonyms', ['biosample_synonyms']),
+    ('System slims', ['system_slims']),
+    ('Organ slims', ['organ_slims']),
     ('Biosample life stage', ['replicates.library.biosample.life_stage']),
     ('Biosample sex', ['replicates.library.biosample.sex']),
     ('Biosample Age', ['replicates.library.biosample.age',
@@ -95,6 +98,7 @@ _tsv_mapping = OrderedDict([
     ('Assembly', ['files.assembly']),
     ('Platform', ['files.platform.title']),
     ('Controlled by', ['files.controlled_by']),
+    ('External Source', ['dbxrefs']),
     ('File Status', ['files.status'])
 ])
 
@@ -112,6 +116,49 @@ _audit_mapping = OrderedDict([
                      'audit.ERROR.category',
                      'audit.ERROR.detail'])
 ])
+varshney_chromhmm_states = {
+    'Strong_transcription': 'Transcription',
+    'Repressed_polycomb': 'Repressed-polycomb',
+    'Genic_enhancer': 'Enhancer_Genic',
+    'Weak_TSS': 'Promoter_Weak',
+    'Weak_repressed_polycomb': 'Repressed-polycomb_Weak',
+    'Quiescent/low_signal': 'Quiescent-low',
+    'Active_enhancer_1': 'Enhancer_Active_1',
+    'Active_enhancer_2': 'Enhancer_Active_2',
+    'Weak_transcription': 'Transcription_Weak',
+    'Flanking_TSS': 'Promoter_Flanking',
+    'Active_TSS': 'Promoter_Active',
+    'Bivalent/poised_TSS': 'Promoter_Bivalent',
+    'Weak_enhancer': 'Enhancer_Weak'
+}
+roadmap_chromhmm_states = {
+    'Tx': 'Transcription',
+    'Txn': 'Transcription',
+    'ReprPC': 'Repressed-polycomb',
+    'ReprPCWk': 'Repressed-polycomb_Weak',
+    'EnhG': 'Enhancer_Genic',
+    'EnhG1': 'Enhancer_Genic_1',
+    'EnhG2': 'Enhancer_Genic_2',
+    'Quies': 'Quiescent-low',
+    'EnhA1': 'Enhancer_Active_1',
+    'EnhA2': 'Enhancer_Active_2',
+    'TxWk': 'Transcription_Weak',
+    'TssAFlnk': 'Promoter_Flanking',
+    'TssFlnk': 'Promoter_Flanking',
+    'TssA': 'Promoter_Active',
+    'TssBiv': 'Promoter_Bivalent',
+    'BivFlnk': 'Promoter_Bivalent_Flanking',
+    'EnhWk': 'Enhancer_Weak',
+    'TssFlnkU': 'Promoter_Flanking_Upstream',
+    'Het': 'Heterochromatin',
+    'ZNF/Rpts': 'ZNF-Repeat',
+    'TssFlnkD': 'Promoter_Flanking_Downstream',
+    'EnhBiv': 'Enhancer_Bivalent',
+    'TxFlnk': 'Transcription_Flanking',
+    'Enh': 'Enhancer',
+    'Ctcf': 'CTCF-bound'
+}
+
 _biosample_color = {
     'liver':'#0000ff',
     'HepG2':'#ff3300',
@@ -628,6 +675,7 @@ def annotation_metadata(context, request):
     results = request.embed(path, as_user=True)
     json_doc = {}
     for annotation_json in results['@graph']:
+        log.warn(annotation_json)
         files = {}
         for f in annotation_json['files']:
             title = f['title']
@@ -672,22 +720,44 @@ def annotation_metadata(context, request):
         annotation_id = annotation_json['accession']
         annotation_type = annotation_json['annotation_type']
         biosample_term_name = annotation_json['biosample_term_name']
+        biosample_synonyms = annotation_json['biosample_synonyms'] if 'biosample_synonyms' in annotation_json else None
+        system_slims = annotation_json['system_slims'] if 'system_slims' in annotation_json else None
+        organ_slims = annotation_json['organ_slims'] if 'organ_slims' in annotation_json else None
+        biosample_type = annotation_json['biosample_type']
+        biosample_term_id = annotation_json['biosample_term_id'] if 'biosample_term_id' in annotation_json else None
+        dbxrefs = annotation_json['dbxrefs'] 
+        harmonized_states = roadmap_chromhmm_states if annotation_type == 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else None  if annotation_type != 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else varshney_chromhmm_states  
         if files:
             if annotation_type not in json_doc:
                 json_doc[annotation_type] = []
                 json_doc[annotation_type].append({
                     'annotation_type': annotation_type,
                     'annotation_id': annotation_id,
+                    'dbxrefs': dbxrefs,
+                    'biosample_term_id': biosample_term_id,
                     'biosample_term_name': biosample_term_name,
+                    'biosample_synonyms': biosample_synonyms,
+                    'biosample_type': biosample_type,
+                    'organ_slims': organ_slims,
+                    'system_slims': system_slims,
+                    'harmonized_states': harmonized_states,
                     'file_download': files
                 })  
             else:
                 json_doc[annotation_type].append({
                     'annotation_type': annotation_type,
                     'annotation_id': annotation_id,
+                    'dbxrefs': dbxrefs,
+                    'biosample_term_id': biosample_term_id,
                     'biosample_term_name': biosample_term_name,
+                    'biosample_synonyms': biosample_synonyms,
+                    'biosample_type': biosample_type,
+                    'organ_slims': organ_slims,
+                    'system_slims':system_slims,
+                    'harmonized_states': harmonized_name,
                     'file_download': files
-                })  
+                    }) 
+            
     if 'annotation_metadata.json' in request.url:
         return Response(
             content_type='text/plain',
