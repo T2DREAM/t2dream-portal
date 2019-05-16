@@ -159,6 +159,47 @@ roadmap_chromhmm_states = {
     'Ctcf': 'CTCF-bound'
 }
 
+_chromhmm_states = {
+    'Strong_transcription': 'Transcription',
+    'Repressed_polycomb': 'Repressed-polycomb',
+    'Genic_enhancer': 'Enhancer_Genic',
+    'Weak_TSS': 'Promoter_Weak',
+    'Weak_repressed_polycomb': 'Repressed-polycomb_Weak',
+    'Quiescent/low_signal': 'Quiescent-low',
+    'Active_enhancer_1': 'Enhancer_Active_1',
+    'Active_enhancer_2': 'Enhancer_Active_2',
+    'Weak_transcription': 'Transcription_Weak',
+    'Flanking_TSS': 'Promoter_Flanking',
+    'Active_TSS': 'Promoter_Active',
+    'Bivalent/poised_TSS': 'Promoter_Bivalent',
+    'Weak_enhancer': 'Enhancer_Weak',
+    'Tx': 'Transcription',
+    'Txn': 'Transcription',
+    'ReprPC': 'Repressed-polycomb',
+    'ReprPCWk': 'Repressed-polycomb_Weak',
+    'EnhG': 'Enhancer_Genic',
+    'EnhG1': 'Enhancer_Genic_1',
+    'EnhG2': 'Enhancer_Genic_2',
+    'Quies': 'Quiescent-low',
+    'EnhA1': 'Enhancer_Active_1',
+    'EnhA2': 'Enhancer_Active_2',
+    'TxWk': 'Transcription_Weak',
+    'TssAFlnk': 'Promoter_Flanking',
+    'TssFlnk': 'Promoter_Flanking',
+    'TssA': 'Promoter_Active',
+    'TssBiv': 'Promoter_Bivalent',
+    'BivFlnk': 'Promoter_Bivalent_Flanking',
+    'EnhWk': 'Enhancer_Weak',
+    'TssFlnkU': 'Promoter_Flanking_Upstream',
+    'Het': 'Heterochromatin',
+    'ZNF/Rpts': 'ZNF-Repeat',
+    'TssFlnkD': 'Promoter_Flanking_Downstream',
+    'EnhBiv': 'Enhancer_Bivalent',
+    'TxFlnk': 'Transcription_Flanking',
+    'Enh': 'Enhancer',
+    'Ctcf': 'CTCF-bound'
+}
+
 _biosample_color = {
     'liver':'#0000ff',
     'HepG2':'#ff3300',
@@ -187,26 +228,32 @@ _biosample_color = {
     'skeletal muscle':'#a9a9a9',
     'visceral omenum adipose':'#a9a9a9',
     'CD34-PB':'#a9a9a9',
-    'GM12878':'#a9a9a9',
-    'H1':'#a9a9a9',
-    'K562':'#a9a9a9',
-    'caudate nucleus':'#a9a9a9',
-    'cingulate gyrus':'#a9a9a9',
-    'colonic mucosa':'#a9a9a9',
-    'duodenum mucosa':'#a9a9a9',
-    'endothelial cell of umbilical vein':'#a9a9a9',
-    'fibroblast of lung':'#a9a9a9',
-    'keratinocyte':'#a9a9a9',
-    'layer of hippocampus':'#a9a9a9',
-    'mammary epithelial cell':'#a9a9a9',
-    'mesenchymal cell':'#a9a9a9',
-    'mid-frontal lobe':'#a9a9a9',
-    'mucosa of rectum':'#a9a9a9',
-    'rectal smooth muscle':'#a9a9a9',
-    'skeletal muscle myoblast':'#a9a9a9',
-    'stomach smooth muscle':'#a9a9a9',
-    'substantia nigra':'#a9a9a9',
-    'temporal lobe':'#a9a9a9',
+    'GM12878':'#d4d4d4',
+    'H1':'#d4d4d4',
+    'K562':'#d4d4d4',
+    'caudate nucleus':'#d4d4d4',
+    'cingulate gyrus':'#d4d4d4',
+    'colonic mucosa':'#d4d4d4',
+    'duodenum mucosa':'#d4d4d4',
+    'endothelial cell of umbilical vein':'#d4d4d4',
+    'fibroblast of lung':'#d4d4d4',
+    'keratinocyte':'#d4d4d4',
+    'layer of hippocampus':'#d4d4d4',
+    'mammary epithelial cell':'#d4d4d4',
+    'mesenchymal cell':'#d4d4d4',
+    'mid-frontal lobe':'#d4d4d4',
+    'mucosa of rectum':'#d4d4d4',
+    'rectal smooth muscle':'#d4d4d4',
+    'skeletal muscle myoblast':'#d4d4d4',
+    'stomach smooth muscle':'#d4d4d4',
+    'substantia nigra':'#d4d4d4',
+    'temporal lobe':'#d4d4d4',
+    'coronary artery':'#d4d4d4',
+    'muscle of leg':'#d4d4d4',
+    'germinal matrix':'#d4d4d4',
+    'angular gyrus':'#d4d4d4',
+    'pancreatic polypeptide-secreting cell':'#ffb6c1',
+    'ascending aorta':'#d4d4d4'
 }
 def get_file_uuids(result_dict):
     file_uuids = []
@@ -366,16 +413,18 @@ def variant_graph(context, request):
     json_doc = {}
     json_doc['nodes'] = []
     query = results['query']
-    json_doc['nodes'].append({'path':query,'id':"", 'color':"#170451", "link":"region=" + query + "&genome=GRCh37","label":query})
+    biosample_check = []
+    json_doc['nodes'].append({'path':query,'id':query, 'color':"#170451", "link":"region=" + query + "&genome=GRCh37","label":query})
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
             annotation_json = request.embed(file_json['dataset'])
-            #biosample_term_list = ['liver', 'pancreas', 'adipocyte', 'islet of Langerhans', 'HepG2', 'ESC derived cell line', 'subcutaneous adipose']
             biosample = annotation_json['biosample_term_name']
-            biosample_term_list = ['islet of Langerhans', 'adipocyte', 'liver', 'pancreatic alpha cell', 'pancreatic beta cell', 'subcutaneous adipose', 'pancreas', 'pancreatic delta cell', 'ESC derived cell line', 'aorta', 'heart', 'heart left ventricle', 'heart right ventricle', 'kidney', 'pancreatic stellate cell', 'right cardiac atrium', 'skeletal muscle', 'visceral omenum adipose', 'CD34-PB', 'GM12878', 'H1', 'HepG2', 'K562', 'caudate nucleus', 'cingulate gyrus', 'colonic mucosa', 'duodenum mucosa', 'endothelial cell of umbilical vein', 'fibroblast of lung', 'keratinocyte', 'layer of hippocampus', 'mammary epithelial cell', 'mesenchymal cell', 'mid-frontal lobe', 'mucosa of rectum', 'pancreatic acinar cell', 'pancreatic cell', 'pancreatic ductal cell', 'pancreatic endothelial cell', 'pancreatic exocrine cell', 'pancreatic glial cell', 'pancreatic immune cell', 'rectal smooth muscle', 'skeletal muscle myoblast', 'stomach smooth muscle', 'substantia nigra', 'temporal lobe']
+            biosample_term_list = ['islet of Langerhans', 'adipocyte', 'liver', 'pancreatic alpha cell', 'pancreatic beta cell', 'subcutaneous adipose', 'pancreas', 'pancreatic delta cell', 'ESC derived cell line', 'aorta', 'heart', 'heart left ventricle', 'heart right ventricle', 'kidney', 'pancreatic stellate cell', 'right cardiac atrium', 'skeletal muscle', 'visceral omenum adipose', 'CD34-PB', 'GM12878', 'H1', 'HepG2', 'K562', 'caudate nucleus', 'cingulate gyrus', 'colonic mucosa', 'duodenum mucosa', 'endothelial cell of umbilical vein', 'fibroblast of lung', 'keratinocyte', 'layer of hippocampus', 'mammary epithelial cell', 'mesenchymal cell', 'mid-frontal lobe', 'mucosa of rectum', 'pancreatic acinar cell', 'pancreatic cell', 'pancreatic ductal cell', 'pancreatic endothelial cell', 'pancreatic exocrine cell', 'pancreatic glial cell', 'pancreatic immune cell', 'rectal smooth muscle', 'skeletal muscle myoblast', 'stomach smooth muscle', 'substantia nigra', 'temporal lobe', 'coronary artery', 'muscle of leg', 'germinal matrix', 'angular gyrus', 'pancreatic polypeptide-secreting cell', 'ascending aorta']
             if biosample in biosample_term_list:
-                json_doc['nodes'].append({'path':query + '|' + biosample,'id':biosample, 'color': _biosample_color[biosample], "link":"biosample_term_name=" + biosample ,"label":biosample, "name": biosample})
+                if biosample not in biosample_check:
+                    json_doc['nodes'].append({'path':query + '|' + biosample,'id':biosample, 'color': _biosample_color[biosample], "link":"biosample_term_name=" + biosample ,"label":biosample, "name": biosample})
+                    biosample_check.append(biosample)
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
                 chrom = '{}'.format(row['_index'])
@@ -383,16 +432,18 @@ def variant_graph(context, request):
                 start = int('{}'.format(hit['_source']['start']))
                 stop = int('{}'.format(hit['_source']['end']))
                 state = '{}'.format(hit['_source']['state'])
+                new_state = re.sub(r'\d+[_]','',state) if re.match(r'\d+[_]', state) else state
+                new_state1 = _chromhmm_states[new_state] if new_state in _chromhmm_states else state
+                #log.warn(new_state)
                 val = '{}'.format(hit['_source']['val'])
                 file_accession = file_json['accession']
                 annotation_accession = annotation_json['accession']
                 coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
                 annotation = annotation_json['annotation_type']
                 biosample_term = annotation_json['biosample_term_name']
-                biosample_term_list = ['islet of Langerhans', 'adipocyte', 'liver', 'pancreatic alpha cell', 'pancreatic beta cell', 'subcutaneous adipose', 'pancreas', 'pancreatic delta cell',  'ESC derived cell line', 'aorta', 'heart', 'heart left ventricle', 'heart right ventricle', 'kidney', 'pancreatic stellate cell', 'right cardiac atrium', 'skeletal muscle', 'visceral omenum adipose', 'CD34-PB', 'GM12878', 'H1', 'HepG2', 'K562', 'caudate nucleus', 'cingulate gyrus', 'colonic mucosa', 'duodenum mucosa', 'endothelial cell of umbilical vein', 'fibroblast of lung', 'keratinocyte', 'layer of hippocampus', 'mammary epithelial cell', 'mesenchymal cell', 'mid-frontal lobe', 'mucosa of rectum', 'pancreatic acinar cell', 'pancreatic cell', 'pancreatic ductal cell', 'pancreatic endothelial cell', 'pancreatic exocrine cell', 'pancreatic glial cell', 'pancreatic immune cell', 'rectal smooth muscle', 'skeletal muscle myoblast', 'stomach smooth muscle', 'substantia nigra', 'temporal lobe']
-                #biosample_term_list = ['liver', 'pancreas', 'adipocyte', 'islet of Langerhans', 'HepG2', 'ESC derived cell line', 'subcutaneous adipose']
+                biosample_term_list = ['islet of Langerhans', 'adipocyte', 'liver', 'pancreatic alpha cell', 'pancreatic beta cell', 'subcutaneous adipose', 'pancreas', 'pancreatic delta cell',  'ESC derived cell line', 'aorta', 'heart', 'heart left ventricle', 'heart right ventricle', 'kidney', 'pancreatic stellate cell', 'right cardiac atrium', 'skeletal muscle', 'visceral omenum adipose', 'CD34-PB', 'GM12878', 'H1', 'HepG2', 'K562', 'caudate nucleus', 'cingulate gyrus', 'colonic mucosa', 'duodenum mucosa', 'endothelial cell of umbilical vein', 'fibroblast of lung', 'keratinocyte', 'layer of hippocampus', 'mammary epithelial cell', 'mesenchymal cell', 'mid-frontal lobe', 'mucosa of rectum', 'pancreatic acinar cell', 'pancreatic cell', 'pancreatic ductal cell', 'pancreatic endothelial cell', 'pancreatic exocrine cell', 'pancreatic glial cell', 'pancreatic immune cell', 'rectal smooth muscle', 'skeletal muscle myoblast', 'stomach smooth muscle', 'substantia nigra', 'temporal lobe', 'coronary artery', 'muscle of leg', 'germinal matrix', 'angular gyrus', 'pancreatic polypeptide-secreting cell', 'ascending aorta']
                 if biosample_term in biosample_term_list:
-                    json_doc['nodes'].append({'path':query + '|' + biosample_term + '|' + state + '_' + coordinates, 'id':state, 'color': _biosample_color[biosample_term], "link": "accession=" + annotation_accession, "label": state, "name":annotation_accession})  
+                    json_doc['nodes'].append({'path':query + '|' + biosample_term + '|' + new_state + '_' + annotation_accession, 'id':state, 'color': _biosample_color[biosample_term], "link": "accession=" + annotation_accession, "label": new_state1, "name":annotation_accession})  
     if 'variant_graph.json' in request.url:
         return Response(
             content_type='text/plain',
