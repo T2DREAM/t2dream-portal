@@ -207,10 +207,13 @@ _biosample_color = {
     'adipocyte': '#f98900',
     'ESC derived cell line':'#ab93fd',
     'subcutaneous adipose': '#66ffff',
+    'visceral omenum adipose': '#5daaaa',
+    'skeletal muscle myoblast':'#2c5e8d',
+    'skeletal muscle':'#1a5353',
     'pancreas':'#78ff02',
     'pancreatic alpha cell': '#8b0000',
     'pancreatic beta cell': '#21a041',
-    'pancreatic delta cell': '#ffd700',
+    'pancreatic delta cell': '#ffcff1',
     'pancreatic stellate cell':'#00ffff',
     'pancreatic acinar cell':'#8b4513',
     'pancreatic cell':'#ee82ee',
@@ -219,41 +222,38 @@ _biosample_color = {
     'pancreatic exocrine cell':'#6e8b1c',
     'pancreatic glial cell':'#73cccc',
     'pancreatic immune cell':'#b38019',
-    'heart':'#a9a9a9',
-    'aorta': '#a9a9a9',
-    'heart left ventricle':'#a9a9a9',
-    'heart right ventricle':'#a9a9a9',
-    'kidney':'#a9a9a9',
-    'right cardiac atrium':'#a9a9a9',
-    'skeletal muscle':'#a9a9a9',
-    'visceral omenum adipose':'#a9a9a9',
-    'CD34-PB':'#a9a9a9',
-    'GM12878':'#d4d4d4',
-    'H1':'#d4d4d4',
-    'K562':'#d4d4d4',
-    'caudate nucleus':'#d4d4d4',
-    'cingulate gyrus':'#d4d4d4',
-    'colonic mucosa':'#d4d4d4',
-    'duodenum mucosa':'#d4d4d4',
-    'endothelial cell of umbilical vein':'#d4d4d4',
-    'fibroblast of lung':'#d4d4d4',
-    'keratinocyte':'#d4d4d4',
-    'layer of hippocampus':'#d4d4d4',
-    'mammary epithelial cell':'#d4d4d4',
-    'mesenchymal cell':'#d4d4d4',
-    'mid-frontal lobe':'#d4d4d4',
-    'mucosa of rectum':'#d4d4d4',
-    'rectal smooth muscle':'#d4d4d4',
-    'skeletal muscle myoblast':'#d4d4d4',
-    'stomach smooth muscle':'#d4d4d4',
-    'substantia nigra':'#d4d4d4',
-    'temporal lobe':'#d4d4d4',
-    'coronary artery':'#d4d4d4',
-    'muscle of leg':'#d4d4d4',
-    'germinal matrix':'#d4d4d4',
-    'angular gyrus':'#d4d4d4',
-    'pancreatic polypeptide-secreting cell':'#ffb6c1',
-    'ascending aorta':'#d4d4d4'
+    'pancreatic polypeptide-secreting cell':'#685b40',
+    'heart':'#ffc107',
+    'aorta': '#ffc107',
+    'heart left ventricle':'#ffc107',
+    'heart right ventricle':'#ffc107',
+    'kidney':'#ffc107',
+    'right cardiac atrium':'#ffc107',
+    'endothelial cell of umbilical vein':'#ffc107',
+    'coronary artery':'#ffc107',
+    'ascending aorta':'#ffc107',    
+    'CD34-PB':'#d6d1d1',
+    'GM12878':'#d6d1d1',
+    'H1':'#d6d1d1',
+    'K562':'#d6d1d1',
+    'caudate nucleus':'#d6d1d1',
+    'cingulate gyrus':'#d6d1d1',
+    'colonic mucosa':'#d6d1d1',
+    'duodenum mucosa':'#d6d1d1',
+    'fibroblast of lung':'#d6d1d1',
+    'keratinocyte':'#d6d1d1',
+    'layer of hippocampus':'#d6d1d1',
+    'mammary epithelial cell':'#d6d1d1',
+    'mesenchymal cell':'#d6d1d1',
+    'mid-frontal lobe':'#d6d1d1',
+    'mucosa of rectum':'#d6d1d1',
+    'rectal smooth muscle':'#d6d1d1',
+    'stomach smooth muscle':'#d6d1d1',
+    'substantia nigra':'#d6d1d1',
+    'temporal lobe':'#d6d1d1',
+    'muscle of leg':'#d6d1d1',
+    'germinal matrix':'#d6d1d1',
+    'angular gyrus':'#d6d1d1',
 }
 def get_file_uuids(result_dict):
     file_uuids = []
@@ -414,7 +414,7 @@ def variant_graph(context, request):
     json_doc['nodes'] = []
     query = results['query']
     biosample_check = []
-    json_doc['nodes'].append({'path':query,'id':query, 'color':"#170451", "link":"region=" + query + "&genome=GRCh37","label":query})
+    json_doc['nodes'].append({'path':query,'id':query, 'color':"#170451", "link":"region=" + query + "&genome=GRCh37","label":query, "name": query})
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
@@ -434,7 +434,6 @@ def variant_graph(context, request):
                 state = '{}'.format(hit['_source']['state'])
                 new_state = re.sub(r'\d+[_]','',state) if re.match(r'\d+[_]', state) else state
                 new_state1 = _chromhmm_states[new_state] if new_state in _chromhmm_states else state
-                #log.warn(new_state)
                 val = '{}'.format(hit['_source']['val'])
                 file_accession = file_json['accession']
                 annotation_accession = annotation_json['accession']
@@ -726,7 +725,6 @@ def annotation_metadata(context, request):
     results = request.embed(path, as_user=True)
     json_doc = {}
     for annotation_json in results['@graph']:
-        log.warn(annotation_json)
         files = {}
         for f in annotation_json['files']:
             title = f['title']
@@ -805,7 +803,7 @@ def annotation_metadata(context, request):
                     'biosample_type': biosample_type,
                     'organ_slims': organ_slims,
                     'system_slims':system_slims,
-                    'harmonized_states': harmonized_name,
+                    'harmonized_states': harmonized_states,
                     'file_download': files
                     }) 
             
