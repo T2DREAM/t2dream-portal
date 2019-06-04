@@ -201,37 +201,36 @@ _chromhmm_states = {
 }
 
 _biosample_color = {
-    'liver':'#0000ff',
-    'HepG2':'#ff3300',
-    'islet of Langerhans':'#ff00ff',
+    'liver':'#ffd700',
+    'HepG2':'#ffd700',
+    'islet of Langerhans':'#8b0000',
     'adipocyte': '#f98900',
-    'ESC derived cell line':'#ab93fd',
     'subcutaneous adipose': '#66ffff',
     'visceral omenum adipose': '#5daaaa',
     'skeletal muscle myoblast':'#2c5e8d',
     'skeletal muscle':'#1a5353',
-    'pancreas':'#78ff02',
+    'pancreas':'#8b0000',
     'pancreatic alpha cell': '#8b0000',
-    'pancreatic beta cell': '#21a041',
-    'pancreatic delta cell': '#ffcff1',
-    'pancreatic stellate cell':'#00ffff',
-    'pancreatic acinar cell':'#8b4513',
-    'pancreatic cell':'#ee82ee',
-    'pancreatic ductal cell':'#fdd993',
-    'pancreatic endothelial cell':'#bdb76b',
-    'pancreatic exocrine cell':'#6e8b1c',
-    'pancreatic glial cell':'#73cccc',
-    'pancreatic immune cell':'#b38019',
-    'pancreatic polypeptide-secreting cell':'#685b40',
-    'heart':'#ffc107',
-    'aorta': '#ffc107',
-    'heart left ventricle':'#ffc107',
-    'heart right ventricle':'#ffc107',
-    'kidney':'#ffc107',
-    'right cardiac atrium':'#ffc107',
-    'endothelial cell of umbilical vein':'#ffc107',
-    'coronary artery':'#ffc107',
-    'ascending aorta':'#ffc107',    
+    'pancreatic beta cell': '#8b0000',
+    'pancreatic delta cell': '#8b0000',
+    'pancreatic stellate cell':'#8b0000',
+    'pancreatic acinar cell':'#8b0000',
+    'pancreatic cell':'#8b0000',
+    'pancreatic ductal cell':'#8b0000',
+    'pancreatic endothelial cell':'#8b0000',
+    'pancreatic exocrine cell':'#8b0000',
+    'pancreatic glial cell':'#8b0000',
+    'pancreatic immune cell':'#8b0000',
+    'pancreatic polypeptide-secreting cell':'#8b0000',
+    'heart':'#ff0000',
+    'aorta': '#ff0000',
+    'heart left ventricle':'#ff0000',
+    'heart right ventricle':'#ff0000',
+    'kidney':'#7fff00',
+    'right cardiac atrium':'#ff0000',
+    'endothelial cell of umbilical vein':'#ff00ff',
+    'coronary artery':'#ff0000',
+    'ascending aorta':'#ff0000',    
     'CD34-PB':'#d6d1d1',
     'GM12878':'#d6d1d1',
     'H1':'#d6d1d1',
@@ -254,7 +253,12 @@ _biosample_color = {
     'muscle of leg':'#d6d1d1',
     'germinal matrix':'#d6d1d1',
     'angular gyrus':'#d6d1d1',
+    'ESC derived cell line':'#d6d1d1',
 }
+biosample_term_list = [ 'adipocyte', 'liver','subcutaneous adipose', 'pancreas', 'ESC derived cell line', 'heart', 'kidney','skeletal muscle', 'visceral omenum adipose', 'CD34-PB', 'GM12878', 'H1', 'K562', 'caudate nucleus', 'cingulate gyrus', 'colonic mucosa', 'duodenum mucosa', 'endothelial cell of umbilical vein', 'fibroblast of lung', 'keratinocyte', 'layer of hippocampus', 'mammary epithelial cell', 'mesenchymal cell', 'mid-frontal lobe', 'mucosa of rectum', 'rectal smooth muscle', 'skeletal muscle myoblast', 'stomach smooth muscle', 'substantia nigra', 'temporal lobe', 'muscle of leg', 'germinal matrix', 'angular gyrus']
+pancreatic_cells = ['pancreatic acinar cell', 'pancreatic cell', 'pancreatic ductal cell', 'pancreatic endothelial cell', 'pancreatic exocrine cell', 'pancreatic glial cell', 'pancreatic immune cell', 'pancreatic alpha cell', 'pancreatic beta cell', 'pancreatic delta cell','islet of Langerhans', 'pancreatic polypeptide-secreting cell',  'pancreatic stellate cell']
+heart_tissues =[ 'aorta', 'heart left ventricle', 'heart right ventricle', 'right cardiac atrium', 'coronary artery', 'ascending aorta']
+liver_cells =  ['HepG2']
 def get_file_uuids(result_dict):
     file_uuids = []
     for item in result_dict['@graph']:
@@ -414,17 +418,30 @@ def variant_graph(context, request):
     json_doc['nodes'] = []
     query = results['query']
     biosample_check = []
-    json_doc['nodes'].append({'path':query,'id':query, 'color':"#170451", "link":"region=" + query + "&genome=GRCh37","label":query, "name": query})
+    cell_check = []
+    json_doc['nodes'].append({'path':query,'id':query, 'color':"#170451", "link":"region=" + query + "&genome=GRCh37","label":query, "name": query, "type":"rsdid"})
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
             annotation_json = request.embed(file_json['dataset'])
             biosample = annotation_json['biosample_term_name']
-            biosample_term_list = ['islet of Langerhans', 'adipocyte', 'liver', 'pancreatic alpha cell', 'pancreatic beta cell', 'subcutaneous adipose', 'pancreas', 'pancreatic delta cell', 'ESC derived cell line', 'aorta', 'heart', 'heart left ventricle', 'heart right ventricle', 'kidney', 'pancreatic stellate cell', 'right cardiac atrium', 'skeletal muscle', 'visceral omenum adipose', 'CD34-PB', 'GM12878', 'H1', 'HepG2', 'K562', 'caudate nucleus', 'cingulate gyrus', 'colonic mucosa', 'duodenum mucosa', 'endothelial cell of umbilical vein', 'fibroblast of lung', 'keratinocyte', 'layer of hippocampus', 'mammary epithelial cell', 'mesenchymal cell', 'mid-frontal lobe', 'mucosa of rectum', 'pancreatic acinar cell', 'pancreatic cell', 'pancreatic ductal cell', 'pancreatic endothelial cell', 'pancreatic exocrine cell', 'pancreatic glial cell', 'pancreatic immune cell', 'rectal smooth muscle', 'skeletal muscle myoblast', 'stomach smooth muscle', 'substantia nigra', 'temporal lobe', 'coronary artery', 'muscle of leg', 'germinal matrix', 'angular gyrus', 'pancreatic polypeptide-secreting cell', 'ascending aorta']
             if biosample in biosample_term_list:
                 if biosample not in biosample_check:
-                    json_doc['nodes'].append({'path':query + '|' + biosample,'id':biosample, 'color': _biosample_color[biosample], "link":"biosample_term_name=" + biosample ,"label":biosample, "name": biosample})
+                    json_doc['nodes'].append({'path':query + '|' + biosample,'id':biosample, 'color': _biosample_color[biosample], "link":"biosample_term_name=" + biosample ,"label":biosample, "name": biosample, 'type':'biosample'})
                     biosample_check.append(biosample)
+            if biosample in pancreatic_cells:
+                if biosample not in cell_check:
+                    json_doc['nodes'].append({'path':query + '|pancreas|' + biosample,'id':biosample, 'color': _biosample_color[biosample], "link":"biosample_term_name=" + biosample, "label":biosample, "name": biosample, 'type':'cell'})
+                    cell_check.append(biosample)
+            elif biosample in liver_cells:
+                if biosample not in cell_check:
+                    json_doc['nodes'].append({'path':query + '|liver|' + biosample,'id':biosample, 'color': _biosample_color[biosample], "link":"biosample_term_name=" + biosample ,"label":biosample, "name": biosample, 'type':'cell'})
+                    cell_check.append(biosample)
+            elif biosample in heart_tissues:
+                if biosample not in cell_check:
+                    json_doc['nodes'].append({'path':query + '|heart|' + biosample,'id':biosample, 'color': _biosample_color[biosample], "link":"biosample_term_name=" + biosample ,"label":biosample, "name": biosample, 'type':'cell'})
+                    cell_check.append(biosample)
+                
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
                 chrom = '{}'.format(row['_index'])
@@ -440,9 +457,15 @@ def variant_graph(context, request):
                 coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
                 annotation = annotation_json['annotation_type']
                 biosample_term = annotation_json['biosample_term_name']
-                biosample_term_list = ['islet of Langerhans', 'adipocyte', 'liver', 'pancreatic alpha cell', 'pancreatic beta cell', 'subcutaneous adipose', 'pancreas', 'pancreatic delta cell',  'ESC derived cell line', 'aorta', 'heart', 'heart left ventricle', 'heart right ventricle', 'kidney', 'pancreatic stellate cell', 'right cardiac atrium', 'skeletal muscle', 'visceral omenum adipose', 'CD34-PB', 'GM12878', 'H1', 'HepG2', 'K562', 'caudate nucleus', 'cingulate gyrus', 'colonic mucosa', 'duodenum mucosa', 'endothelial cell of umbilical vein', 'fibroblast of lung', 'keratinocyte', 'layer of hippocampus', 'mammary epithelial cell', 'mesenchymal cell', 'mid-frontal lobe', 'mucosa of rectum', 'pancreatic acinar cell', 'pancreatic cell', 'pancreatic ductal cell', 'pancreatic endothelial cell', 'pancreatic exocrine cell', 'pancreatic glial cell', 'pancreatic immune cell', 'rectal smooth muscle', 'skeletal muscle myoblast', 'stomach smooth muscle', 'substantia nigra', 'temporal lobe', 'coronary artery', 'muscle of leg', 'germinal matrix', 'angular gyrus', 'pancreatic polypeptide-secreting cell', 'ascending aorta']
                 if biosample_term in biosample_term_list:
-                    json_doc['nodes'].append({'path':query + '|' + biosample_term + '|' + new_state + '_' + annotation_accession, 'id':state, 'color': _biosample_color[biosample_term], "link": "accession=" + annotation_accession, "label": new_state1, "name":annotation_accession})  
+                    json_doc['nodes'].append({'path':query + '|' + biosample_term + '|' + new_state + '_' + annotation_accession, 'id':state, 'color': _biosample_color[biosample_term], "link": "accession=" + annotation_accession, "label": new_state1, "name":annotation_accession, 'type':'annotation'})  
+                elif biosample_term in pancreatic_cells: 
+                    json_doc['nodes'].append({'path':query + '|pancreas|' + biosample_term + '|' + new_state + '_' + annotation_accession, 'id':state, 'color': _biosample_color[biosample_term], "link": "accession=" + annotation_accession, "label": new_state1, "name":annotation_accession, 'type':'annotation'})  
+                elif biosample_term in liver_cells:
+                    json_doc['nodes'].append({'path':query + '|liver|' + biosample_term + '|' + new_state + '_' + annotation_accession, 'id':state, 'color': _biosample_color[biosample_term], "link": "accession=" + annotation_accession, "label": new_state1, "name":annotation_accession, 'type':'annotation'})  
+                elif biosample_term in heart_tissues:
+                    json_doc['nodes'].append({'path':query + '|heart|' + biosample_term + '|' + new_state + '_' + annotation_accession, 'id':state, 'color': _biosample_color[biosample_term], "link": "accession=" + annotation_accession, "label": new_state1, "name":annotation_accession, 'type':'annotation'})  
+
     if 'variant_graph.json' in request.url:
         return Response(
             content_type='text/plain',
