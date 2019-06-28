@@ -3,7 +3,7 @@
 # Instance
 
 apt_sources:
-- source: "ppa:webupd8team/java"
+- source: "ppa:linuxuprising/java"
 - source: "deb http://packages.elasticsearch.org/elasticsearch/1.7/debian stable main"
   key: |
     -----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -41,7 +41,7 @@ apt_sources:
 bootcmd:
 - set -ex
 - cloud-init-per once ssh-users-ca echo "TrustedUserCAKeys /etc/ssh/users_ca.pub" >> /etc/ssh/sshd_config
-- cloud-init-per once accepted-oracle-license-v1-1 echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections
+- cloud-init-per once accepted-oracle-license-v1-2 echo "oracle-java11-installer shared/accepted-oracle-license-v1-2 select true" | debconf-set-selections
 - cloud-init-per once fallocate-swapfile fallocate -l 4G /swapfile
 - cloud-init-per once chmod-swapfile chmod 600 /swapfile
 - cloud-init-per once mkswap-swapfile mkswap /swapfile
@@ -62,6 +62,8 @@ packages:
 - build-essential
 - elasticsearch
 - libssl-dev
+- oracle-java11-installer
+- oracle-java11-set-default
 - python2.7-dev
 - python3.4-dev
 - python-software-properties
@@ -81,14 +83,6 @@ runcmd:
 # Ideally this would build as a different user so encoded only has read
 # permissions
 - set -ex
-# Manually install java
-- sudo -u ubuntu aws s3 cp --region=us-west-2 --recursive s3://t2depi-conf-prod/.aws ~ubuntu/.aws
-- sudo mkdir -p /usr/lib/jvm
-- sudo chmod 777 /usr/lib/jvm
-- sudo tar -xzvf /home/ubuntu/.aws/jdk-8u211-linux-x64.tar.gz --directory /usr/lib/jvm/
-- sudo -u ubuntu rm -r /home/ubuntu/.aws
-- sudo chmod 755 /usr/lib/jvm
-- sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_211/bin/java 100
 - update-rc.d elasticsearch defaults
 - sudo bash /etc/elasticsearch/cluster.sh %(CLUSTER_NAME)s
 - sudo /usr/share/elasticsearch/bin/plugin install elasticsearch/elasticsearch-cloud-aws/2.7.1
