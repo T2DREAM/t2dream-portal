@@ -190,7 +190,11 @@ _biosample_color = {
     'subcutaneous adipose': '#66ffff',
     'visceral omenum adipose': '#5daaaa',
     'skeletal muscle myoblast':'#2c5e8d',
+<<<<<<< HEAD
     'skeletal muscle':'#2c5e8d',
+=======
+    'skeletal muscle':'#1a5353',
+>>>>>>> f0d22d993de009c1784f340e5ccb11c3df409049
     'pancreas':'#8b0000',
     'pancreatic alpha cell': '#8b0000',
     'pancreatic beta cell': '#8b0000',
@@ -237,11 +241,19 @@ _biosample_color = {
     'angular gyrus':'#d6d1d1',
     'ESC derived cell line':'#d6d1d1',
 }
+<<<<<<< HEAD
 biosample_term_list = [ 'adipocyte','subcutaneous adipose', 'ESC derived cell line', 'kidney', 'visceral omenum adipose', 'CD34-PB', 'GM12878', 'H1', 'K562', 'caudate nucleus', 'cingulate gyrus', 'colonic mucosa', 'duodenum mucosa', 'endothelial cell of umbilical vein', 'fibroblast of lung', 'keratinocyte', 'layer of hippocampus', 'mammary epithelial cell', 'mesenchymal cell', 'mid-frontal lobe', 'mucosa of rectum', 'rectal smooth muscle', 'stomach smooth muscle', 'substantia nigra', 'temporal lobe', 'muscle of leg', 'germinal matrix', 'angular gyrus']
 pancreatic_cells = [ 'pancreas', 'pancreatic acinar cell', 'pancreatic cell', 'pancreatic ductal cell', 'pancreatic endothelial cell', 'pancreatic exocrine cell', 'pancreatic glial cell', 'pancreatic immune cell', 'pancreatic alpha cell', 'pancreatic beta cell', 'pancreatic delta cell','islet of Langerhans', 'pancreatic polypeptide-secreting cell',  'pancreatic stellate cell']
 heart_tissues =[ 'aorta', 'heart left ventricle', 'heart right ventricle', 'right cardiac atrium', 'coronary artery', 'ascending aorta', 'heart']
 liver_cells =  ['HepG2', 'liver']
 skeletal_tissues = ['skeletal muscle myoblast', 'skeletal muscle']
+=======
+biosample_term_list = [ 'adipocyte','subcutaneous adipose', 'ESC derived cell line', 'kidney','skeletal muscle', 'visceral omenum adipose', 'CD34-PB', 'GM12878', 'H1', 'K562', 'caudate nucleus', 'cingulate gyrus', 'colonic mucosa', 'duodenum mucosa', 'endothelial cell of umbilical vein', 'fibroblast of lung', 'keratinocyte', 'layer of hippocampus', 'mammary epithelial cell', 'mesenchymal cell', 'mid-frontal lobe', 'mucosa of rectum', 'rectal smooth muscle', 'skeletal muscle myoblast', 'stomach smooth muscle', 'substantia nigra', 'temporal lobe', 'muscle of leg', 'germinal matrix', 'angular gyrus']
+pancreatic_cells = [ 'pancreas', 'pancreatic acinar cell', 'pancreatic cell', 'pancreatic ductal cell', 'pancreatic endothelial cell', 'pancreatic exocrine cell', 'pancreatic glial cell', 'pancreatic immune cell', 'pancreatic alpha cell', 'pancreatic beta cell', 'pancreatic delta cell','islet of Langerhans', 'pancreatic polypeptide-secreting cell',  'pancreatic stellate cell']
+heart_tissues =[ 'aorta', 'heart left ventricle', 'heart right ventricle', 'right cardiac atrium', 'coronary artery', 'ascending aorta', 'heart']
+liver_cells =  ['HepG2', 'liver']
+
+>>>>>>> f0d22d993de009c1784f340e5ccb11c3df409049
 def get_file_uuids(result_dict):
     file_uuids = []
     for item in result_dict['@graph']:
@@ -389,6 +401,7 @@ def variant_graph(context, request):
                 if biosample not in cell_check:
                     json_doc['nodes'].append({'path':query + '|liver|' + biosample,'id':biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'cell'})
                     cell_check.append(biosample)
+<<<<<<< HEAD
             elif biosample in skeletal_tissues:
                 if 'skeletal muscle' not in biosample_check:
                     json_doc['nodes'].append({'path':query + '|skeletal muscle','id':'skeletal muscle', 'color': _biosample_color['skeletal muscle'], 'link':'biosample_term_name=skeletal muscle', 'label':'skeletal muscle', 'name': 'skeletal muscle', 'type':'biosample'})
@@ -396,6 +409,8 @@ def variant_graph(context, request):
                 if biosample not in cell_check:
                     json_doc['nodes'].append({'path':query + '|skeletal muscle|' + biosample,'id':biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'cell'})
                     cell_check.append(biosample)
+=======
+>>>>>>> f0d22d993de009c1784f340e5ccb11c3df409049
             elif biosample in heart_tissues:
                 if 'heart' not in biosample_check:
                     json_doc['nodes'].append({'path':query + '|heart','id':'heart', 'color': _biosample_color['heart'], 'link':'biosample_term_name=heart', 'label':'heart', 'name': 'heart', 'type':'biosample'})
@@ -426,8 +441,11 @@ def variant_graph(context, request):
                     json_doc['nodes'].append({'path':query + '|pancreas|' + biosample_term + '|' + new_state + '_' + annotation_accession, 'id':state, 'color': _biosample_color[biosample_term], 'link': 'accession=' + annotation_accession, 'label': harmonized_state, 'name':annotation_accession, 'type':'annotation'})  
                 elif biosample_term in liver_cells:
                     json_doc['nodes'].append({'path':query + '|liver|' + biosample_term + '|' + new_state + '_' + annotation_accession, 'id':state, 'color': _biosample_color[biosample_term], 'link': 'accession=' + annotation_accession, 'label': harmonized_state, 'name':annotation_accession, 'type':'annotation'})  
+<<<<<<< HEAD
                 elif biosample_term in skeletal_tissues:
                     json_doc['nodes'].append({'path':query + '|skeletal muscle|' + biosample_term + '|' + new_state + '_' + annotation_accession, 'id':state, 'color': _biosample_color[biosample_term], 'link': 'accession=' + annotation_accession, 'label': harmonized_state, 'name':annotation_accession, 'type':'annotation'})  
+=======
+>>>>>>> f0d22d993de009c1784f340e5ccb11c3df409049
                 elif biosample_term in heart_tissues:
                     json_doc['nodes'].append({'path':query + '|heart|' + biosample_term + '|' + new_state + '_' + annotation_accession, 'id':state, 'color': _biosample_color[biosample_term], 'link': 'accession=' + annotation_accession, 'label': harmonized_state, 'name':annotation_accession, 'type':'annotation'})  
     if 'variant_graph.json' in request.url:
