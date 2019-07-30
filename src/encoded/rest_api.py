@@ -182,16 +182,14 @@ _states_maps = {
     'TxFlnk': 'Transcription_Flanking',
     'Enh': 'Enhancer',
     'Ctcf': 'CTCF-bound',
-    'alpha_1': 'Glucagon Alpha high',
-    'alpha_2': 'Glucagon Alpha low',
-    'beta_1': 'Glucagon Beta high',
-    'beta_2': 'Glucagon Beta low',
-    'delta_1': 'Glucagon Delta high',
-    'delta_2': 'Glucagon Delta low',
-    'endothelial_1': 'Glucagon Endothelial high',
-    'endothelial_2': 'Glucagon Endothelial low'
+    'alpha_1': 'glucagon high',
+    'alpha_2': 'glucagon low',
+    'beta_1': 'insulin high',
+    'beta_2': 'insulin low',
+    'delta_1': 'somatostatin high',
+    'delta_2': 'somatostatin low'
     }
-_high_states = ['Transcription', 'Repressed-polycomb', 'Enhancer_Genic', 'Promoter_Weak', 'Enhancer_Active_1', 'Enhancer_Active_2', 'Promoter_Flanking', 'Promoter_Active', 'Promoter_Bivalent', 'Glucagon Alpha high', 'Glucagon Beta high', 'Glucagon Delta high', 'Glucagon Endothelia high']
+_high_states = ['Transcription', 'Enhancer_Active_1', 'Enhancer_Active_2',  'Promoter_Active',  'glucagon high', 'insulin high', 'somatostatin high', 'endothelial_1','endothelial_2','gamma','immune','exocrine','glial','stellate']
 _biosample_color = {
     'liver':'#ffd700',
     'HepG2':'#ffd700',
