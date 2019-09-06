@@ -3,7 +3,6 @@
 # Instance
 
 apt_sources:
-- source: "ppa:linuxuprising/java"
 - source: "deb http://packages.elasticsearch.org/elasticsearch/1.7/debian stable main"
   key: |
     -----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -95,7 +94,6 @@ apt_sources:
 bootcmd:
 - set -ex
 - cloud-init-per once ssh-users-ca echo "TrustedUserCAKeys /etc/ssh/users_ca.pub" >> /etc/ssh/sshd_config
-- cloud-init-per once accepted-oracle-license-v1-2 echo "oracle-java11-installer shared/accepted-oracle-license-v1-2 select true" | debconf-set-selections
 - cloud-init-per once fallocate-swapfile fallocate -l 4G /swapfile
 - cloud-init-per once chmod-swapfile chmod 600 /swapfile
 - cloud-init-per once mkswap-swapfile mkswap /swapfile
@@ -138,8 +136,6 @@ packages:
 - lzop
 - nodejs
 - ntp
-- oracle-java11-installer
-- oracle-java11-set-default
 - postgresql-9.3
 - pv
 - python2.7-dev
