@@ -161,17 +161,14 @@ runcmd:
 # Ideally this would build as a different user so encoded only has read
 # permissions
 - set -ex
-<<<<<<< HEAD
-=======
 # Manually install java
-- sudo -u ubuntu aws s3 cp --region=us-west-2 --recursive s3:///t2depi-conf-prod/.aws ~ubuntu/.aws
+- sudo -u ubuntu aws s3 cp --region=us-west-2 --recursive s3://encoded-conf-prod/.aws ~ubuntu/.aws
 - sudo mkdir -p /usr/lib/jvm
 - sudo chmod 777 /usr/lib/jvm
-- sudo tar -xzvf /home/ubuntu/.aws/jdk-8u211-linux-x64.tar.gz --directory /usr/lib/jvm/
+- sudo tar -xzvf /home/ubuntu/.aws/jdk-11.0.3_linux-x64_bin.tar.gz --directory /usr/lib/jvm/
 - sudo -u ubuntu rm -r /home/ubuntu/.aws
 - sudo chmod 755 /usr/lib/jvm
-- sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_211/bin/java 100
->>>>>>> f0d22d993de009c1784f340e5ccb11c3df409049
+- sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-11.0.3/bin/java 100
 - update-rc.d elasticsearch defaults
 - service elasticsearch start
 - chown postgres:postgres /etc/postgresql/9.3/main/*.conf
