@@ -49,6 +49,7 @@ _tsv_mapping = OrderedDict([
     ('Biosample term name', ['biosample_term_name']),
     ('Biosample type', ['biosample_type']),
     ('Biosample synonyms', ['biosample_synonyms']),
+    ('software_used', ['software_used']),
     ('System slims', ['system_slims']),
     ('Organ slims', ['organ_slims']),
     ('Biosample life stage', ['replicates.library.biosample.life_stage']),
@@ -182,14 +183,14 @@ _states_maps = {
     'TxFlnk': 'Transcription_Flanking',
     'Enh': 'Enhancer',
     'Ctcf': 'CTCF-bound',
-    'alpha_1': 'glucagon high',
-    'alpha_2': 'glucagon low',
-    'beta_1': 'insulin high',
-    'beta_2': 'insulin low',
-    'delta_1': 'somatostatin high',
-    'delta_2': 'somatostatin low'
+    'alpha_1': 'Glucagon high',
+    'alpha_2': 'Glucagon low',
+    'beta_1': 'Insulin high',
+    'beta_2': 'Insulin low',
+    'delta_1': 'Somatostatin high',
+    'delta_2': 'Somatostatin low'
     }
-_high_states = ['Transcription', 'Enhancer_Active_1', 'Enhancer_Active_2',  'Promoter_Active',  'glucagon high', 'insulin high', 'somatostatin high', 'endothelial_1','endothelial_2','gamma','immune','exocrine','glial','stellate']
+_high_states = ['Enhancer_Active_1', 'Enhancer_Active_2',  'Promoter_Active']
 _biosample_color = {
     'liver':'#ffd700',
     'HepG2':'#ffd700',
@@ -376,7 +377,7 @@ def variant_graph(context, request):
     query = results['query']
     biosample_check = []
     cell_check = []
-    json_doc['nodes'].append({'path':query,'id':query, 'color':'#170451', 'link':'region=' + query + '&genome=GRCh37','label':query, 'name': query, 'type':'rsid','biosample_state':'-'})
+    json_doc['nodes'].append({'path':query,'id':query, 'color':'#170451', 'link':'region=' + query + '&genome=GRCh37','label':query, 'name': query, 'type':'rsid','biosample':'-', 'annotation_type':'-', 'accession_ids':'-'})
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
@@ -384,28 +385,28 @@ def variant_graph(context, request):
             biosample = annotation_json['biosample_term_name']
             if biosample in biosample_term_list:
                 if biosample not in biosample_check:
-                    json_doc['nodes'].append({'path':query + '|' + biosample,'id':biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'biosample','biosample_state':'-'})
+                    json_doc['nodes'].append({'path':query + '|' + biosample,'id':biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'biosample','biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     biosample_check.append(biosample)
             if biosample in pancreatic_cells:
                 if 'pancreas' not in biosample_check:
-                    json_doc['nodes'].append({'path':query + '|pancreas','id':'pancreas', 'color': _biosample_color['pancreas'], 'link':'biosample_term_name=pancreas', 'label':'pancreas', 'name': 'pancreas', 'type':'biosample','biosample_state':'-'})
+                    json_doc['nodes'].append({'path':query + '|pancreas','id':'pancreas', 'color': _biosample_color['pancreas'], 'link':'biosample_term_name=pancreas', 'label':'pancreas', 'name': 'pancreas', 'type':'biosample','biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     biosample_check.append('pancreas')
                 if biosample not in cell_check:
-                    json_doc['nodes'].append({'path':query + '|pancreas|' + biosample,'id':'pancreas|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample, 'label':biosample, 'name': biosample, 'type':'cell','biosample_state':'-'})
+                    json_doc['nodes'].append({'path':query + '|pancreas|' + biosample,'id':'pancreas|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample, 'label':biosample, 'name': biosample, 'type':'cell','biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     cell_check.append(biosample)
             elif biosample in liver_cells:
                 if 'liver' not in biosample_check:
-                    json_doc['nodes'].append({'path':query + '|liver','id':'liver', 'color': _biosample_color['liver'], 'link':'biosample_term_name=liver', 'label':'liver', 'name': 'liver', 'type':'biosample','biosample_state':'-'})
+                    json_doc['nodes'].append({'path':query + '|liver','id':'liver', 'color': _biosample_color['liver'], 'link':'biosample_term_name=liver', 'label':'liver', 'name': 'liver', 'type':'biosample','biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     biosample_check.append('liver')
                 if biosample not in cell_check:
-                    json_doc['nodes'].append({'path':query + '|liver|' + biosample,'id':'liver|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'cell','biosample_state':'-'})
+                    json_doc['nodes'].append({'path':query + '|liver|' + biosample,'id':'liver|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'cell','biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     cell_check.append(biosample)
             elif biosample in heart_tissues:
                 if 'heart' not in biosample_check:
-                    json_doc['nodes'].append({'path':query + '|heart','id':'heart', 'color': _biosample_color['heart'], 'link':'biosample_term_name=heart', 'label':'heart', 'name': 'heart', 'type':'biosample'})
+                    json_doc['nodes'].append({'path':query + '|heart','id':'heart', 'color': _biosample_color['heart'], 'link':'biosample_term_name=heart', 'label':'heart', 'name': 'heart', 'type':'biosample','type':'biosample', 'biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     biosample_check.append('heart')
                 if biosample not in cell_check:
-                    json_doc['nodes'].append({'path':query + '|heart|' + biosample,'id':'heart|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'cell'})
+                    json_doc['nodes'].append({'path':query + '|heart|' + biosample,'id':'heart|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'cell','biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     cell_check.append(biosample)
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
@@ -435,19 +436,23 @@ def variant_graph(context, request):
                     json_doc1[state_biosample].append(
                         annotation_accession
                         )
-                if harmonized_state in _high_states or (annotation == 'accessible chromatin' and biosample_type == 'tissue') or annotation == 'variant allelic effects' or annotation == 'target gene predictions' or annotation == 'binding sites':
+                if harmonized_state in _high_states or annotation == 'accessible chromatin' or annotation == 'variant allelic effects' or annotation == 'target gene predictions' or annotation == 'binding sites':
                     if biosample_term in biosample_term_list:
                         links = "&accession=".join(json_doc1[state_biosample])
-                        json_doc['nodes'].append({'path':query + '|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation'}) 
+                        accession_ids = ", ".join(json_doc1[state_biosample])
+                        json_doc['nodes'].append({'path':query + '|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation', 'biosample':biosample_term, 'annotation_type':annotation, 'accession_ids':accession_ids}) 
                     elif biosample_term in pancreatic_cells:
                         links = "&accession=".join(json_doc1[state_biosample])
-                        json_doc['nodes'].append({'path':query + '|pancreas|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation'})  
+                        accession_ids = ", ".join(json_doc1[state_biosample])
+                        json_doc['nodes'].append({'path':query + '|pancreas|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation', 'biosample':biosample_term, 'annotation_type':annotation, 'accession_ids':accession_ids})  
                     elif biosample_term in liver_cells:
                         links = "&accession=".join(json_doc1[state_biosample])
-                        json_doc['nodes'].append({'path':query + '|liver|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation'})  
+                        accession_ids = ", ".join(json_doc1[state_biosample])
+                        json_doc['nodes'].append({'path':query + '|liver|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation', 'biosample':biosample_term, 'annotation_type':annotation, 'accession_ids':accession_ids})  
                     elif biosample_term in heart_tissues:
                         links = "&accession=".join(json_doc1[state_biosample])
-                        json_doc['nodes'].append({'path':query + '|heart|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation'})
+                        accession_ids = ", ".join(json_doc1[state_biosample])
+                        json_doc['nodes'].append({'path':query + '|heart|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation', 'biosample':biosample_term, 'annotation_type':annotation, 'accession_ids':accession_ids})
                 #unique by id (aka. unique by same state & same tissue/cell)
                 json_doc2['nodes'] = list({v['id']:v for v in json_doc['nodes']}.values())
     if 'variant_graph.json' in request.url:
@@ -474,7 +479,7 @@ def variant_all_graph(context, request):
     query = results['query']
     biosample_check = []
     cell_check = []
-    json_doc['nodes'].append({'path':query,'id':query, 'color':'#170451', 'link':'region=' + query + '&genome=GRCh37','label':query, 'name': query, 'type':'rsid','biosample_state':'-'})
+    json_doc['nodes'].append({'path':query,'id':query, 'color':'#170451', 'link':'region=' + query + '&genome=GRCh37','label':query, 'name': query, 'type':'rsid','biosample':'-', 'annotation_type':'-', 'accession_ids':'-'})
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
@@ -482,28 +487,28 @@ def variant_all_graph(context, request):
             biosample = annotation_json['biosample_term_name']
             if biosample in biosample_term_list:
                 if biosample not in biosample_check:
-                    json_doc['nodes'].append({'path':query + '|' + biosample,'id':biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'biosample','biosample_state':'-'})
+                    json_doc['nodes'].append({'path':query + '|' + biosample,'id':biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'biosample','biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     biosample_check.append(biosample)
             if biosample in pancreatic_cells:
                 if 'pancreas' not in biosample_check:
-                    json_doc['nodes'].append({'path':query + '|pancreas','id':'pancreas', 'color': _biosample_color['pancreas'], 'link':'biosample_term_name=pancreas', 'label':'pancreas', 'name': 'pancreas', 'type':'biosample','biosample_state':'-'})
+                    json_doc['nodes'].append({'path':query + '|pancreas','id':'pancreas', 'color': _biosample_color['pancreas'], 'link':'biosample_term_name=pancreas', 'label':'pancreas', 'name': 'pancreas', 'type':'biosample','biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     biosample_check.append('pancreas')
                 if biosample not in cell_check:
-                    json_doc['nodes'].append({'path':query + '|pancreas|' + biosample,'id':'pancreas|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample, 'label':biosample, 'name': biosample, 'type':'cell','biosample_state':'-'})
+                    json_doc['nodes'].append({'path':query + '|pancreas|' + biosample,'id':'pancreas|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample, 'label':biosample, 'name': biosample, 'type':'cell','biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     cell_check.append(biosample)
             elif biosample in liver_cells:
                 if 'liver' not in biosample_check:
-                    json_doc['nodes'].append({'path':query + '|liver','id':'liver', 'color': _biosample_color['liver'], 'link':'biosample_term_name=liver', 'label':'liver', 'name': 'liver', 'type':'biosample','biosample_state':'-'})
+                    json_doc['nodes'].append({'path':query + '|liver','id':'liver', 'color': _biosample_color['liver'], 'link':'biosample_term_name=liver', 'label':'liver', 'name': 'liver', 'type':'biosample','biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     biosample_check.append('liver')
                 if biosample not in cell_check:
-                    json_doc['nodes'].append({'path':query + '|liver|' + biosample,'id':'liver|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'cell','biosample_state':'-'})
+                    json_doc['nodes'].append({'path':query + '|liver|' + biosample,'id':'liver|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'cell','biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     cell_check.append(biosample)
             elif biosample in heart_tissues:
                 if 'heart' not in biosample_check:
-                    json_doc['nodes'].append({'path':query + '|heart','id':'heart', 'color': _biosample_color['heart'], 'link':'biosample_term_name=heart', 'label':'heart', 'name': 'heart', 'type':'biosample'})
+                    json_doc['nodes'].append({'path':query + '|heart','id':'heart', 'color': _biosample_color['heart'], 'link':'biosample_term_name=heart', 'label':'heart', 'name': 'heart', 'type':'biosample', 'biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     biosample_check.append('heart')
                 if biosample not in cell_check:
-                    json_doc['nodes'].append({'path':query + '|heart|' + biosample,'id':'heart|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'cell'})
+                    json_doc['nodes'].append({'path':query + '|heart|' + biosample,'id':'heart|'+biosample, 'color': _biosample_color[biosample], 'link':'biosample_term_name=' + biosample ,'label':biosample, 'name': biosample, 'type':'cell', 'biosample':biosample, 'annotation_type':'-', 'accession_ids':'-'})
                     cell_check.append(biosample)
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
@@ -535,16 +540,20 @@ def variant_all_graph(context, request):
                         )
                 if biosample_term in biosample_term_list:
                     links = "&accession=".join(json_doc1[state_biosample])
-                    json_doc['nodes'].append({'path':query + '|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation'}) 
+                    accession_ids = ", ".join(json_doc1[state_biosample])
+                    json_doc['nodes'].append({'path':query + '|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation', 'biosample':biosample_term, 'annotation_type':annotation, 'accession_ids':accession_ids}) 
                 elif biosample_term in pancreatic_cells:
                     links = "&accession=".join(json_doc1[state_biosample])
-                    json_doc['nodes'].append({'path':query + '|pancreas|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation'})  
+                    accession_ids = ", ".join(json_doc1[state_biosample])
+                    json_doc['nodes'].append({'path':query + '|pancreas|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation', 'biosample':biosample_term, 'annotation_type':annotation, 'accession_ids':accession_ids})  
                 elif biosample_term in liver_cells:
                     links = "&accession=".join(json_doc1[state_biosample])
-                    json_doc['nodes'].append({'path':query + '|liver|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation'})  
+                    accession_ids = ", ".join(json_doc1[state_biosample])
+                    json_doc['nodes'].append({'path':query + '|liver|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation', 'biosample':biosample_term, 'annotation_type':annotation, 'accession_ids':accession_ids})  
                 elif biosample_term in heart_tissues:
                     links = "&accession=".join(json_doc1[state_biosample])
-                    json_doc['nodes'].append({'path':query + '|heart|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation'})
+                    accession_ids = ", ".join(json_doc1[state_biosample])
+                    json_doc['nodes'].append({'path':query + '|heart|' + biosample_term + '|' + harmonized_state, 'id':state_biosample, 'color': _biosample_color[biosample_term], 'link': 'accession=' + links, 'label': harmonized_state, 'name': json_doc1[state_biosample], 'type':'annotation', 'biosample':biosample_term, 'annotation_type':annotation, 'accession_ids':accession_ids})
                 #unique by id (aka. unique by same state & same tissue/cell)
                 json_doc2['nodes'] = list({v['id']:v for v in json_doc['nodes']}.values())
     if 'variant_all_graph.json' in request.url:
@@ -703,7 +712,9 @@ def annotation_metadata(context, request):
         files = {}
         for f in annotation_json['files']:
             title = f['title']
+            log.warn(title)
             md5sum = f['md5sum']
+            log.warn(md5sum)
             date_created = f['date_created']
             lab = f['lab']['title']
             href = request.host_url + f['href']
@@ -743,6 +754,7 @@ def annotation_metadata(context, request):
                     })
         annotation_id = annotation_json['accession']
         annotation_type = annotation_json['annotation_type']
+        software = None if annotation_json.get("software_used")== None else annotation_json["software_used"][0]["software"]["title"]
         biosample_term_name = annotation_json['biosample_term_name']
         biosample_synonyms = annotation_json['biosample_synonyms'] if 'biosample_synonyms' in annotation_json else None
         system_slims = annotation_json['system_slims'] if 'system_slims' in annotation_json else None
@@ -750,7 +762,8 @@ def annotation_metadata(context, request):
         biosample_type = annotation_json['biosample_type']
         biosample_term_id = annotation_json['biosample_term_id'] if 'biosample_term_id' in annotation_json else None
         dbxrefs = annotation_json['dbxrefs'] 
-        harmonized_states = roadmap_chromhmm_states if annotation_type == 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else None  if annotation_type != 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else varshney_chromhmm_states  
+        harmonized_states = varshney_chromhmm_states if dbxrefs == ['dbGaP:phs001188.v1.p1'] and dbxrefs != ['ENCODE:ENCSR123'] else None  if annotation_type != 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else roadmap_chromhmm_states  
+        #harmonized_states = roadmap_chromhmm_states if annotation_type == 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else None  if annotation_type != 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else varshney_chromhmm_states  
         if files:
             if annotation_type not in json_doc:
                 json_doc[annotation_type] = []
@@ -765,7 +778,8 @@ def annotation_metadata(context, request):
                     'organ_slims': organ_slims,
                     'system_slims': system_slims,
                     'harmonized_states': harmonized_states,
-                    'file_download': files
+                    'file_download': files,
+                    'annotation_method': software
                 })  
             else:
                 json_doc[annotation_type].append({
@@ -779,7 +793,8 @@ def annotation_metadata(context, request):
                     'organ_slims': organ_slims,
                     'system_slims':system_slims,
                     'harmonized_states': harmonized_states,
-                    'file_download': files
+                    'file_download': files,
+                    'annotation_method': software
                     }) 
             
     if 'annotation_metadata.json' in request.url:
