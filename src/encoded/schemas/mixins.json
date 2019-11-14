@@ -381,6 +381,7 @@
                 "eCLIP",
 		"GRO-seq",
 		"pCHi-C",
+		"RNA microarray",
                 "shRNA knockdown followed by RNA-seq",
                 "RNA Bind-n-Seq",
                 "transcription profiling by array assay",
