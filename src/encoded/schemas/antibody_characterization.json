@@ -1,4 +1,4 @@
- {
+S {
     "title": "Antibody characterization",
     "description": "Schema for submitting antibody characterization data.",
     "id": "/profiles/antibody_characterization.json",
@@ -199,6 +199,7 @@
                             "in vitro differentiated cells",
                             "induced pluripotent stem cell line",
                             "whole organisms",
+			    "cell line",
                             "stem cell"
                         ]
                     }

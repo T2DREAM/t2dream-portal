@@ -48,7 +48,7 @@
                             "enum": ["year"]
                         },
                         "age": {
-                            "pattern": "^(([1-9]?\\d)|(90 or above))$"
+                            "pattern": "^(([1-9]?\\d))$"
                         }
                     }
                 },

@@ -176,6 +176,7 @@
                     "pseudoreplicated idr thresholded peaks",
                     "stable peaks",
                     "enhancer validation",
+		    "matrix eQTL results",
                     "semi-automated genome annotation",
                     "blacklisted regions",
                     "mitochondria blacklisted regions"
