@@ -220,6 +220,7 @@ def main(global_config, **local_config):
     config.include('.types')
     config.include('.root')
     config.include('.batch_download')
+    config.include('.rest_api')
     config.include('.visualization')
 
     if 'elasticsearch.server' in config.registry.settings:
