@@ -468,13 +468,13 @@ def variant_graph_new(context, request):
                 state_list = []
                 new_state_annotation = new_state + '|' + annotation_accession
                 state_biosample = new_state + '|' +biosample_term
-                if state_biosample not in json_doc1:
-                    json_doc1[state_biosample] = []
-                    json_doc1[state_biosample].append(
+                if new_state not in json_doc1:
+                    json_doc1[new_state] = []
+                    json_doc1[new_state].append(
                         annotation_accession
                         )
                 else:
-                    json_doc1[state_biosample].append(
+                    json_doc1[new_state].append(
                         annotation_accession
                         )
                 if new_state not in json_doc3:
@@ -505,28 +505,29 @@ def variant_graph_new(context, request):
                 state_list = []
                 new_state_annotation = new_state + '|' + annotation_accession
                 state_biosample = new_state + '|' +biosample_term
+                target_gene_accession = list(set(json_doc1[new_state]))
                 #target gene predictions
                 if annotation in target_gene_prediction_annotation:
                     if biosample_term in biosample_term_list:
-                        links = "&accession=".join(json_doc1[state_biosample])
-                        accession_ids = ", ".join(json_doc1[state_biosample])
-                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': json_doc1[state_biosample], 'type':'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3}) 
+                        links = "&accession=".join(target_gene_accession)
+                        accession_ids = ", ".join(target_gene_accession)
+                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': target_gene_accession, 'type':'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3}) 
                         json_doc['links'].append({'source': biosample, 'target': new_state, 'id': biosample + new_state, 'label': None, "width": 0, 'length': 40})
                     elif biosample_term in pancreatic_cells:
                         state_len = (len(set(json_doc3[new_state]))) * 2
-                        links = "&accession=".join(json_doc1[state_biosample])
-                        accession_ids = ", ".join(json_doc1[state_biosample])
-                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': json_doc1[state_biosample], 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': state_len})  
+                        links = "&accession=".join(target_gene_accession)
+                        accession_ids = ", ".join(target_gene_accession)
+                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': target_gene_accession, 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': state_len})  
                         json_doc['links'].append({'source': biosample, 'target': new_state, 'id': biosample + new_state, 'label': None, "width": 0, 'length': 40})
                     elif biosample_term in liver_cells:
-                        links = "&accession=".join(json_doc1[state_biosample])
-                        accession_ids = ", ".join(json_doc1[state_biosample])
-                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': json_doc1[state_biosample], 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3})  
+                        links = "&accession=".join(target_gene_accession)
+                        accession_ids = ", ".join(target_gene_accession)
+                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': target_gene_accession, 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3})  
                         json_doc['links'].append({'source': biosample, 'target': new_state, 'id': biosample + new_state, 'label': None, "width": 0, 'length': 40})
                     elif biosample_term in heart_tissues:
-                        links = "&accession=".join(json_doc1[state_biosample])
-                        accession_ids = ", ".join(json_doc1[state_biosample])
-                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': json_doc1[state_biosample], 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3})
+                        links = "&accession=".join(target_gene_accession)
+                        accession_ids = ", ".join(target_gene_accession)
+                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': target_gene_accession, 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3})
                         json_doc['links'].append({'source': biosample, 'target': new_state, 'id': biosample + new_state, 'label': None, "width": 0, 'length': 40})
                 #unique by id (aka. unique by same state & same tissue/cell)
                 json_doc2['nodes'] = list({v['id']:v for v in json_doc['nodes']}.values())
