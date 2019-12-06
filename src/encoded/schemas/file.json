@@ -718,8 +718,9 @@
                         "blacklisted regions",
                         "mitochondria blacklisted regions",
 
-			"matrix eQTL results"
-
+			"matrix eQTL results",
+			
+			"RPKM counts matrix"
                     ]
                 },
                 {
@@ -1018,7 +1019,7 @@
         "rejected reads": "raw data",
         "raw data": "raw data",
         "reporter code counts": "raw data",
-
+	
         "alignments": "alignment",
         "unfiltered alignments": "alignment",
 	"redacted alignments": "alignment",
@@ -1140,6 +1141,7 @@
         "HMM predicted chromatin state": "annotation",
         "semi-automated genome annotation": "annotation"
         
+	
     },
     "file_format_file_extension": {
         "2bit": ".2bit",

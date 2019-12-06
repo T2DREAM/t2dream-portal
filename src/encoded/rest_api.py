@@ -194,25 +194,25 @@ _high_states = ['Enhancer_Active_1', 'Enhancer_Active_2',  'Promoter_Active']
 _biosample_color = {
     'liver':'#ffd700',
     'HepG2':'#ffd700',
-    'islet of Langerhans':'#add8e6',
+    'islet of Langerhans':'#0eb8f0',
     'adipocyte': '#f98900',
     'subcutaneous adipose': '#66ffff',
     'visceral omenum adipose': '#5daaaa',
     'skeletal muscle myoblast':'#2c5e8d',
     'skeletal muscle':'#1a5353',
     'pancreas': '#add8e6',
-    'pancreatic alpha cell': '#add8e6',
-    'pancreatic beta cell': '#add8e6',
-    'pancreatic delta cell': '#add8e6',
-    'pancreatic stellate cell': '#add8e6',
-    'pancreatic acinar cell': '#add8e6',
-    'pancreatic cell': '#add8e6',
-    'pancreatic ductal cell': '#add8e6',
-    'pancreatic endothelial cell': '#add8e6',
-    'pancreatic exocrine cell': '#add8e6',
-    'pancreatic glial cell': '#add8e6',
-    'pancreatic immune cell': '#add8e6',
-    'pancreatic polypeptide-secreting cell': '#add8e6',
+    'pancreatic alpha cell': '#0eb8f0',
+    'pancreatic beta cell': '#0eb8f0',
+    'pancreatic delta cell': '#0eb8f0',
+    'pancreatic stellate cell': '#0eb8f0',
+    'pancreatic acinar cell': '#0eb8f0',
+    'pancreatic cell': '#0eb8f0',
+    'pancreatic ductal cell': '#0eb8f0',
+    'pancreatic endothelial cell': '#0eb8f0',
+    'pancreatic exocrine cell': '#0eb8f0',
+    'pancreatic glial cell': '#0eb8f0',
+    'pancreatic immune cell': '#0eb8f0',
+    'pancreatic polypeptide-secreting cell': '#0eb8f0',
     'heart':'#ff0000',
     'aorta': '#ff0000',
     'heart left ventricle':'#ff0000',
@@ -372,6 +372,7 @@ def variant_graph_new(context, request):
     json_doc1 = {}
     json_doc2 = {}
     json_doc3 = {}
+    json_doc4 = {}
     json_doc['nodes'] = []
     json_doc1['nodes'] = []
     json_doc2['nodes'] = []
@@ -468,6 +469,7 @@ def variant_graph_new(context, request):
                 state_list = []
                 new_state_annotation = new_state + '|' + annotation_accession
                 state_biosample = new_state + '|' +biosample_term
+                software = None if annotation_json.get("software_used")== None else annotation_json["software_used"][0]["software"]["description"]
                 if new_state not in json_doc1:
                     json_doc1[new_state] = []
                     json_doc1[new_state].append(
@@ -485,6 +487,15 @@ def variant_graph_new(context, request):
                 else:
                     json_doc3[new_state].append(
                         new_state_annotation
+                        )
+                if new_state not in json_doc4:
+                    json_doc4[new_state] = []
+                    json_doc4[new_state].append(
+                        software
+                        )
+                else:
+                    json_doc4[new_state].append(
+                        software
                         )
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
@@ -506,6 +517,7 @@ def variant_graph_new(context, request):
                 new_state_annotation = new_state + '|' + annotation_accession
                 state_biosample = new_state + '|' +biosample_term
                 target_gene_accession = list(set(json_doc1[new_state]))
+                target_gene_accession_method = list(set(json_doc1[new_state])) + list(set(json_doc4[new_state]))
                 #target gene predictions
                 if annotation in target_gene_prediction_annotation:
                     if biosample_term in biosample_term_list:
@@ -517,7 +529,8 @@ def variant_graph_new(context, request):
                         state_len = (len(set(json_doc3[new_state]))) * 2
                         links = "&accession=".join(target_gene_accession)
                         accession_ids = ", ".join(target_gene_accession)
-                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': target_gene_accession, 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': state_len})  
+                        accession_method = ", ".join(target_gene_accession_method)
+                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': accession_method, 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': state_len})  
                         json_doc['links'].append({'source': biosample, 'target': new_state, 'id': biosample + new_state, 'label': None, "width": 0, 'length': 40})
                     elif biosample_term in liver_cells:
                         links = "&accession=".join(target_gene_accession)

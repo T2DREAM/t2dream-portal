@@ -380,6 +380,7 @@
                 "DNase-seq",
                 "eCLIP",
 		"GRO-seq",
+		"snDrop-seq",
 		"pCHi-C",
 		"RNA microarray",
                 "shRNA knockdown followed by RNA-seq",
