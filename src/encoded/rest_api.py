@@ -413,7 +413,7 @@ def variant_graph_new(context, request):
                 if biosample in biosample_term_list:
                     if biosample not in biosample_check:
                         label = biosamples_annotation_type[biosample] if biosamples_annotation_type[biosample] in variant_allelic_effects else None
-                        link = biosample if biosample in biosamples_annotation_type else None
+                        link = 'biosample_term_name=' + biosample if biosample in biosamples_annotation_type else None
                         width = 2
                         json_doc['nodes'].append({'path': biosample, 'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3})
                         json_doc['links'].append({'source': query, 'target': biosample, 'id': query + biosample, 'label': label, 'width': width, 'length': 55, 'linkout': link})
@@ -438,7 +438,7 @@ def variant_graph_new(context, request):
                     if biosample not in cell_check:
                         label = variant_allelic_effects if biosample in biosamples_annotation_type else None
                         width = 2 if biosample in biosamples_annotation_type else 0
-                        link = biosample if biosample in biosamples_annotation_type else None
+                        link = 'biosample_term_name=' + biosample if biosample in biosamples_annotation_type else None
                         json_doc['nodes'].append({'path': biosample, 'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'cell','biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3})
                         json_doc['links'].append({'source': 'liver', 'target': biosample, 'id': 'liver' + biosample, 'label': label, 'width': width, 'length': 10, 'linkout': link})
                         cell_check.append(biosample)
@@ -450,7 +450,7 @@ def variant_graph_new(context, request):
                     if biosample not in cell_check:
                         label = variant_allelic_effects if biosample in biosamples_annotation_type else None
                         width = 2 if biosample in biosamples_annotation_type else 0
-                        link = biosample if biosamples_annotation_type[biosample] in biosamples_annotation_type else None
+                        link = 'biosample_term_name=' + biosample if biosamples_annotation_type[biosample] in biosamples_annotation_type else None
                         json_doc['nodes'].append({'path': biosample,'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'cell', 'biosample':biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3})
                         json_doc['links'].append({'source': 'heart', 'target': biosample, 'id': 'heart' + biosample, 'label': label, 'width': width, 'length': 10, 'linkout':None})
                         cell_check.append(biosample)
