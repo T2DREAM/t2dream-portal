@@ -720,7 +720,8 @@
 
 			"matrix eQTL results",
 			
-			"RPKM counts matrix"
+			"RPKM counts matrix",
+			"gene read counts"
                     ]
                 },
                 {
