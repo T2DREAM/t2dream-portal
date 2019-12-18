@@ -385,8 +385,9 @@ def variant_graph_new(context, request):
     cell_check = []
     biosamples_annotation_type = {}
     biosample_annotation = {}
+    variant_coordinates = results['coordinates']
     #variant node
-    json_doc['nodes'].append({'path':query,'id':query, 'color':'LightGrey', 'link':'region=' + query + '&genome=GRCh37','label':query, 'name': query, 'type':'rsid','biosample':'-', 'annotation_type':'-', 'accession_ids':'-', 'level': 1, 'state_len': 3, 'score': None})
+    json_doc['nodes'].append({'path':query,'id':query, 'color':'LightGrey', 'link':'region=' + query + '&genome=GRCh37','label':query, 'name': query, 'type':'rsid','biosample':'-', 'annotation_type':'-', 'accession_ids':'-', 'level': 1, 'state_len': 3, 'score': None, 'distance': None})
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
@@ -416,43 +417,43 @@ def variant_graph_new(context, request):
                         label = biosamples_annotation_type[biosample] if biosamples_annotation_type[biosample] in variant_allelic_effects else None
                         link = 'biosample_term_name=' + biosample if biosample in biosamples_annotation_type else None
                         width = 2
-                        json_doc['nodes'].append({'path': biosample, 'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None})
+                        json_doc['nodes'].append({'path': biosample, 'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None, 'distance': None})
                         json_doc['links'].append({'source': query, 'target': biosample, 'id': query + biosample, 'label': label, 'width': width, 'length': 55, 'linkout': link})
                         biosample_check.append(biosample)
                 if biosample in pancreatic_cells:
                     if 'pancreas' not in biosample_check:
-                        json_doc['nodes'].append({'path': 'pancreas', 'id':'pancreas', 'color': _biosample_color['pancreas'], 'link': 'biosample_term_name=pancreas', 'label': 'pancreas', 'name': 'pancreas', 'type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None})
+                        json_doc['nodes'].append({'path': 'pancreas', 'id':'pancreas', 'color': _biosample_color['pancreas'], 'link': 'biosample_term_name=pancreas', 'label': 'pancreas', 'name': 'pancreas', 'type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None, 'distance': None})
                         json_doc['links'].append({'source': query, 'target': 'pancreas', 'id': query + 'pancreas', 'label': None, 'width': 0, 'length': 55, 'linkout': None})
                         biosample_check.append('pancreas')
                     if biosample not in cell_check:
                         label = variant_allelic_effects if biosample in biosamples_annotation_type else None
                         width = 2 if biosample in biosamples_annotation_type else 0
                         link = 'biosample_term_name=' + biosample if biosample in biosamples_annotation_type else None
-                        json_doc['nodes'].append({'path': biosample, 'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample, 'label': biosample, 'name': biosample, 'type': 'cell','biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None})
+                        json_doc['nodes'].append({'path': biosample, 'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample, 'label': biosample, 'name': biosample, 'type': 'cell','biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None, 'distance': None})
                         json_doc['links'].append({'source': 'pancreas', 'target': biosample, 'id': 'pancreas' + biosample, 'label': label, 'width': width, 'length': 10, 'linkout': link})
                         cell_check.append(biosample)
                 elif biosample in liver_cells:
                     if 'liver' not in biosample_check:
-                        json_doc['nodes'].append({'path': 'liver', 'id': 'liver', 'color': _biosample_color['liver'], 'link': 'biosample_term_name=liver', 'label': 'liver', 'name': 'liver', 'type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None})
+                        json_doc['nodes'].append({'path': 'liver', 'id': 'liver', 'color': _biosample_color['liver'], 'link': 'biosample_term_name=liver', 'label': 'liver', 'name': 'liver', 'type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None, 'distance': None})
                         json_doc['links'].append({'source': query, 'target': 'liver', 'id': query + 'liver', 'label': None, 'width': 0, 'length': 55, 'linkoutout':None})
                         biosample_check.append('liver')
                     if biosample not in cell_check:
                         label = variant_allelic_effects if biosample in biosamples_annotation_type else None
                         width = 2 if biosample in biosamples_annotation_type else 0
                         link = 'biosample_term_name=' + biosample if biosample in biosamples_annotation_type else None
-                        json_doc['nodes'].append({'path': biosample, 'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'cell','biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None})
+                        json_doc['nodes'].append({'path': biosample, 'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'cell','biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None, 'distance': None})
                         json_doc['links'].append({'source': 'liver', 'target': biosample, 'id': 'liver' + biosample, 'label': label, 'width': width, 'length': 10, 'linkout': link})
                         cell_check.append(biosample)
                 elif biosample in heart_tissues:
                     if 'heart' not in biosample_check:
-                        json_doc['nodes'].append({'path': 'heart', 'id': 'heart', 'color': _biosample_color['heart'], 'link': 'biosample_term_name=heart', 'label': 'heart', 'name': 'heart','type': 'biosample','type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None})
+                        json_doc['nodes'].append({'path': 'heart', 'id': 'heart', 'color': _biosample_color['heart'], 'link': 'biosample_term_name=heart', 'label': 'heart', 'name': 'heart','type': 'biosample','type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None, 'distance': None})
                         json_doc['links'].append({'source': query, 'target': 'heart', 'id': query + 'heart', 'label': None, 'width': 0, 'length': 55, 'linkout':None})
                         biosample_check.append('heart')
                     if biosample not in cell_check:
                         label = variant_allelic_effects if biosample in biosamples_annotation_type else None
                         width = 2 if biosample in biosamples_annotation_type else 0
                         link = 'biosample_term_name=' + biosample if biosamples_annotation_type[biosample] in biosamples_annotation_type else None
-                        json_doc['nodes'].append({'path': biosample,'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'cell', 'biosample':biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None})
+                        json_doc['nodes'].append({'path': biosample,'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'cell', 'biosample':biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None, 'distance': None})
                         json_doc['links'].append({'source': 'heart', 'target': biosample, 'id': 'heart' + biosample, 'label': label, 'width': width, 'length': 10, 'linkout':None})
                         cell_check.append(biosample)
             for hit in row['inner_hits']['positions']['hits']['hits']:
@@ -537,11 +538,16 @@ def variant_graph_new(context, request):
                 method = list(set(json_doc4[new_state]))
                 #target gene predictions
                 if annotation in target_gene_prediction_annotation:
+                    target_gene_coordinates = state.split(':', 1)[1]
+                    target_gene_first_coordinate = target_gene_coordinates.split('-', 1)[0]
+                    variant_gene_coordinates = variant_coordinates.split(':', 1)[1]
+                    variant_gene_first_coordinate = variant_gene_coordinates.split('-', 1)[0]
+                    distance = abs(int(target_gene_first_coordinate) - int(variant_gene_first_coordinate))
                     if biosample_term in biosample_term_list:
                         links = "&accession=".join(target_gene_accession)
                         accession_ids = ", ".join(target_gene_accession)
                         score = ", ".join(json_doc5[state_biosample])
-                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': 'accession:' + target_gene_accession + "\n" + 'score:' + val, 'type':'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3, 'score': val}) 
+                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': 'accession:' + target_gene_accession + "\n" + 'score:' + val, 'type':'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3, 'score': val, 'distance': distance}) 
                         json_doc['links'].append({'source': biosample, 'target': new_state, 'id': biosample + new_state, 'label': None, "width": 0, 'length': 40, 'link':None})
                     elif biosample_term in pancreatic_cells:
                         state_len = (len(set(json_doc3[new_state]))) * 2
@@ -549,19 +555,19 @@ def variant_graph_new(context, request):
                         accession_ids = ", ".join(target_gene_accession)
                         method = ", ".join(method)
                         score = ", ".join(json_doc5[new_state])
-                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': 'accession: ' + accession_ids + '\n' + 'evidence: ' + method + '\n' + 'score: ' + score, 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': state_len, 'score': val})  
+                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': 'accession: ' + accession_ids + '\n' + 'evidence: ' + method + '\n' + 'score: ' + score, 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': state_len, 'score': val, 'distance': distance})  
                         json_doc['links'].append({'source': biosample, 'target': new_state, 'id': biosample + new_state, 'label': None, "width": 0, 'length': 40, 'linkout':None})
                     elif biosample_term in liver_cells:
                         links = "&accession=".join(target_gene_accession)
                         accession_ids = ", ".join(target_gene_accession)
                         score = ", ".join(json_doc5[state_biosample])
-                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': target_gene_accession, 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3, 'score': val})  
+                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': target_gene_accession, 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3, 'score': val, 'distance': distance})  
                         json_doc['links'].append({'source': biosample, 'target': new_state, 'id': biosample + new_state, 'label': None, "width": 0, 'length': 40, 'linkout':None})
                     elif biosample_term in heart_tissues:
                         links = "&accession=".join(target_gene_accession)
                         accession_ids = ", ".join(target_gene_accession)
                         score = ", ".join(json_doc5[state_biosample])
-                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': target_gene_accession, 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3, 'score': val})
+                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': target_gene_accession, 'type': 'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': 3, 'score': val, 'distance': distance})
                         json_doc['links'].append({'source': biosample, 'target': new_state, 'id': biosample + new_state, 'label': None, "width": 0, 'length': 40, 'linkout':None})
                 #unique by id (aka. unique by same state & same tissue/cell)
                 json_doc2['nodes'] = list({v['id']:v for v in json_doc['nodes']}.values())
