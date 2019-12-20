@@ -374,6 +374,7 @@ def variant_graph_new(context, request):
     json_doc3 = {}
     json_doc4 = {}
     json_doc5 = {}
+    json_doc6 = {}
     json_doc['nodes'] = []
     json_doc1['nodes'] = []
     json_doc2['nodes'] = []
@@ -514,7 +515,6 @@ def variant_graph_new(context, request):
                     json_doc5[new_state].append(
                         val
                         )
-
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
                 chrom = '{}'.format(row['_index'])
@@ -538,11 +538,21 @@ def variant_graph_new(context, request):
                 method = list(set(json_doc4[new_state]))
                 #target gene predictions
                 if annotation in target_gene_prediction_annotation:
-                    target_gene_coordinates = state.split(':', 1)[1]
-                    target_gene_first_coordinate = target_gene_coordinates.split('-', 1)[0]
+                    if new_state not in json_doc6:
+                        json_doc6[new_state] = []
+                        json_doc6[new_state].append(
+                            state.split(':', 1)[1]
+                            )
+                    else:
+                        json_doc6[new_state].append(
+                            state.split(':', 1)[1]
+                            )
+                    promoter = json_doc6[new_state]
                     variant_gene_coordinates = variant_coordinates.split(':', 1)[1]
-                    variant_gene_first_coordinate = variant_gene_coordinates.split('-', 1)[0]
-                    distance = str(abs(int(target_gene_first_coordinate) - int(variant_gene_first_coordinate)))
+                    variant_gene_first_coordinate = variant_gene_coordinates.split('-')[0]
+                    target_gene_first_coordinate = [i.split('-')[0] for i in promoter]
+                    distances = [str(abs(int(i) - int(variant_gene_first_coordinate))) for i in target_gene_first_coordinate]
+                    distance = ", ".join(distances)
                     if biosample_term in biosample_term_list:
                         links = "&accession=".join(target_gene_accession)
                         accession_ids = ", ".join(target_gene_accession)
