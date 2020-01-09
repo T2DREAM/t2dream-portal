@@ -102,16 +102,15 @@ bootcmd:
 - MEMGIGS=$(awk '/MemTotal/{printf "%%.0f", $2 / 1024**2}' /proc/meminfo)
 - if [ "$MEMGIGS" -gt 32 ]
 - then
--    echo "ES_HEAP_SIZE=8g" > /etc/default/elasticsearch
+-    echo "ES_HEAP_SIZE=16g" > /etc/default/elasticsearch
 - elif [ "$MEMGIGS" -gt 12 ]
 - then
--    echo "ES_HEAP_SIZE=4g" > /etc/default/elasticsearch
+-    echo "ES_HEAP_SIZE=8g" > /etc/default/elasticsearch
 - else
--    echo "ES_HEAP_SIZE=2g" > /etc/default/elasticsearch
+-    echo "ES_HEAP_SIZE=4g" > /etc/default/elasticsearch
 -    sysctl "vm.swappiness=1"
 -    swapon /swapfile
 - fi
-
 
 package_upgrade: true
 
@@ -171,8 +170,6 @@ runcmd:
 - sudo chmod 755 /usr/lib/jvm
 - sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_211/bin/java 100
 - update-rc.d elasticsearch defaults
-- sudo bash /etc/elasticsearch/cluster.sh %(CLUSTER_NAME)s
-- sudo /usr/share/elasticsearch/bin/plugin install elasticsearch/elasticsearch-cloud-aws/2.7.1
 - service elasticsearch start
 - chown postgres:postgres /etc/postgresql/9.3/main/*.conf
 - echo "include 'custom.conf'" >> /etc/postgresql/9.3/main/postgresql.conf
@@ -197,12 +194,13 @@ runcmd:
 - sudo -u postgres virtualenv --python=python2.7 /opt/wal-e
 - sudo -u postgres /opt/wal-e/bin/pip install -r wal-e-requirements.txt
 #- /etc/init.d/postgresql stop
-#- sudo -u postgres /opt/wal-e/bin/wal-e --aws-instance-profile --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix)" backup-fetch /var/lib/postgresql/9.3/main base_0000000B0000008A0000003D_00000040
+#- sudo -u postgres /opt/wal-e/bin/wal-e --aws-instance-profile --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix)" backup-fetch /var/lib/postgresql/9.3/main LATEST KG - causing issues
 #- sudo -u postgres ln -s /etc/postgresql/9.3/main/recovery.conf /var/lib/postgresql/9.3/main/
 - /etc/init.d/postgresql start
-- sudo pip3 install -U zc.buildout setuptools==43
+- sudo pip3 install -U zc.buildout setuptools
 - sudo -u encoded buildout bootstrap
-- sudo -u encoded LANG=en_US.UTF-8 bin/buildout -c %(ROLE)s.cfg production-ini:region_search_instance=localhost:9200
+#- sudo -u encoded LANG=en_US.UTF-8 bin/buildout -c %(ROLE)s.cfg KG - issues with build using encoded?
+- sudo LANG=en_US.UTF-8 bin/buildout
 - sudo -u encoded bin/aws s3 cp --recursive s3://t2depi-conf-prod/.aws .aws
 - until sudo -u postgres psql postgres -c ""; do sleep 10; done
 - sudo -u encoded sh -c 'cat /dev/urandom | head -c 256 | base64 > session-secret.b64'
@@ -224,7 +222,7 @@ runcmd:
 - a2disconf localized-error-pages
 - a2disconf other-vhosts-access-log
 - a2disconf serve-cgi-bin
-- if test "%(ROLE)s" = "demo"
+- if test "%(ROLE)s" = "demox"
 - then
 -   sudo -i -u encoded bin/batchupgrade production.ini --app-name app
 - fi
@@ -244,6 +242,8 @@ runcmd:
 # - sudo -i -u postgres /opt/wal-e/bin/envfile --config ~postgres/.aws/credentials --section default --upper -- /opt/wal-e/bin/wal-e --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix)" backup-push /var/lib/postgresql/9.3/main
 # - sleep 60
 # - sudo -i -u encoded PATH="/usr/share/elasticsearch/bin:/usr/lib/postgresql/9.3/bin:$PATH" bin/test -m "not bdd" > tests.out
+# - sudo echo "00 7 * * * sudo -i -u postgres /opt/wal-e/bin/envfile --config ~postgres/.aws/credentials --section default --upper -- /opt/wal-e/bin/wal-e --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix)" backup-push /var/lib/postgresql/9.3/main" > /home/ubuntu/wal-e-backup
+# - sudo crontab /home/ubuntu/wal-e-backup
 
 users:
 - default
@@ -270,7 +270,7 @@ write_files:
     Unattended-Upgrade::Allowed-Origins {
         "${distro_id} ${distro_codename}-security";
     };
-    Unattended-Upgrade::Mail "pkudtarkar@ucsd.edu";
+    Unattended-Upgrade::Mail "kgaulton@ucsd.edu";
     Unattended-Upgrade::Automatic-Reboot "false";
 
 - path: /etc/cron.d/cloudwatchmon
@@ -282,32 +282,6 @@ write_files:
     index.search.slowlog.threshold.query.warn: 8s
     index.search.slowlog.threshold.fetch.warn: 1s
     index.indexing.slowlog.threshold.index.warn: 25s
-    network.host: 0.0.0.0
-    action.auto_create_index: false
-    index.mapper.dynamic: false
-    node.master: true
-    node.data: false
-
-    discovery:
-        type: ec2
-
-    cloud.aws.region: us-west-2
-
-    discovery.ec2.groups: elasticsearch-https, ssh-http-https
-
-    # discovery.zen.minimum_master_nodes: 2
-
-- path: /etc/elasticsearch/cluster.sh
-  content: |
-    #!/bin/bash
-    name=$1
-    
-    if [[ -n "$name" ]]; then
-        echo "cluster.name: $name" >> /etc/elasticsearch/elasticsearch.yml
-    else
-        echo "argument error"
-    fi
-
 
 - path: /etc/postgresql/9.3/main/custom.conf
   content: |
