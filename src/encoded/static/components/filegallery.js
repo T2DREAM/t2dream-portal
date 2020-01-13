@@ -1447,7 +1447,7 @@ const FileGalleryRenderer = createReactClass({
 	const assay = context['@id'];
 	const proposedStatus = context.status === 'proposed';
 	const cellBrowser = 'https://www.browser.t2depigenome.org/CellBrowser/index.html';
-	const genomeBrowser = 'https://www.t2depigenome.org/search/?type=File&dataset=' + context['@id'] + '&file_format=bigWig&&file_format=bigBed&status=uploading&assembly=hg19';
+	const genomeBrowser = 'https://www.diabetesepigenome.org/search/?type=File&dataset=' + context['@id'] + '&file_format=bigWig&&file_format=bigBed&status=uploading&assembly=hg19';
         const files = (data ? data['@graph'] : []).concat(this.state.relatedFiles); // Array of searched files arrives in data.@graph result
         if (files.length === 0) {
             return null;
@@ -1546,7 +1546,7 @@ const FileGalleryRenderer = createReactClass({
 	    {loggedIn ?
 	    <div style={{'height': '800px'}}>
             {context.visualize ?
-	              <Iframe url={'https://www.browser.t2depigenome.org/browser-slim/?genome=' + selectedAssembly + '&hub=https://www.t2depigenome.org' + assay + '@@hub/' + selectedAssembly + '/jsonout/trackDb.json'} height="450px" width="1140px" />
+	              <Iframe url={'https://www.browser.t2depigenome.org/browser-slim/?genome=' + selectedAssembly + '&hub=https://diabetesepigenome.org' + assay + '@@hub/' + selectedAssembly + '/jsonout/trackDb.json'} height="450px" width="1140px" />
 	     : <p className="browser-error">Files must be in bigBed or bigWig file format to be visualized on Epigenome Browser</p> }
              </div>
 	     : <p className="browser-error">Your account is not allowed to view this page. Please sign in to view this page.</p> }
