@@ -464,7 +464,7 @@ def variant_graph_new(context, request):
                 start = int('{}'.format(hit['_source']['start']))
                 stop = int('{}'.format(hit['_source']['end']))
                 state = '{}'.format(hit['_source']['state'])
-                new_state = state.split('_', 1)[0].replace('.', '').upper()
+                new_state = state.split('_', 1)[-1].replace('.', '').upper()
                 val = '{}'.format(hit['_source']['val'])
                 file_accession = file_json['accession']
                 annotation_accession = annotation_json['accession']
@@ -522,7 +522,7 @@ def variant_graph_new(context, request):
                 start = int('{}'.format(hit['_source']['start']))
                 stop = int('{}'.format(hit['_source']['end']))
                 state = '{}'.format(hit['_source']['state'])
-                new_state = state.split('_', 1)[0].replace('.', '').upper()
+                new_state = state.split('_', 1)[-1].replace('.', '').upper()
                 val = '{}'.format(hit['_source']['val'])
                 file_accession = file_json['accession']
                 annotation_accession = annotation_json['accession']
