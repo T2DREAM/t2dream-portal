@@ -135,6 +135,8 @@ http://ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com/_indexer
 * Create base backup from production machine and schdeule corn jobs to backup postgresdb
 https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/database-backup-retrievals.md#wal-backup
 
+Finally online!
+
 **Notes**
 
 ES best practice 
@@ -147,4 +149,4 @@ https://www.datadoghq.com/blog/elasticsearch-unassigned-shards/
 
 Reference - https://github.com/ENCODE-DCC/encoded/blob/dev/docs/aws-deployment.rst
 
-Finally online!
+
