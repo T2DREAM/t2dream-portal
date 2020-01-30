@@ -3,26 +3,6 @@
 Purpose: Wal-e for continous archiving PostgreSQL WAL files and base backups.
 
 **Step 1**
-Create t2depi-backups bucket. Properties under Versioning Menu **Enable Versioning**
-
-TBD - create backup bucket in different region, in case there is a failure in primary database region??
-
-**Step 2**
-
-Install wal-e
-
-```
-sudo apt-get -y update
-sudo apt-get -y install daemontools python-dev lzop pv
-curl -O https://bootstrap.pypa.io/get-pip.py
-sudo python get-pip.py
-export LC_ALL=C
-sudo pip install -U six
-sudo pip install -U requests
-sudo pip install wal-e
-```
-
-**Step 3**
 
 Configure PostgreSQL
 
@@ -44,7 +24,7 @@ archive_command = '/opt/wal-e/bin/envfile --config /home/ubuntu/.aws/credentials
 p"'
 
 Restart postgres
-**Step 4**
+**Step 2**
 
 Create base backup
 
@@ -53,7 +33,7 @@ sudo -i -u postgres /opt/wal-e/bin/envfile --config /home/ubuntu/.aws/credential
 h /var/lib/postgresql/9.3/main
 ```
 
-**Step 5**
+**Step 3**
 
 Schedule base-backup
 
@@ -70,11 +50,8 @@ The cron job will be triggered daily at 1 am(PST)
 
 **Purpose: Move database across production server (new release/updates)**
 
+
 **Step 1**
-
-Install wal-e on new production server see: wal backup step 2
-
-**Step 2**
 
 Stop PostgreSQL server and remove data directory
 
@@ -83,7 +60,7 @@ sudo service postgresql stop
 sudo rm -rf /var/lib/postgresql/9.3/main
 ```
 
-**Step 3**
+**Step 2**
 
 Fetch latest wal-e backup
 
@@ -103,7 +80,7 @@ wal_e.worker.s3.s3_worker INFO     MSG: beginning partition download
         STRUCTURED: time=2017-07-18T23:27:08.274393-00 pid=4541
 
 
-**Step 4**
+**Step 3**
 
 Change postgres recovery.conf to include command that runs during recovering
 
@@ -115,7 +92,7 @@ Add to recovery.conf
 restore_command = '/opt/wal-e/bin/wal-e --aws-instance-profile --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix)" wal-fetch "%f" "%p"'
 
 
-**Step 5**
+**Step 4**
 
 Start PostgreSQL and reboot the instance
 
