@@ -103,16 +103,15 @@ https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/database-back
 Once wal backups are retrived indexing to ES datastore initiates 
 
 * Create and login https://auth0.com/ for authentication and login for autheticated users (AMP consortium members)
-- Create auth0 application (react, application type: single page) 
-- Add the web url to allowed callback urls, allowed web origins and CORS
+1. Create auth0 application (react, application type: single page) 
+2. Add the web url to allowed callback urls, allowed web origins and CORS
 
 ![](https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/auth0.png)
 
-- Enable AWS add on
-
-- Configure and enable connections for GMAIL(google account), Facebook, Twitter etc. so that user can login using these accounts 
+3. Enable AWS add on
+4. Configure and enable connections for GMAIL(google account), Facebook, Twitter etc. so that user can login using these accounts 
 https://auth0.com/docs/dashboard/guides/connections/set-up-connections-social
-- Check if you can login using your social media accounts
+5. Check if you can login using your social media accounts
 
 * Complete indexing (as of January 2020) takes ~1 hour to index assays, pages, biosamples, annotations and everything else ~30 hours for indexing .bed files for variant search (since indexing of internal hits is slow) 
 
