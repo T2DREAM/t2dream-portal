@@ -13,7 +13,7 @@ git clone https://github.com/T2DREAM/t2dream-portal.git
 
 For production:
 
-Navigate to t2dream-portal local directory and master node
+Navigate to t2dream-portal local directory and launch master node
 
 ```
 bin/deploy --cluster-name vX-cluster --profile-name production --candidate --n vX-master --instance-type c5.9xlarge
