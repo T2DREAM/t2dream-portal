@@ -94,7 +94,7 @@ restore_command = '/opt/wal-e/bin/wal-e --aws-instance-profile --s3-prefix="$(ca
 
 **Step 4**
 
-Start PostgreSQL and reboot the instance
+Start PostgreSQL and **Reboot the server (master and cluster nodes via. aws console)!**
 
 sudo service postgresql start
 
@@ -127,7 +127,7 @@ FD 00000040
 
 In the backup-fetch replace LATEST argument with the base backup name from backup-list to roll back to previous backup versions.
 
-**Very Important: Reboot the server!**
+
 
 
 
