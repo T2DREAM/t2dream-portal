@@ -121,6 +121,14 @@ On web browser check -
 http://ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com/_indexer
 
 * Attach elastic ip for production server after compelete indexing
+* Redirect everything to https - add following config to apache.conf file on master node server
+```
+<VirtualHost *:80>
+    RewriteEngine on
+    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+```
+
 * Install security cert on master node https://certbot.eff.org/lets-encrypt/ubuntutrusty-apache
 * Size down master c5.9xlarge to c5.4xlarge(not recommended though)
 
