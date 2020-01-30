@@ -1,7 +1,7 @@
 
 ## Workflow to deploy database on cloud in cluster mode
 
-This will launch the elastic search and indexing in cluster mode to accomodate large datasets and meet computational demands. Needed for production and upload (demo) machines. The cluster node has only elasticsearch (for indexing & searching) and the master node runs python codebase 
+This will launch the elastic search and indexing in cluster mode to accomodate large datasets and meet computational demands. Needed for production. The cluster node has only elasticsearch (for indexing & searching) and the master node runs python codebase 
 
 **Deploy to AWS instance:**
 
@@ -13,28 +13,46 @@ git clone https://github.com/T2DREAM/t2dream-portal.git
 
 For production:
 
-Navigate to t2dream-portal local directory and launch cluster nodes
+Navigate to t2dream-portal local directory and master node
 
 ```
-bin/deploy --elasticsearch yes --cluster-name vX-cluster --cluster-size 4 --profile-name production --name vX-cluster --instance-type m4.xlarge
+bin/deploy --cluster-name vX-cluster --profile-name production --candidate --n vX-master --instance-type c5.9xlarge
 ```
 
 Launch cluster nodes
 
 ```
-bin/deploy --cluster-name vX-cluster --profile-name production --candidate --n vX-master --instance-type c4.8xlarge
+bin/deploy --elasticsearch yes --cluster-name vX-cluster --cluster-size 3 --profile-name production --name vX-cluster --instance-type c5.xlarge
+
 ```
 
 Note: *X is the instance version*
+
 Ensure the --cluster-name for launching cluster nodes and master node is same
 
 Go to AWS console, check cluster nodes and master nodes running
 
+*Important:* Open security groups elasticsearch-https (for elasticsearch cluster mode), ssh-http-https and t2dkp (for REST_API connection) for master and all the cluster nodes individually via. AWS console.
+
 Select public DNS for the master node just deployed, e.g.:
 ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com (each time will be different DNS)
 
-Login to instance to check status of installation:
+Login to master instance to check status of installation:
 ssh ubuntu@ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com
+
+View progress:
+```
+tail -f /var/log/cloud-init-output.log
+```
+
+Usually runs without any errors, errors encountered only when modules/dependecies are deprecated
+
+* The master server should automatically reboot after installation is complete
+* Going to the URL od master node http://ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com should return the homepage
+
+Login to master node instance to add easticsearch replicas:
+ssh ubuntu@ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com
+
 
 https://www.elastic.co/guide/en/elasticsearch/guide/current/distributed-cluster.html
 
@@ -78,80 +96,37 @@ curl localhost:9200/_cluster/health?pretty
 }
 ```
 
-On cluster instance
-```
-{
-  "cluster_name" : "v6-cluster",
-  "status" : "green",
-  "timed_out" : false,
-  "number_of_nodes" : 5,
-  "number_of_data_nodes" : 4,
-  "active_primary_shards" : 102,
-  "active_shards" : 204,
-  "relocating_shards" : 0,
-  "initializing_shards" : 0,
-  "unassigned_shards" : 0,
-  "delayed_unassigned_shards" : 0,
-  "number_of_pending_tasks" : 0,
-  "number_of_in_flight_fetch" : 0
-}
-```
+* This retrieves the latest wal backups (during installation process) - required for production
+https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/database-backup-retrievals.md#wal-retrivals
 
-Note: *Security groups elasticsearch-https and ssh-http-https should open for the cluser instances*
-
-View progress:
-```
-tail -f /var/log/cloud-init-output.log
-```
-
-Usually runs without any errors, errors encountered only when modules/dependecies are deprecated
-
-* The master server should automatically reboot after installation is complete
-* Going to the URL http://ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com should return the homepage
-* This retrieves the latest wal backups (during installation process) - required for demo and production
 * Initiates indexing
+Once wal backups are retrived indexing to ES datastore initiates 
 
-Check logs on master
+* Create and login https://auth0.com/ for authentication and login for autheticated users (AMP consortium members)
+- Create auth0 application (react, application type: single page) 
+- Add the web url to allowed callback urls, allowed web origins and CORS
 
-```
-tail /var/log/apache2/error.logs
-```
+![](https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/auth0.png)
 
-check indexing on cluster nodes
-```
-sudo tail /var/log/elasticsearch/v6-cluster_index_indexing_slowlog.log
-```
+- Enable AWS add on
 
-* Complete indexing (as of May 18th 2018) takes ~24 hours (while indexing is in-progress check logs for errors)
+- Configure and enable connections for GMAIL(google account), Facebook, Twitter etc. so that user can login using these accounts 
+https://auth0.com/docs/dashboard/guides/connections/set-up-connections-social
+- Check if you can login using your social media accounts
 
-After indexing -
-* For production send email to t2dream-l@mailman.ucsd.edu notifying downtime (current downtime - )
-* Wait for /_indexer snapshot on new instance to match snapshot on old instance (both should be status: "waiting" and recovery: true)
-```
-echo "include 'demo.conf'" | sudo tee -a /etc/postgresql/9.3/main/postgresql.conf
-```
-```
-sudo pg_ctlcluster 9.3 main reload
-```
-```
-sudo pg_ctlcluster 9.3 main promote
-```
-```
-cd /srv/encoded
+* Complete indexing (as of January 2020) takes ~1 hour to index assays, pages, biosamples, annotations and everything else ~30 hours for indexing .bed files for variant search (since indexing of internal hits is slow) 
 
-sudo -i -u encoded bin/batchupgrade production.ini --app-name app
-```
-* Attach elastic ip for demo (data upload server) and production server after compelete indexing
-* Install security cert https://certbot.eff.org/lets-encrypt/ubuntutrusty-apache
-* Size down master c2.8xlarge to c2.4xlarge(not recommended though)
-* For Demo create and schedule wal backups (at 6pm daily)
+* Wait for /_indexer snapshot on new instance to match snapshot on old instance (both should be status: "waiting")
 
-https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/database-backup-retrievals.md
+On web browser check -  
+http://ec2-xx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com/_indexer
 
+* Attach elastic ip for production server after compelete indexing
+* Install security cert on master node https://certbot.eff.org/lets-encrypt/ubuntutrusty-apache
+* Size down master c5.9xlarge to c5.4xlarge(not recommended though)
 
-
-
-
+* Create base backup from production machine and schdeule corn jobs to backup postgresdb
+https://github.com/T2DREAM/t2dream-portal/blob/master/t2dream_docs/database-backup-retrievals.md#wal-backup
 
 ES best practice 
 https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started.html
