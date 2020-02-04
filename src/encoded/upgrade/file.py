@@ -265,7 +265,8 @@ def file_4_5(value, system):
         'WaveSignal': 'wavelet-smoothed signal',
         'signal p-value': 'signal p-value',
         'fold change over control': 'fold change over control',
-
+        
+        'gene read counts': 'gene read counts',
         'enrichment': 'enrichment',
         'exon quantifications': 'exon quantifications',
         'ExonsDeNovo': 'exon quantifications',

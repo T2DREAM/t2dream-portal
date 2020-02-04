@@ -651,6 +651,7 @@
                         "fold change over control",
                         
                         "exon quantifications",
+			"gene read counts",
                         "gene quantifications",
                         "microRNA quantifications",
                         "transcript quantifications",
@@ -720,8 +721,7 @@
 
 			"matrix eQTL results",
 			
-			"RPKM counts matrix",
-			"gene read counts"
+			"RPKM counts matrix"
                     ]
                 },
                 {
@@ -1057,6 +1057,7 @@
         "enrichment": "quantification",
         "library fraction": "quantification",
         "exon quantifications": "quantification",
+	"gene read counts": "quantification",
         "gene quantifications": "quantification",
         "microRNA quantifications": "quantification",
         "transcript quantifications": "quantification",

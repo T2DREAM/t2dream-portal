@@ -1,5 +1,7 @@
 ## Changelog for file.json
 
+### Minor changes version 11
+* output_types: "gene read count" enumerations are categorized as "quantification".
 ### Schema version 11
 
 * added bed_file_state to describe name and score field in bed file

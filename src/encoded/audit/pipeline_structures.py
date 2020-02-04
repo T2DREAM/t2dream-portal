@@ -131,6 +131,7 @@ class encode_rampage_experiment_replicate(basic_experiment):
     def __init__(self):
         basic_experiment.__init__(self)
         self.file_types[('tsv', 'gene quantifications')] = None
+        self.file_types[('tsv', 'gene read counts')] = None
         self.file_types[('bed', 'transcription start sites')] = None
         self.file_types[('gff', 'transcription start sites')] = None
         self.file_types[('bigBed', 'transcription start sites')] = None
