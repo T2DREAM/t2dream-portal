@@ -1,7 +1,7 @@
 
 ## Peak indexing
 
-The "peaks" which is essentially an interval in a BED file are kept in a separate index per chromosome. Each peak (line of BED file) is indexed as {file-uuid, chr, start, stop, state, value}. DGA variant search tool indexes and display Peaks that intersect - coordinates, state and value, Files that created those peaks (bed), Annotations with facets that those files belong to. Currently annotation bed files for annnotation type chromatin state, accessible chromatin, gene expression,  variant allelic,  target gene predictions, eQTL for genome assemblies GRCh38 and hg19 are indexed and displayed on variant search page.
+The "peaks" which is essentially an interval in a BED file are kept in a separate index per chromosome. Each peak (line of BED file) is indexed as {file-uuid, chr, start, stop, state, value}. DGA variant search tool indexes and display Peaks that intersect - coordinates, state and value, Files that created those peaks (bed), Annotations with facets that those files belong to. Currently annotation bed files for annnotation type chromatin state, accessible chromatin, gene expression,  variant allelic,  target gene predictions, eQTL for genome assemblies GRCh38 and hg19 are indexed and region that overlaps the searched variant is displayed on variant search page.
 
 ```
 # hashmap of aannotations and corresponding file types that are being indexed                                                                                
