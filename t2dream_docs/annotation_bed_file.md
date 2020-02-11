@@ -35,6 +35,7 @@ _ASSEMBLIES = ['hg19', 'GRCh38']
 
 
 **General format for annotation bed files** 
+
 Since first five columns of bed files are indexed, the first 5 columns of BED file require standard format http://genome.ucsc.edu/FAQ/FAQformat#format1 
 
 BED file Headers:
