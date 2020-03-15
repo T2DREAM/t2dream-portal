@@ -80,6 +80,7 @@
                 "ENCODE4",
                 "GGR",
 		"AMP",
+		"HPAP",
                 "Roadmap",
                 "modENCODE",
                 "modERN",
@@ -95,6 +96,7 @@
                 "GGR",
                 "Roadmap",
 		"AMP",
+		"HPAP",
                 "modENCODE",
                 "modERN",
                 "community"
@@ -109,6 +111,7 @@
                 "ENCODE4",
                 "GGR",
 		"AMP",
+		"HPAP",
 		"gaulton-lab-internal",
 		"ren-lab-internal",
 		"reviwer",

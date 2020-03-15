@@ -605,6 +605,7 @@ def audit_file_chip_seq_control_read_depth(value, system,
                                                          'ENCODE2-Mouse',
                                                          'ENCODE2',
                                                          'ENCODE',
+                                                         'HPAP',
                                                          'AMP-T2D',
                                                          'Roadmap')):
     '''

@@ -195,6 +195,7 @@
             "enum": [
 		"AMP-T2D consortium",
                 "ENCODE",
+		"HPAP",
                 "mouseENCODE",
                 "modENCODE",
                 "Roadmap",

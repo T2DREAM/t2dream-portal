@@ -21,6 +21,8 @@ def groupfinder(login, request):
         elif localname in ['TEST_AUTHENTICATED']:
             return ['viewing_group.AMP-gaulton-lab-internal']
         elif localname in ['TEST_AUTHENTICATED']:
+            return ['viewing_group.HPAP']
+        elif localname in ['TEST_AUTHENTICATED']:
             return ['viewing_group.reviwer']
 
     if namespace in ('mailto', 'remoteuser', 'auth0'):
