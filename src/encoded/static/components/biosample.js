@@ -482,6 +482,7 @@ var BiosampleTermId = createReactClass({
     // Specific term IDs are appended to these after converting ':' to '_'.
     urlMap: {
         'EFO': 'http://www.ebi.ac.uk/efo/',
+	'BTO': 'http://www.ontobee.org/ontology/BTO?iri=http://purl.obolibrary.org/obo/',
         'UBERON': 'http://www.ontobee.org/ontology/UBERON?iri=http://purl.obolibrary.org/obo/',
         'CL': 'http://www.ontobee.org/ontology/CL?iri=http://purl.obolibrary.org/obo/'
     },
