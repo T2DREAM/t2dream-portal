@@ -75,10 +75,21 @@
                 "transcript expression",
                 "validated enhancers",
                 "variant calls",
-		"target gene predictions",
+		"Chromatin interaction target genes",
+		"Coaccessible target genes",
 		"variant allelic effects",
                 "overlap",
                 "other"
+            ]
+        },
+	"annotation_type_category": {
+            "title": "Category",
+            "description": "The category that best describes the annotation sub-set.",
+            "type": "string",
+            "enum": [
+	    "pCHi-C",
+	    "Hi-C",
+	    "other"
             ]
         },
         "encyclopedia_version": {
@@ -191,6 +202,9 @@
     "facets": {
         "annotation_type": {
             "title": "Annotation type"
+        },
+	"annotation_type_category": {
+	"title": "Annotation type Category"
         },
         "files.replicate.experiment.assay_term_name": {
             "title": "Assay"

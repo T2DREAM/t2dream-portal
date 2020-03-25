@@ -719,6 +719,8 @@
 
                         "blacklisted regions",
                         "mitochondria blacklisted regions",
+			
+			"mapping quality thresholded chromatin interactions",
 
 			"matrix eQTL results",
 			

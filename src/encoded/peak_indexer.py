@@ -35,7 +35,10 @@ _INDEXED_DATA = {
     'variant allelic effects': {
         'output_type': ['variant calls']
         },
-    'target gene predictions': {
+    'Coaccessible target genes': {
+        'file_type': ['bed bed3+']
+        },
+    'Chromatin interaction target genes': {
         'file_type': ['bed bed3+']
         },
     'binding sites': {
