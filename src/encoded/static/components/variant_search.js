@@ -243,14 +243,13 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 		      </DropdownMenu>
 		      </DropdownButton>
 		      : null}
-                     {loggedIn ? <a className="btn btn-info btn-sm" target = "_blank" href = { 'https://www.browser.t2depigenome.org/browser-slim/?genome=' + assembly + '&position=' + chromosome +':' +start + '-' + end + '&hub=https://www.t2depigenome.org/batch_hub/region,,' +  kp + '|genome,,' + genome +'/' + genome + '/trackDb.json' }>Epigenome Browser <span className="beta-badge">BETA</span></a> : null}
 		     <a className="btn btn-info btn-sm" target = "_blank" href = { `${domain}${kp}` }>Knowledge Portal</a>
 		     
 </div>
 </div> 
                                   <hr />
 		                  <Panel>
-		                  <TabPanel tabs={{ table: <h5> Results </h5>, graph: <h5> Variant Network </h5> , browser: 'Epigenome Browser'? <h5> Epigenome Browser  <span className="beta-badge">BETA</span> </h5> : null }}>
+		                  <TabPanel tabs={{ table: <h5> Results </h5>, graph: <h5> Variant Network </h5> }}>
                                   <TabPanelPane key="table">
                                   <ul className="nav result-table" id="result-table">
                                       {results.map(function (result) {
@@ -284,13 +283,6 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 						      <FileGallery context={context} session={this.context.session} />
 						    
                                           </TabPanelPane>
-		                          <TabPanelPane key="browser">
-		                          {loggedIn ?
-		                          <div style={{'height': '800px'}}>
-                                          <Iframe url={'https://www.browser.t2depigenome.org/browser-slim/?genome=' + assembly + '&position=' + chromosome +':' +start + '-' + end +'&hub=https://www.t2depigenome.org/batch_hub/region,,' +  kp + '|genome,,' + genome +'/' + genome + '/trackDb.json'} height="680px" width="100%" />
-                                          </div>
-					   : <p className="browser-error">Your account is not allowed to view this page. Please sign in to view this page.</p> }
-                                    </TabPanelPane>
                                           </TabPanel>
                                           </Panel>
                                 </div>

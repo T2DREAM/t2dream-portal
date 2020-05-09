@@ -28,12 +28,12 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 # NOTE: Caching is turned on and off with this global AND TRACKHUB_CACHING in peak_indexer.py
-USE_CACHE = False  # Use elasticsearch caching of individual acc_composite blobs
+USE_CACHE = True  # Use elasticsearch caching of individual acc_composite blobs
 
-# GRCh38 datahub url for epigenome browser 02-08-2019
+
 _ASSEMBLY_MAPPER = {
     'GRCh38-minimal': 'hg38',
-    'GRCh38': 'GRCh38',
+    'GRCh38': 'hg38',
     'GRCh37': 'hg19',
     "hg18": 'hg18',
     'mm10-minimal': 'mm10',
@@ -50,7 +50,6 @@ _ASSEMBLY_MAPPER_FULL = {
                         'ucsc_assembly':    'hg38',
                         'ensembl_host':     'www.ensembl.org',
                         'quickview':        True,
-                        'epigenomebrowser': 'GRCh38',
                         'comment':          'Ensembl works'
     },
     'hg18':         {   'species':          'Homo sapiens',     'assembly_reference': 'GRCh18',
@@ -58,14 +57,11 @@ _ASSEMBLY_MAPPER_FULL = {
                         'ucsc_assembly':    'hg18',
                         'ensembl_host':     'www.ensembl.org',
                         'quickview':        True,
-                        'epigenomebrowser': True,
                         'comment':          'Ensembl works'
     },
     'GRCh38-minimal': { 'species':          'Homo sapiens',     'assembly_reference': 'GRCh38',
                         'common_name':      'human',
                         'ucsc_assembly':    'hg38',
-                        'quickview':        True,
-                        'epigenomebrowser': 'GRCh38',
                         'ensembl_host':     'www.ensembl.org',
     },
     'hg19': {           'species':          'Homo sapiens',     'assembly_reference': 'GRCh37',
@@ -73,13 +69,13 @@ _ASSEMBLY_MAPPER_FULL = {
                         'ucsc_assembly':    'hg19',
                         'NA_ensembl_host':  'grch37.ensembl.org',
                         'quickview':        True,
-                        'epigenomebrowser':        True,
                         'comment':          'Ensembl DOES NOT WORK'
     },
     'mm10': {           'species':          'Mus musculus',     'assembly_reference': 'GRCm38',
                         'common_name':      'mouse',
                         'ucsc_assembly':    'mm10',
                         'ensembl_host':     'www.ensembl.org',
+                        'quickview':        True,
                         'comment':          'Ensembl works'
     },
     'mm10-minimal': {   'species':          'Mus musculus',     'assembly_reference': 'GRCm38',
@@ -138,10 +134,9 @@ _ASSEMBLY_MAPPER_FULL = {
 def includeme(config):
     config.add_route('batch_hub', '/batch_hub/{search_params}/{txt}')
     config.add_route('batch_hub:trackdb', '/batch_hub/{search_params}/{assembly}/{txt}')
-    config.add_route('browser_hub', '/browser_hub/{search_params}/{txt}')
-    config.add_route('browser_hub:trackdb', '/browser_hub/{search_params}/{assembly}/{txt}')
     config.add_route('index-vis', '/index-vis')
     config.scan(__name__)
+
 
 PROFILE_START_TIME = 0  # For profiling within this module
 
@@ -152,10 +147,10 @@ HUB_TXT = 'hub.txt'
 TRACKDB_TXT = 'trackDb.txt'
 BIGWIG_FILE_TYPES = ['bigWig']
 BIGBED_FILE_TYPES = ['bigBed']
-HIC_FILE_TYPES = ['hic']
-VISIBLE_DATASET_STATUSES = ["released", "proposed"]
+
+VISIBLE_DATASET_STATUSES = ["released"]
 QUICKVIEW_STATUSES_BLOCKED = ["proposed", "started", "deleted", "revoked", "replaced"]
-VISIBLE_FILE_STATUSES = ["released","uploading","restricted"]
+VISIBLE_FILE_STATUSES = ["released"]
 VISIBLE_DATASET_TYPES = ["Experiment", "Annotation"]
 VISIBLE_DATASET_TYPES_LC = ["experiment", "annotation"]
 VISIBLE_ASSEMBLIES = ['hg19', 'GRCh38', 'mm10', 'mm10-minimal' ,'mm9','dm6','dm3','ce10','ce11']
@@ -250,9 +245,8 @@ def lookup_token(token, dataset, a_file=None):
     if token in SIMPLE_DATASET_TOKENS:
         term = dataset.get(token[1:-1])
         if term is None:
-            term = token[1:-1].split('_')[0].capitalize()
+            term = "Unknown " + token[1:-1].split('_')[0].capitalize()
         return term
-    # test
     elif token == "{experiment.accession}":
         return dataset['accession']
     elif token in ["{target}", "{target.label}", "{target.name}", "{target.title}"]:
@@ -499,7 +493,46 @@ def lookup_vis_defs(vis_type):
     return vis_def
 
 
-SUPPORTED_SUBGROUPS = ["Biosample", "Targets", "Assay", "Replicates", EXP_GROUP]
+PENNANTS = {
+    "Diabetes Epigenome Atlas":     ("https://www.t2depigenome.org/static/img/logo.png "
+                  "t2depigenome.org/ "
+                  "\"This trackhub was automatically generated from the files and metadata found "
+                  "at the T2DREAM portal\""),
+    "ENCODE":    ("https://www.encodeproject.org/static/img/pennant-encode.png "
+                  "https://www.encodeproject.org/ "
+                  "\"This trackhub was automatically generated from the ENCODE files and metadata "
+                  "found at the ENCODE portal\""),
+    "modENCODE": ("https://www.encodeproject.org/static/img/pennant-encode.png "
+                  "https://www.encodeproject.org/ "
+                  "\"This trackhub was automatically generated from the modENCODE files and "
+                  "metadata found at the ENCODE portal\""),
+    "GGR":       ("https://www.encodeproject.org/static/img/pennant-ggr.png "
+                  "https://www.encodeproject.org/ "
+                  "\"This trackhub was automatically generated from  the Genomics of "
+                  "Gene Regulation files files and metadata found at the "
+                  "ENCODE portal\""),
+    "REMC":      ("https://www.encodeproject.org/static/img/pennant-remc.png "
+                  "https://www.encodeproject.org/ "
+                  "\"This trackhub was automatically generated from the Roadmap Epigentics files "
+                  "and metadata found at the ENCODE portal\"")
+    # "Roadmap":   "encodeThumbnail.jpg "
+    #              "https://www.encodeproject.org/ "
+    #              "\"This trackhub was automatically generated from the Roadmap files and "
+    #              "metadata found at https://www.encodeproject.org/\"",
+    # "modERN":   "encodeThumbnail.jpg "
+    #             "https://www.encodeproject.org/ "
+    #             "\"This trackhub was automatically generated from the modERN files and "
+    #             "metadata found at https://www.encodeproject.org/\"",
+    }
+
+
+def find_pennent(dataset):
+    '''Returns an appropriate pennantIcon given dataset's award'''
+    project = dataset.get("award", {}).get("project", "T2DREAM")
+    return PENNANTS.get(project, PENNANTS.get("T2DREAM"))
+
+
+SUPPORTED_SUBGROUPS = ["Biosample", "Targets", "Assay", "Replicates", "Views", EXP_GROUP]
 
 SUPPORTED_TRACK_SETTINGS = [
     "type", "visibility", "longLabel", "shortLabel", "color", "altColor", "allButtonPair", "html",
@@ -508,7 +541,7 @@ SUPPORTED_TRACK_SETTINGS = [
 COMPOSITE_SETTINGS = ["longLabel", "shortLabel", "visibility", "pennantIcon", "allButtonPair",
                       "html"]
 VIEW_SETTINGS = SUPPORTED_TRACK_SETTINGS
-TRACK_SETTINGS = ["url", "longLabel", "shortLabel", "type", "color", "altColor"]
+TRACK_SETTINGS = ["bigDataUrl", "longLabel", "shortLabel", "type", "color", "altColor"]
 
 
 OUTPUT_TYPE_8CHARS = {
@@ -527,7 +560,6 @@ OUTPUT_TYPE_8CHARS = {
     # "raw minus strand signal":"raw -",   # these are all now minus signal of all reads
     # "raw plus strand signal":"raw +",    # these are all now plus signal of all reads
     "raw signal":                           "raw sig",
-    "signal":                               "sig",
     "raw normalized signal":                "nraw",
     "read-depth normalized signal":         "rdnorm",
     "control normalized signal":            "ctlnorm",
@@ -590,6 +622,116 @@ OUTPUT_TYPE_8CHARS = {
     "enhancer validation":                  "enh val",
     "semi-automated genome annotation":     "saga"
     }
+
+BIOSAMPLE_COLOR = {
+    "induced pluripotent stem cell line":       {"color": "80,49,120",
+                                                 "altColor": "107,95,102"},  # Purple
+    "stem cell":        {"color": "0,107,27",    "altColor": "0.0,77,20"},   # Dark Green
+    "GM12878":          {"color": "153,38,0",    "altColor": "115,31,0"},    # Dark Orange-Red
+    "H1-hESC":          {"color": "0,107,27",    "altColor": "0,77,20"},     # Dark Green
+    "K562":             {"color": "46,0,184",    "altColor": "38,0,141"},    # Dark Blue
+    "keratinocyte":     {"color": "179,0,134",   "altColor": "154,0,113"},   # Darker Pink-Purple
+    "HepG2":            {"color": "189,0,157",   "altColor": "189,76,172"},  # Pink-Purple
+    "HeLa-S3":          {"color": "0,119,158",   "altColor": "0,94,128"},    # Greenish-Blue
+    "HeLa":             {"color": "0,119,158",   "altColor": "0,94,128"},    # Greenish-Blue
+    "A549":             {"color": "204,163,0",   "altColor": "218,205,22"},  # Dark Yellow
+    "endothelial cell of umbilical vein":       {"color": "224,75,0",
+                                                 "altColor": "179,60,0"},    # Pink
+    "MCF-7":            {"color": "22,219,206",  "altColor": "18,179,168"},  # Cyan
+    "SK-N-SH":          {"color": "255,115,7",   "altColor": "218,98,7"},    # Orange
+    "IMR-90":           {"color": "6,62,218",    "altColor": "5,52,179"},    # Blue
+    "CH12.LX":          {"color": "86,180,233",  "altColor": "76,157,205"},  # Dark Orange-Red
+    "MEL cell line":    {"color": "46,0,184",    "altColor": "38,0,141"},    # Dark Blue
+    "brain":            {"color": "105,105,105", "altColor": "77,77,77"},    # Grey
+    "eye":              {"color": "105,105,105", "altColor": "77,77,77"},    # Grey
+    "spinal cord":      {"color": "105,105,105", "altColor": "77,77,77"},    # Grey
+    "olfactory organ":  {"color": "105,105,105", "altColor": "77,77,77"},    # Grey
+    "esophagus":        {"color": "230,159,0",   "altColor": "179,125,0"},   # Mustard
+    "stomach":          {"color": "230,159,0",   "altColor": "179,125,0"},   # Mustard
+    "liver":            {"color": "230,159,0",   "altColor": "179,125,0"},   # Mustard
+    "pancreas":         {"color": "230,159,0",   "altColor": "179,125,0"},   # Mustard
+    "large intestine":  {"color": "230,159,0",   "altColor": "179,125,0"},   # Mustard
+    "small intestine":  {"color": "230,159,0",   "altColor": "179,125,0"},   # Mustard
+    "gonad":            {"color": "0.0,158,115", "altColor": "0.0,125,92"},  # Darker Aquamarine
+    "mammary gland":    {"color": "0.0,158,115", "altColor": "0.0,125,92"},  # Darker Aquamarine
+    "prostate gland":   {"color": "0.0,158,115", "altColor": "0.0,125,92"},  # Darker Aquamarine
+    "ureter":           {"color": "204,121,167", "altColor": "166,98,132"},  # Grey-Pink
+    "urinary bladder":  {"color": "204,121,167", "altColor": "166,98,132"},  # Grey-Pink
+    "kidney":           {"color": "204,121,167", "altColor": "166,98,132"},  # Grey-Pink
+    "muscle organ":     {"color": "102,50,200 ", "altColor": "81,38,154"},   # Violet
+    "tongue":           {"color": "102,50,200",  "altColor": "81,38,154"},   # Violet
+    "adrenal gland":    {"color": "189,0,157",   "altColor": "154,0,128"},   # Pink-Purple
+    "thyroid gland":    {"color": "189,0,157",   "altColor": "154,0,128"},   # Pink-Purple
+    "lung":             {"color": "145,235,43",  "altColor": "119,192,35"},  # Mossy green
+    "bronchus":         {"color": "145,235,43",  "altColor": "119,192,35"},  # Mossy green
+    "trachea":          {"color": "145,235,43",  "altColor": "119,192,35"},  # Mossy green
+    "nose":             {"color": "145,235,43",  "altColor": "119,192,35"},  # Mossy green
+    "placenta":         {"color": "153,38,0",    "altColor": "102,27,0"},    # Orange-Brown
+    "extraembryonic structure":                 {"color": "153,38,0",
+                                                 "altColor": "102,27,0"},    # Orange-Brown
+    "thymus":           {"color": "86,180,233",  "altColor": "71,148,192"},  # Baby Blue
+    "spleen":           {"color": "86,180,233",  "altColor": "71,148,192"},  # Baby Blue
+    "bone element":     {"color": "86,180,233",  "altColor": "71,148,192"},  # Baby Blue
+    "blood":            {"color": "86,180,233",  "altColor": "71,148,192"},  # Baby Blue (red?)
+    "blood vessel":     {"color": "214,0,0",     "altColor": "214,79,79"},   # Red
+    "heart":            {"color": "214,0,0",     "altColor": "214,79,79"},   # Red
+    "lymphatic vessel": {"color": "214,0,0",     "altColor": "214,79,79"},   # Red
+    "skin of body":     {"color": "74,74,21",    "altColor": "102,102,44"},   # Brown
+    }
+
+
+def lookup_colors(dataset):
+    '''Using the mask, determine which color table to use.'''
+    color = None
+    altColor = None
+    coloring = {}
+    biosample_term = dataset.get('biosample_type')
+    if biosample_term is not None:
+        if isinstance(biosample_term, list):
+            if len(biosample_term) == 1:
+                biosample_term = biosample_term[0]
+            else:
+                log.debug("%s has biosample_type %s that is unexpectedly a list" %
+                         (dataset['accession'], str(biosample_term)))
+                biosample_term = "unknown"  # really only seen in test data!
+        coloring = BIOSAMPLE_COLOR.get(biosample_term, {})
+    if not coloring:
+        biosample_term = dataset.get('biosample_term_name')
+        if biosample_term is not None:
+            if isinstance(biosample_term, list):
+                if len(biosample_term) == 1:
+                    biosample_term = biosample_term[0]
+                else:
+                    log.debug("%s has biosample_term_name %s that is unexpectedly a list" %
+                             (dataset['accession'], str(biosample_term)))
+                    biosample_term = "unknown"  # really only seen in test data!
+            coloring = BIOSAMPLE_COLOR.get(biosample_term, {})
+    if not coloring:
+        organ_slims = dataset.get('organ_slims', [])
+        if len(organ_slims) > 1:
+            coloring = BIOSAMPLE_COLOR.get(organ_slims[1])
+    if coloring:
+        assert("color" in coloring)
+        if "altColor" not in coloring:
+            color = coloring["color"]
+            shades = color.split(',')
+            red = int(shades[0]) / 2
+            green = int(shades[1]) / 2
+            blue = int(shades[2]) / 2
+            altColor = "%d,%d,%d" % (red, green, blue)
+            coloring["altColor"] = altColor
+
+    return coloring
+
+
+def add_living_color(live_settings, dataset):
+    '''Adds color and altColor.  Note that altColor is only added if color is found.'''
+    colors = lookup_colors(dataset)
+    if colors and "color" in colors:
+        live_settings["color"] = colors["color"]
+        if "altColor" in colors:
+            live_settings["altColor"] = colors["altColor"]
+
 
 def sanitize_char(c, exceptions=['_'], htmlize=False, numeralize=False):
     '''Pass through for 0-9,A-Z.a-z,_, but then either html encodes, numeralizes or removes special
@@ -752,6 +894,14 @@ def handle_negateValues(live_settings, defs, dataset, composite):
     '''If negateValues is set then adjust some settings like color'''
     if live_settings.get("negateValues", "off") == "off":
         return
+
+    # need to swap color and altColor
+    color = live_settings.get("color", composite.get("color"))
+    if color is not None:
+        altColor = live_settings.get("altColor", composite.get("altColor", color))
+        live_settings["color"] = altColor
+        live_settings["altColor"] = color
+
     # view limits need to change because numbers are all negative
     viewLimits = live_settings.get("viewLimits")
     if viewLimits is not None:
@@ -815,6 +965,7 @@ def generate_live_groups(composite, title, group_defs, dataset, rep_tags=[]):
                         live_group["groups"][term_tag]["url"] = term
         live_group["preferred_order"] = "sorted"
         # No tag order since only one
+
     # simple swapping tag and title and creating subgroups set with order
     else:  # "Views", "Replicates", etc:
         # if there are subgroups, they can be handled by recursion
@@ -846,6 +997,7 @@ def generate_live_groups(composite, title, group_defs, dataset, rep_tags=[]):
                 log.debug(json.dumps(live_group, indent=4))
             live_group["group_order"] = tag_order
             live_group["preferred_order"] = preferred_order
+
     return (tag, live_group)
 
 
@@ -948,10 +1100,10 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
         output_types = view.get("output_type", [])
         file_format_types = view.get("file_format_type", [])
         file_format = view["type"].split()[0]
-        #if file_format == "bigBed":
-        #    view["type"] = "bigBed"  # scoreFilter implies score so 6 +
-        #    format_type = view.get('file_format_type','')
-        #log.warn("%d files looking for type %s" % ((len(dataset["files"]),view["type"]))
+        if file_format == "bigBed":
+            view["type"] = "bigBed"  # scoreFilter implies score so 6 +
+            format_type = view.get('file_format_type','')
+        # log.debug("%d files looking for type %s" % (len(dataset["files"]),view["type"]))
         for a_file in dataset["files"]:
             if a_file['status'] not in VISIBLE_FILE_STATUSES:
                 continue
@@ -959,9 +1111,11 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
                 continue
             if len(output_types) > 0 and a_file.get('output_type', 'unknown') not in output_types:
                 continue
-            if len(file_format_types) > 0 and a_file.get('file_format_type', 'unknown') not in file_format_types:
+            if len(file_format_types) > 0 and \
+               a_file.get('file_format_type', 'unknown') not in file_format_types:
                 continue
-            if 'assembly' not in a_file or _ASSEMBLY_MAPPER.get(a_file['assembly'], a_file['assembly']) != ucsc_assembly:
+            if 'assembly' not in a_file or \
+               _ASSEMBLY_MAPPER.get(a_file['assembly'], a_file['assembly']) != ucsc_assembly:
                 continue
             if "rep_tech" not in a_file:
                 rep_tech = rep_for_file(a_file)
@@ -971,7 +1125,7 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             rep_techs[rep_tech] = rep_tech
             files.append(a_file)
     if len(files) == 0:
-        #log.warn("No visualizable files for %s" % (dataset["accession"]))
+        log.debug("No visualizable files for %s %s" % (dataset["accession"], composite["vis_type"]))
         return None
 
     # convert rep_techs to simple reps
@@ -996,10 +1150,14 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             (repgroup_tag, repgroup) = generate_live_groups(composite, "replicate",
                                                             subgroups["replicate"], dataset,
                                                             rep_tags)
+            # Now to hook them into the composite structure
+            composite_rep_group = composite["groups"]["REP"]
+            composite_rep_group["groups"] = repgroup.get("groups", {})
+            composite_rep_group["group_order"] = repgroup.get("group_order", [])
 
     # second pass once all rep_techs are known
     if host is None:
-        host ="https://www.t2depigenome.org"
+        host ="https://t2depigenome.org"
     for view_tag in composite["view"].get("group_order", []):
         view = composite["view"]["groups"][view_tag]
         output_types = view.get("output_type", [])
@@ -1016,25 +1174,53 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
             rep_tech = a_file["rep_tech"]
             rep_tag = rep_techs[rep_tech]
             a_file["rep_tag"] = rep_tag
+
+            if "tracks" not in view:
+                view["tracks"] = []
             track = {}
+            track["name"] = a_file['accession']
             track["type"] = view["type"]
-            track["url"] = "%s%s" % (host,a_file["href"])
-            track["showOnHubLoad"] = True
-            # longLabel = vis_defs.get('file_defs', {}).get('longLabel')
-            longLabel = ("{assay_title} of {biosample_term_name} {output_type}"
+            typetrack = view["type"]
+            s3path = subprocess.check_output('aws s3 ls s3://t2depi-files-dev --recursive | grep {}.{} | cut -c 32-' .format(a_file['accession'],view["type"]),shell=True)
+            s3path1 = s3path.decode('ascii')
+            s3path_final = s3path1.strip()
+            track["bigDataUrl"] = 'https://s3-us-west-2.amazonaws.com/t2depi-files-dev/{}'.format(s3path_final)
+            longLabel = vis_defs.get('file_defs', {}).get('longLabel')
+            if longLabel is None:
+                longLabel = ("{assay_title} of {biosample_term_name} {output_type}"
                              "{biological_replicate_number}")
             longLabel += " {experiment.accession} - {file.accession}"  # Always add the accessions
-            track["name"] = sanitize_label(convert_mask(longLabel, dataset, a_file))
-            
+            track["longLabel"] = sanitize_label(convert_mask(longLabel, dataset, a_file))
+            # Specialized addendum comments because subtle details alway get in the way of elegance.
+            addendum = ""
+            submitted_name = a_file.get('submitted_file_name', "none")
+            if "_tophat" in submitted_name:
+                addendum = addendum + 'TopHat,'
+            if a_file.get('assembly', assembly) == 'mm10-minimal':
+                addendum = addendum + 'mm10-minimal,'
+            if len(addendum) > 0:
+                track["longLabel"] = track["longLabel"] + " (" + addendum[0:-1] + ")"
+
+            metadata_pairs = {}
+            metadata_pairs['file&#32;download'] = ( \
+                '"<a href=\'%s%s\' title=\'Download this file from the T2DREAM portal\'>%s</a>"' %
+                (host, a_file["href"], a_file["accession"]))
+            lab = convert_mask("{lab.title}", dataset)
+            if len(lab) > 0 and not lab.startswith('unknown'):
+                metadata_pairs['laboratory'] = '"' + sanitize_label(lab) + '"'  # 'lab' is UCSC word
+            (rep_key, rep_val) = replicates_pair(a_file)
+            if rep_key != "":
+                metadata_pairs[rep_key] = '"' + rep_val + '"'
+
             # Expecting short label to change when making assay based composites
-            #shortLabel = vis_defs.get('file_defs', {}).get('shortLabel',
-                                                          # "{replicate} {output_type_short_label}")
-            #track["shortLabel"] = sanitize_label(convert_mask(shortLabel, dataset, a_file))
+            shortLabel = vis_defs.get('file_defs', {}).get('shortLabel',
+                                                           "{replicate} {output_type_short_label}")
+            track["shortLabel"] = sanitize_label(convert_mask(shortLabel, dataset, a_file))
 
             # How about subgroups!
             membership = {}
             membership["view"] = view["tag"]
-            # view["tracks"].append(track)  # <==== This is how we connect them to the views
+            view["tracks"].append(track)  # <==== This is how we connect them to the views
             for (group_tag, group) in composite["groups"].items():
                 # "Replicates", "Biosample", "Targets", "Assay", ... member?
                 group_title = group["title"]
@@ -1056,138 +1242,49 @@ def acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, hos
                     # if len(subgroups) == 1:
                     for (subgroup_tag, subgroup) in subgroups.items():
                         membership[group_tag] = subgroup["tag"]
+                        if "url" in subgroup:
+                            metadata_pairs[group_title] = ( \
+                                '"<a href=\'%s/%s/\' TARGET=\'_blank\' title=\'%s details at the T2DREAM portal\'>%s</a>"' %
+                                (host, subgroup["url"], group_title, subgroup["title"]))
+                        elif group_title == "Biosample":
+                            bs_value = sanitize_label(dataset.get("biosample_summary", ""))
+                            if len(bs_value) == 0:
+                                bs_value = subgroup["title"]
+                            biosamples = biosamples_for_file(a_file, dataset)
+                            if len(biosamples) > 0:
+                                for bs_acc in sorted(biosamples.keys()):
+                                    bs_value += ( \
+                                        " <a href=\'%s%s\' TARGET=\'_blank\' title=\' %s details at the T2DREAM portal\'>%s</a>" %
+                                        (host, biosamples[bs_acc]["@id"], group_title,
+                                                  bs_acc))
+                            metadata_pairs[group_title] = '"%s"' % (bs_value)
+                        else:
+                            metadata_pairs[group_title] = '"%s"' % (subgroup["title"])
                 else:
                     assert(group_tag == "Don't know this group!")
-            track["metadata"] = membership
+
+            # plumbing for ihec:
+            if 'pipeline' not in composite:
+                as_ver = a_file.get("analysis_step_version")  # this embedding could evaporate
+                if as_ver and isinstance(as_ver, dict):
+                    a_step = as_ver.get("analysis_step")
+                    if a_step and isinstance(a_step, dict):
+                        pipelines = a_step.get("pipelines")
+                        if pipelines and isinstance(pipelines, list) and len(pipelines) > 0:
+                            pipeline = pipelines[0].get("title")
+                            pipeline_group = pipelines[0].get("lab")
+                            if pipeline:
+                                composite['pipeline'] = pipeline
+                                if pipeline_group:
+                                    composite['pipeline_group'] = pipeline_group
+            track['md5sum'] = a_file['md5sum']
+
+            track["membership"] = membership
+            if len(metadata_pairs):
+                track["metadata_pairs"] = metadata_pairs
+
             tracks.append(track)
-    return tracks
 
-
-def acc_composite_extend_with_tracks1(composite, vis_defs, dataset, assembly, host= None):
-    '''Extends live experiment composite object with track definitions'''
-    tracks = []
-    rep_techs = {}
-    files = []
-    ucsc_assembly = composite['ucsc_assembly']
-    # first time through just to get rep_tech
-    group_order = composite["view"].get("group_order", [])
-    for view_tag in group_order:
-        view = composite["view"]["groups"][view_tag]
-        output_types = view.get("output_type", [])
-        file_format_types = view.get("file_format_type", [])
-        file_format = view["type"].split()[0]
-        #if file_format == "bigBed":
-        #    view["type"] = "bigBed"  # scoreFilter implies score so 6 +
-        #    format_type = view.get('file_format_type','')
-        #log.warn("%d files looking for type %s" % ((len(dataset["files"]),view["type"]))
-        for a_file in dataset["files"]:
-            if a_file['status'] not in VISIBLE_FILE_STATUSES:
-                continue
-            if file_format != a_file['file_format']:
-                continue
-            if len(output_types) > 0 and a_file.get('output_type', 'unknown') not in output_types:
-                continue
-            if len(file_format_types) > 0 and a_file.get('file_format_type', 'unknown') not in file_format_types:
-                continue
-            if 'assembly' not in a_file or _ASSEMBLY_MAPPER.get(a_file['assembly'], a_file['assembly']) != ucsc_assembly:
-                continue
-            if "rep_tech" not in a_file:
-                rep_tech = rep_for_file(a_file)
-                a_file["rep_tech"] = rep_tech
-            else:
-                rep_tech = a_file["rep_tech"]
-            rep_techs[rep_tech] = rep_tech
-            files.append(a_file)
-    if len(files) == 0:
-        log.warn("No visualizable files for %s" % (dataset["accession"]))
-        return None
-
-    # convert rep_techs to simple reps
-    rep_ix = 1
-    rep_tags = []
-    for rep_tech in sorted(rep_techs.keys()):  # ordered by a simple sort
-        if rep_tech == "combined":
-            rep_tag = "pool"
-        else:
-            rep_tag = "rep%02d" % rep_ix
-            rep_ix += 1
-        rep_techs[rep_tech] = rep_tag
-        rep_tags.append(rep_tag)
-
-    # Now we can fill in "Replicate" subgroups with with "replicate"
-    other_groups = vis_defs.get("other_groups", []).get("groups", [])
-    if "Replicates" in other_groups:
-        group = other_groups["Replicates"]
-        group_tag = group["tag"]
-        subgroups = group["groups"]
-        if "replicate" in subgroups:
-            (repgroup_tag, repgroup) = generate_live_groups(composite, "replicate",
-                                                            subgroups["replicate"], dataset,
-                                                            rep_tags)
-
-    # second pass once all rep_techs are known
-    if host is None:
-        host ="https://www.t2depigenome.org"
-    for view_tag in composite["view"].get("group_order", []):
-        view = composite["view"]["groups"][view_tag]
-        output_types = view.get("output_type", [])
-        file_format_types = view.get("file_format_type", [])
-        file_format = view["type"].split()[0]
-        for a_file in files:
-            if a_file['file_format'] not in [file_format, "bed"]:
-                continue
-            if len(output_types) > 0 and a_file.get('output_type', 'unknown') not in output_types:
-                continue
-            if len(file_format_types) > 0 and a_file.get('file_format_type',
-                                                         'unknown') not in file_format_types:
-                continue
-            rep_tech = a_file["rep_tech"]
-            rep_tag = rep_techs[rep_tech]
-            a_file["rep_tag"] = rep_tag
-            track = {}
-            track["type"] = view["type"]
-            track["url"] = "%s%s" % (host,a_file["href"])
-            track["showOnHubLoad"] = False
-            # longLabel = vis_defs.get('file_defs', {}).get('longLabel')
-            longLabel = ("{assay_title} of {biosample_term_name} {output_type}"
-                             "{biological_replicate_number}")
-            longLabel += " {experiment.accession} - {file.accession}"  # Always add the accessions
-            track["name"] = sanitize_label(convert_mask(longLabel, dataset, a_file))
-            
-            # Expecting short label to change when making assay based composites
-            #shortLabel = vis_defs.get('file_defs', {}).get('shortLabel',
-                                                          # "{replicate} {output_type_short_label}")
-            #track["shortLabel"] = sanitize_label(convert_mask(shortLabel, dataset, a_file))
-
-            # How about subgroups!
-            membership = {}
-            membership["view"] = view["tag"]
-            # view["tracks"].append(track)  # <==== This is how we connect them to the views
-            for (group_tag, group) in composite["groups"].items():
-                # "Replicates", "Biosample", "Targets", "Assay", ... member?
-                group_title = group["title"]
-                subgroups = group["groups"]
-                if group_title == "Replicates":
-                    # Must figure out membership
-                    # Generate rep_tag for track, then
-                    subgroup = subgroups.get(rep_tag)
-                    # if subgroup is None:
-                    #    subgroup = { "tag": rep_tag, "title": rep_tag }
-                    #    group["groups"][rep_tag] = subgroup
-                    if subgroup is not None:
-                        membership[group_tag] = rep_tag
-                        if "tracks" not in subgroup:
-                            subgroup["tracks"] = []
-                        subgroup["tracks"].append(track)  # <==== also connected to replicate
-                elif group_title in ["Biosample", "Targets", "Assay", EXP_GROUP]:
-                    assert(len(subgroups) == 1)
-                    # if len(subgroups) == 1:
-                    for (subgroup_tag, subgroup) in subgroups.items():
-                        membership[group_tag] = subgroup["tag"]
-                else:
-                    assert(group_tag == "Don't know this group!")
-            track["metadata"] = membership
-            tracks.append(track)
     return tracks
 
 
@@ -1204,37 +1301,62 @@ def make_acc_composite(dataset, assembly, host=None, hide=False):
                  (dataset["accession"], vis_type))
         return {}
     composite = {}
-    composite1 = {} #temp variable for epigenome browser
-    log.debug("%s has vis_type: %s." % (dataset["accession"],vis_type))
+    # log.debug("%s has vis_type: %s." % (dataset["accession"],vis_type))
+    composite["vis_type"] = vis_type
+    composite["name"] = dataset["accession"]
 
     ucsc_assembly = _ASSEMBLY_MAPPER.get(assembly, assembly)
     if assembly != ucsc_assembly:  # Sometimes 'assembly' is hg38 already.
-        composite1['assembly'] = assembly
-    composite1['ucsc_assembly'] = ucsc_assembly
+        composite['assembly'] = assembly
+    composite['ucsc_assembly'] = ucsc_assembly
 
     # plumbing for ihec, among other things:
-    # for term in ['biosample_term_name', 'biosample_term_id', 'biosample_summary',
-    #             'biosample_type', 'assay_term_id', 'assay_term_name']:
-    #    if term in dataset:
-    #        composite[term] = dataset[term]
+    for term in ['biosample_term_name', 'biosample_term_id', 'biosample_summary',
+                 'biosample_type', 'assay_term_id', 'assay_term_name']:
+        if term in dataset:
+            composite[term] = dataset[term]
     replicates = dataset.get("replicates", [])
- 
+    molecule = "DNA"  # default
+    if len(replicates) > 0:
+        taxon_id = replicates[0].get("library", {}).get("biosample", {}).get("organism",
+                                                                             {}).get("taxon_id")
+        if taxon_id:
+            composite['taxon_id'] = taxon_id
+        molecule = replicates[0].get("library", {}).get("nucleic_acid_term_name")
+        if molecule:
+            if molecule == "RNA":
+                descr = dataset.get('description', '').lower()
+                if 'total' in descr:
+                    molecule = "total RNA"
+                elif 'poly' in descr:
+                    molecule = "polyA RNA"
+    composite['molecule'] = molecule
+
     longLabel = vis_defs.get('longLabel',
                              '{assay_term_name} of {biosample_term_name} - {accession}')
+    composite['longLabel'] = sanitize_label(convert_mask(longLabel, dataset))
+    shortLabel = vis_defs.get('shortLabel', '{accession}')
+    composite['shortLabel'] = sanitize_label(convert_mask(shortLabel, dataset))
+    if hide:
+        composite["visibility"] = "hide"
+    else:
+        composite["visibility"] = vis_defs.get("visibility", "full")
+    composite['pennantIcon'] = find_pennent(dataset)
+    add_living_color(composite, dataset)
     # views are always subGroup1
-    composite1["view"] = {}
+    composite["view"] = {}
     title_to_tag = {}
     if "Views" in vis_defs:
-        (tag, views) = generate_live_groups(composite1, "Views", vis_defs["Views"], dataset)
-        composite1[tag] = views
+        (tag, views) = generate_live_groups(composite, "Views", vis_defs["Views"], dataset)
+        composite[tag] = views
         title_to_tag["Views"] = tag
 
     if "other_groups" in vis_defs:
         groups = vis_defs["other_groups"].get("groups", {})
         new_dimensions = {}
         new_filters = {}
-        composite1["group_order"] = []
-        composite1["groups"] = {}  # subgroups def by groups and group_order directly off composite
+        composite["group_order"] = []
+        composite["groups"] = {}  # subgroups def by groups and group_order directly off composite
         group_order = vis_defs["other_groups"].get("group_order")
         preferred_order = []  # have to create preferred order based upon tags, not titles
         if group_order is None or not isinstance(group_order, list):
@@ -1244,88 +1366,43 @@ def make_acc_composite(dataset, assembly, host=None, hide=False):
             if subgroup_title not in groups:
                 continue
             assert(subgroup_title in SUPPORTED_SUBGROUPS)
-            (subgroup_tag, subgroup) = generate_live_groups(composite1, subgroup_title,
+            (subgroup_tag, subgroup) = generate_live_groups(composite, subgroup_title,
                                                             groups[subgroup_title], dataset)
             if isinstance(preferred_order, list):
                 preferred_order.append(subgroup_tag)
             if "groups" in subgroup and len(subgroup["groups"]) > 0:
                 title_to_tag[subgroup_title] = subgroup_tag
-                composite1["groups"][subgroup_tag] = subgroup
-                composite1["group_order"].append(subgroup_tag)
-    tracks = acc_composite_extend_with_tracks(composite1, vis_defs, dataset, assembly, host=host)
+                composite["groups"][subgroup_tag] = subgroup
+                composite["group_order"].append(subgroup_tag)
+            if "dimensions" in vis_defs["other_groups"]:  # (empty) "Targets" dim will be included
+                dimension = vis_defs["other_groups"]["dimensions"].get(subgroup_title)
+                if dimension is not None:
+                    new_dimensions[dimension] = subgroup_tag
+                    if "filterComposite" in vis_defs["other_groups"]:
+                        filterfish = vis_defs["other_groups"]["filterComposite"].get(subgroup_title)
+                        if filterfish is not None:
+                            new_filters[dimension] = filterfish
+        composite["preferred_order"] = preferred_order
+        if len(new_dimensions) > 0:
+            composite["dimensions"] = new_dimensions
+        if len(new_filters) > 0:
+            composite["filterComposite"] = new_filters
+        if "dimensionAchecked" in vis_defs["other_groups"]:
+            composite["dimensionAchecked"] = vis_defs["other_groups"]["dimensionAchecked"]
+
+    if "sortOrder" in vis_defs:
+        sort_order = []
+        for title in vis_defs["sortOrder"]:
+            if title in title_to_tag:
+                sort_order.append(title_to_tag[title])
+        composite["sortOrder"] = sort_order
+
+    tracks = acc_composite_extend_with_tracks(composite, vis_defs, dataset, assembly, host=host)
     if tracks is None or len(tracks) == 0:
         # Already warned about files log.debug("No tracks for %s" % dataset["accession"])
         return {}
-    composite[""] = tracks
-    return tracks
-
-def make_acc_composite1(dataset, assembly, host=None, hide=False):
-    '''Converts experiment composite static definitions to live composite object'''
-    if dataset["status"] not in VISIBLE_DATASET_STATUSES:
-        log.debug("%s can't be visualized because it's not unreleased status:%s." %
-                  (dataset["accession"], dataset["status"]))
-        return {}
-    vis_type = get_vis_type(dataset)
-    vis_defs = lookup_vis_defs(vis_type)
-    if vis_defs is None:
-        log.debug("%s (vis_type: %s) has undiscoverable vis_defs." %
-                 (dataset["accession"], vis_type))
-        return {}
-    composite = {}
-    composite1 = {} #temp variable for epigenome browser
-    log.debug("%s has vis_type: %s." % (dataset["accession"],vis_type))
-
-    ucsc_assembly = _ASSEMBLY_MAPPER.get(assembly, assembly)
-    if assembly != ucsc_assembly:  # Sometimes 'assembly' is hg38 already.
-        composite1['assembly'] = assembly
-    composite1['ucsc_assembly'] = ucsc_assembly
-
-    # plumbing for ihec, among other things:
-    # for term in ['biosample_term_name', 'biosample_term_id', 'biosample_summary',
-    #             'biosample_type', 'assay_term_id', 'assay_term_name']:
-    #    if term in dataset:
-    #        composite[term] = dataset[term]
-    replicates = dataset.get("replicates", [])
- 
-    longLabel = vis_defs.get('longLabel',
-                             '{assay_term_name} of {biosample_term_name} - {accession}')
-    # views are always subGroup1
-    composite1["view"] = {}
-    title_to_tag = {}
-    if "Views" in vis_defs:
-        (tag, views) = generate_live_groups(composite1, "Views", vis_defs["Views"], dataset)
-        composite1[tag] = views
-        title_to_tag["Views"] = tag
-
-    if "other_groups" in vis_defs:
-        groups = vis_defs["other_groups"].get("groups", {})
-        new_dimensions = {}
-        new_filters = {}
-        composite1["group_order"] = []
-        composite1["groups"] = {}  # subgroups def by groups and group_order directly off composite
-        group_order = vis_defs["other_groups"].get("group_order")
-        preferred_order = []  # have to create preferred order based upon tags, not titles
-        if group_order is None or not isinstance(group_order, list):
-            group_order = sorted(groups.keys())
-            preferred_order = "sorted"
-        for subgroup_title in group_order:  # Replicates, Targets, Biosamples
-            if subgroup_title not in groups:
-                continue
-            assert(subgroup_title in SUPPORTED_SUBGROUPS)
-            (subgroup_tag, subgroup) = generate_live_groups(composite1, subgroup_title,
-                                                            groups[subgroup_title], dataset)
-            if isinstance(preferred_order, list):
-                preferred_order.append(subgroup_tag)
-            if "groups" in subgroup and len(subgroup["groups"]) > 0:
-                title_to_tag[subgroup_title] = subgroup_tag
-                composite1["groups"][subgroup_tag] = subgroup
-                composite1["group_order"].append(subgroup_tag)
-    tracks = acc_composite_extend_with_tracks1(composite1, vis_defs, dataset, assembly, host=host)
-    if tracks is None or len(tracks) == 0:
-        # Already warned about files log.debug("No tracks for %s" % dataset["accession"])
-        return {}
-    composite[""] = tracks
-    return tracks
+    composite["tracks"] = tracks
+    return composite
 
 
 def remodel_acc_to_set_composites(acc_composites, hide_after=None):
@@ -1349,58 +1426,233 @@ def remodel_acc_to_set_composites(acc_composites, hide_after=None):
                     track["checked"] = "off"
             else:
                 hide_after -= 1
-        # If set_composite of this vis_type doesn't exist, create it
-        
-        #vis_type = acc_composite["vis_type"]
-        
-        #vis_defs = lookup_vis_defs(vis_type)
-        #assert(vis_type is not None)
-        #if vis_type not in set_composites.keys():  # First one so just drop in place
-        #    set_composite = acc_composite  # Don't bother with deep copy.
-        #    set_defs = vis_defs.get("assay_composite", {})
-        #    set_composite["name"] = vis_type.lower()  # is there something more elegant?
-        #    for tag in ["visibility"]:
-        #        if tag in set_defs:
-        #            set_composite[tag] = set_defs[tag]  # Not expecting any token substitutions!!!
-        #    set_composite['html'] = vis_type
-        #    set_composites[vis_type] = set_composite
 
-        #else:  # Adding an acc_composite to an existing set_composite
-        #set_composite = set_composites[vis_type]
-        #set_composite['composite_type'] = 'set'
-        # combine views
-        #    set_views = set_composite.get("view", [])
-        #    acc_views = acc_composite.get("view", {})
-        #    for view_tag in acc_views["group_order"]:
-        #        acc_view = acc_views["groups"][view_tag]
-        #        if view_tag not in set_views["groups"].keys():  # Should never happen
+        # color must move to tracks because it' i's from biosample and we can mix biosample exps
+        acc_color = acc_composite.get("color")
+        acc_altColor = acc_composite.get("altColor")
+        acc_view_groups = acc_composite.get("view", {}).get("groups", {})
+        for (view_tag, acc_view) in acc_view_groups.items():
+            acc_view_color = acc_view.get("color", acc_color)  # color may be at view level
+            acc_view_altColor = acc_view.get("altColor", acc_altColor)
+            if acc_view_color is None and acc_view_altColor is None:
+                continue
+            for track in acc_view.get("tracks", []):
+                if "color" not in track.keys():
+                    if acc_view_color is not None:
+                        track["color"] = acc_view_color
+                    if acc_view_altColor is not None:
+                        track["altColor"] = acc_view_altColor
+
+        # If set_composite of this vis_type doesn't exist, create it
+        vis_type = acc_composite["vis_type"]
+        vis_defs = lookup_vis_defs(vis_type)
+        assert(vis_type is not None)
+        if vis_type not in set_composites.keys():  # First one so just drop in place
+            set_composite = acc_composite  # Don't bother with deep copy.
+            set_defs = vis_defs.get("assay_composite", {})
+            set_composite["name"] = vis_type.lower()  # is there something more elegant?
+            for tag in ["longLabel", "shortLabel", "visibility"]:
+                if tag in set_defs:
+                    set_composite[tag] = set_defs[tag]  # Not expecting any token substitutions!!!
+            set_composite['html'] = vis_type
+            set_composites[vis_type] = set_composite
+
+        else:  # Adding an acc_composite to an existing set_composite
+            set_composite = set_composites[vis_type]
+            set_composite['composite_type'] = 'set'
+
+            if set_composite.get("project", "unknown") != "T2DREAM":
+                acc_pennant = acc_composite["pennantIcon"]
+                set_pennant = set_composite["pennantIcon"]
+                if acc_pennant != set_pennant:
+                    set_composite["project"] = "T2DREAM"
+                    set_composite["pennantIcon"] = PENNANTS["T2DREAM"]
+
+            # combine views
+            set_views = set_composite.get("view", [])
+            acc_views = acc_composite.get("view", {})
+            for view_tag in acc_views["group_order"]:
+                acc_view = acc_views["groups"][view_tag]
+                if view_tag not in set_views["groups"].keys():  # Should never happen
                     # log.debug("Surprise: view %s not found before" % view_tag)
-        #            insert_live_group(set_views, view_tag, acc_view)
-        #        else:  # View is already defined but tracks need to be appended.
-        #            set_view = set_views["groups"][view_tag]
-        #            if "tracks" not in set_view:
-        #                set_view["tracks"] = acc_view.get("tracks", [])
-        #            else:
-        #                set_view["tracks"].extend(acc_view.get("tracks", []))
+                    insert_live_group(set_views, view_tag, acc_view)
+                else:  # View is already defined but tracks need to be appended.
+                    set_view = set_views["groups"][view_tag]
+                    if "tracks" not in set_view:
+                        set_view["tracks"] = acc_view.get("tracks", [])
+                    else:
+                        set_view["tracks"].extend(acc_view.get("tracks", []))
 
             # All tracks in one set: not needed.
 
             # Combine subgroups:
-            #for group_tag in acc_composite["group_order"]:
-            #    acc_group = acc_composite["groups"][group_tag]
-            #    if group_tag not in set_composite["groups"].keys():  # Should never happen
+            for group_tag in acc_composite["group_order"]:
+                acc_group = acc_composite["groups"][group_tag]
+                if group_tag not in set_composite["groups"].keys():  # Should never happen
                     # log.debug("Surprise: group %s not found before" % group_tag)
-            #        insert_live_group(set_composite, group_tag, acc_group)
-            #    else:  # Need to handle subgroups which definitely may not be there.
-            #        set_group = set_composite["groups"].get(group_tag, {})
-            #        acc_subgroups = acc_group.get("groups", {})
+                    insert_live_group(set_composite, group_tag, acc_group)
+                else:  # Need to handle subgroups which definitely may not be there.
+                    set_group = set_composite["groups"].get(group_tag, {})
+                    acc_subgroups = acc_group.get("groups", {})
                     # acc_subgroup_order = acc_group.get("group_order")
-            #        for subgroup_tag in acc_subgroups.keys():
-            #            if subgroup_tag not in set_group.get("groups", {}).keys():
+                    for subgroup_tag in acc_subgroups.keys():
+                        if subgroup_tag not in set_group.get("groups", {}).keys():
                             # Adding biosamples, targets, and reps
-            #                insert_live_group(set_group, subgroup_tag, acc_subgroups[subgroup_tag])
-    
+                            insert_live_group(set_group, subgroup_tag, acc_subgroups[subgroup_tag])
+
+            # dimensions and filterComposite should not need any extra care:
+            # they get dynamically scaled down during printing
+            # log.debug("       Added.")
+
     return set_composites
+
+
+def ucsc_trackDb_composite_blob(composite, title):
+    '''Given an in-memory composite object, prints a single UCSC trackDb.txt composite structure'''
+    if composite is None or len(composite) == 0:
+        return "# Empty composite for %s.  It cannot be visualized at this time.\n" % title
+    # TODO provide more detail about different possible reasons (should already be in errorlog)
+
+    blob = ""
+    # First the composite structure
+    blob += "track %s\n" % composite["name"]
+    blob += "compositeTrack on\n"
+    blob += "type bed 3\n"
+    for var in COMPOSITE_SETTINGS:
+        val = composite.get(var)
+        if val:
+            blob += "%s %s\n" % (var, val)
+    views = composite.get("view", [])
+    if len(views) > 0:
+        blob += "subGroup1 view %s" % views["title"]
+        for view_tag in views["group_order"]:
+            view_title = views["groups"][view_tag]["title"]
+            blob += " %s=%s" % (view_tag, sanitize_title(view_title))
+        blob += '\n'
+    dimA_checked = composite.get("dimensionAchecked", "all")
+    dimA_tag = ""
+    if dimA_checked == "first":  # All will leave dimA_tag & dimA_checked empty, default to all on
+        dimA_tag = composite.get("dimensions", {}).get("dimA", "")
+    dimA_checked = None
+    subgroup_ix = 2
+    for group_tag in composite["group_order"]:
+        group = composite["groups"][group_tag]
+        blob += "subGroup%d %s %s" % (subgroup_ix, group_tag, sanitize_title(group["title"]))
+        subgroup_ix += 1
+        subgroup_order = None  # group.get("group_order")
+        if subgroup_order is None or not isinstance(subgroup_order, list):
+            subgroup_order = sorted(group["groups"].keys())
+        for subgroup_tag in subgroup_order:
+            subgroup_title = group["groups"][subgroup_tag]["title"]
+            blob += " %s=%s" % (subgroup_tag, sanitize_title(subgroup_title))
+            if group_tag == dimA_tag and dimA_checked is None:
+                dimA_checked = subgroup_tag
+
+        blob += '\n'
+    # sortOrder
+    sort_order = composite.get("sortOrder")
+    if sort_order:
+        blob += "sortOrder"
+        for sort_tag in sort_order:
+            if title.startswith("ENCSR") and sort_tag == "EXP":
+                continue  # Single exp composites do not need to sort on EMP
+            blob += " %s=+" % sort_tag
+        blob += '\n'
+    # dimensions
+    actual_group_tags = ["view"]  # Not all groups will be used in composite, depending upon content
+    dimensions = composite.get("dimensions", {})
+    if dimensions:
+        pairs = ""
+        XY_skipped = []
+        XY_added = []
+        for dim_tag in sorted(dimensions.keys()):
+            group = composite["groups"].get(dimensions[dim_tag])
+            if group is None:  # e.g. "Targets" may not exist
+                continue
+            if dimensions[dim_tag] != "REP":
+                if len(group.get("groups", {})) <= 1:
+                    if dim_tag[-1] in ['X', 'Y']:
+                        XY_skipped.append(dim_tag)
+                    continue
+                elif dim_tag[-1] in ['X', 'Y']:
+                    XY_added.append(dim_tag)
+            pairs += " %s=%s" % (dim_tag, dimensions[dim_tag])
+            actual_group_tags.append(dimensions[dim_tag])
+        # Getting too fancy for our own good:
+        # If one XY dimension has more than one member then we must add both X and Y
+        if len(XY_skipped) > 0 and len(XY_added) > 0:
+            for dim_tag in XY_skipped:
+                pairs += " %s=%s" % (dim_tag, dimensions[dim_tag])
+                actual_group_tags.append(dimensions[dim_tag])
+        if len(pairs) > 0:
+            blob += "dimensions%s\n" % pairs
+    # filterComposite
+    filter_composite = composite.get("filterComposite")
+    if filter_composite:
+        filterfish = ""
+        for filter_tag in sorted(filter_composite.keys()):
+            group = composite["groups"].get(filter_composite[filter_tag])
+            if group is None or len(group.get("groups", {})) <= 1:  # e.g. "Targets" may not exist
+                continue
+            filterfish += " %s" % filter_tag
+            if filter_composite[filter_tag] == "one":
+                filterfish += "=one"
+        if len(filterfish) > 0:
+            blob += 'filterComposite%s\n' % filterfish
+    elif dimA_checked is not None:
+        blob += 'dimensionAchecked %s\n' % dimA_checked
+    blob += '\n'
+
+    # Now cycle through views
+    for view_tag in views["group_order"]:
+        view = views["groups"][view_tag]
+        tracks = view.get("tracks", [])
+        if len(tracks) == 0:
+            continue
+        blob += "    track %s_%s_view\n" % (composite["name"], view["tag"])
+        blob += "    parent %s on\n" % composite["name"]
+        blob += "    view %s\n" % view["tag"]
+        for var in VIEW_SETTINGS:
+            val = view.get(var)
+            if val:
+                blob += "    %s %s\n" % (var, val)
+        blob += '\n'
+
+        # Now cycle through tracks in view
+        for track in tracks:
+            blob += "        track %s\n" % (track["name"])
+            blob += "        parent %s_%s_view" % (composite["name"], view["tag"])
+            dimA_subgroup = track.get("membership", {}).get(dimA_tag)
+            if dimA_subgroup is not None and dimA_subgroup != dimA_checked:
+                blob += " off\n"
+            else:
+                # Can set individual tracks off. Used when remodelling
+                blob += " %s\n" % track.get("checked", "on")
+            if "type" not in track:
+                blob += "        type %s\n" % (view["type"])
+            for var in TRACK_SETTINGS:
+                val = track.get(var)
+                if val:
+                    blob += "        %s %s\n" % (var, val)
+            # Now membership
+            membership = track.get("membership")
+            if membership:
+                blob += "        subGroups"
+                for member_tag in sorted(membership):
+                    blob += " %s=%s" % (member_tag, membership[member_tag])
+                blob += '\n'
+            # metadata line?
+            metadata_pairs = track.get("metadata_pairs")
+            if metadata_pairs is not None:
+                metadata_line = ""
+                for meta_tag in sorted(metadata_pairs.keys()):
+                    metadata_line += ' %s=%s' % (meta_tag.lower(), metadata_pairs[meta_tag])
+                if len(metadata_line) > 0:
+                    blob += "        metadata%s\n" % metadata_line
+
+            blob += '\n'
+    blob += '\n'
+    return blob
 
 
 def remodel_acc_to_ihec_json(acc_composites, request=None):
@@ -1409,9 +1661,9 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
         return {}
 
     if request:
-        host = "https://www.t2depigenome.org"
+        host = "https://t2depigenome.org"
     else:
-        host = "https://www.t2depigenome.org"
+        host = "https://t2depigenome.org"
     # {
     # "hub_description": { ... },  similar to hub.txt/genome.txt
     # "datasets": { ... },         one per experiment, contains "browser" objects, one per track
@@ -1591,7 +1843,7 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
             for track in tracks:
                 ihec_track = {}
                 # ["bigDataUrl","longLabel","shortLabel","type","color","altColor"]
-                ihec_track["big_data_url"] = host + track["url"] #no proxy required
+                ihec_track["big_data_url"] = track["bigDataUrl"] #no proxy required
                 ihec_track["description_url"] = '%s/%s/' % (host, acc)
                 if request:
                     url = '/'.join(request.url.split('/')[0:-1])
@@ -1600,7 +1852,7 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
                 md5sum = track.get('md5sum')
                 if md5sum:
                     ihec_track["md5sum"] = md5sum
-                ihec_track["subtype"] = track["name"]
+                ihec_track["subtype"] = track["longLabel"]
                 rep_membership = track.get("membership", {}).get("REP")
                 rep_group = acc_composite.get("groups", {}).get("REP")
                 if rep_membership and rep_group:
@@ -1608,11 +1860,25 @@ def remodel_acc_to_ihec_json(acc_composites, request=None):
                         ihec_track["sample_source"] = rep_group[rep_membership]["title"]
                         subgroup_order = sorted(rep_group["groups"].keys())
                         ihec_track["primary"] = (rep_membership == subgroup_order[0])
+
+                # extra fields
+                for term in ["type", "color", "altColor"]:
+                    if term in track:
+                        ihec_track[term] = track[term]
                 ihec_track["view"] = view["title"]
+                metadata_pairs = track.get("metadata_pairs", {})
+                for meta_key in metadata_pairs:
+                    ihec_track[meta_key.replace('&#32;', ' ')] = metadata_pairs[meta_key][1:-1]
+                # Could refine download link:
+                # if metadata_pairs:
+                #     file_download = metadata_pairs.get('file&#32;download')
+                #     if file_download:
+                #         file_download = file_download.split()[1][6:-1]
+                #         ihec_track["file download"] = file_download
                 ihec_view.append(ihec_track)
             if len(ihec_view) > 0:
                 browser[view["title"]] = ihec_view
-    
+
     return ihec_json
 
 
@@ -1632,8 +1898,8 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
             #           (len(results),(time.time() - PROFILE_START_TIME)))
         host=request.host_url
         if host is None or host.find("localhost") > -1:
-            host = "https://www.t2depigenome.org"
-        
+            host = "https://t2depigenome.org"
+
         acc_composite = make_acc_composite(dataset, assembly, host=host, hide=hide)
         if USE_CACHE:
             add_to_es(request, es_key, acc_composite)
@@ -1641,33 +1907,7 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
 
         if request_dataset:  # Manage meomory
             del dataset
-    return (found_or_made, acc_composite)
 
-def find_or_make_acc_composite1(request, assembly, acc, dataset=None, hide=False, regen=False):
-    '''Returns json for a single experiment 'acc_composite'.'''
-    acc_composite = None
-    es_key = acc + "_" + assembly
-    found_or_made = "found"
-    if USE_CACHE and not regen:  # Find composite?
-        acc_composite = get_from_es(request, es_key)
-
-    if acc_composite is None:
-        request_dataset = (dataset is None)
-        if request_dataset:
-            dataset = request.embed("/datasets/" + acc + '/', as_user=True)
-            # log.debug("find_or_make_acc_composite len(results) = %d   %.3f secs" %
-            #           (len(results),(time.time() - PROFILE_START_TIME)))
-        host=request.host_url
-        if host is None or host.find("localhost") > -1:
-            host = "https://www.t2depigenome.org"
-        
-        acc_composite = make_acc_composite1(dataset, assembly, host=host, hide=hide)
-        if USE_CACHE:
-            add_to_es(request, es_key, acc_composite)
-        found_or_made = "made"
-
-        if request_dataset:  # Manage meomory
-            del dataset
     return (found_or_made, acc_composite)
 
 
@@ -1685,21 +1925,22 @@ def generate_trackDb(request, dataset, assembly, hide=False, regen=False):
         regen = ('regen' in cmd)
         if not regen: # TODO temporary
             regen = ihec_out
-    
+
     acc = dataset['accession']
     ucsc_assembly = _ASSEMBLY_MAPPER.get(assembly, assembly)
     (found_or_made, acc_composite) = find_or_make_acc_composite(request, ucsc_assembly,
                                                                 dataset["accession"], dataset,
                                                                 hide=hide, regen=regen)
-    # vis_type = acc_composite.get("vis_type", get_vis_type(dataset))
-    #if regen:  # Want to see message if regen was requested
-    #    log.info("%s composite %s_%s %s len(json):%d %.3f" % (found_or_made, dataset['accession'],
-    #             ucsc_assembly, vis_type, len(json.dumps(acc_composite)),
-    #             (time.time() - PROFILE_START_TIME)))
-    #else:
-    #    log.debug("%s composite %s_%s %s len(json):%d %.3f" % (found_or_made, dataset['accession'],
-    #              ucsc_assembly, vis_type, len(json.dumps(acc_composite)),
-    #              (time.time() - PROFILE_START_TIME)))
+
+    vis_type = acc_composite.get("vis_type", get_vis_type(dataset))
+    if regen:  # Want to see message if regen was requested
+        log.info("%s composite %s_%s %s len(json):%d %.3f" % (found_or_made, dataset['accession'],
+                 ucsc_assembly, vis_type, len(json.dumps(acc_composite)),
+                 (time.time() - PROFILE_START_TIME)))
+    else:
+        log.debug("%s composite %s_%s %s len(json):%d %.3f" % (found_or_made, dataset['accession'],
+                  ucsc_assembly, vis_type, len(json.dumps(acc_composite)),
+                  (time.time() - PROFILE_START_TIME)))
     if ihec_out:
         ihec_json = remodel_acc_to_ihec_json({acc: acc_composite}, request)
         return json.dumps(ihec_json, indent=4, sort_keys=True)
@@ -1708,10 +1949,11 @@ def generate_trackDb(request, dataset, assembly, hide=False, regen=False):
     elif json_out:
         acc_composites = {} # Standardize output for biodalliance use
         acc_composites[acc] = acc_composite
-        return json.dumps(acc_composite, indent=4, sort_keys=True)
+        return json.dumps(acc_composites, indent=4, sort_keys=True)
     elif ihec_out:
         ihec_json = remodel_acc_to_ihec_json({acc: acc_composite}, request)
         return json.dumps(ihec_json, indent=4, sort_keys=True)
+    return ucsc_trackDb_composite_blob(acc_composite, acc)
 
 
 def generate_batch_trackDb(request, hide=False, regen=False):
@@ -1729,14 +1971,14 @@ def generate_batch_trackDb(request, hide=False, regen=False):
     assembly = str(request.matchdict['assembly'])
     log.debug("Request for %s trackDb begins   %.3f secs" %
               (assembly, (time.time() - PROFILE_START_TIME)))
-    # for track hubs on epigenome browser
-    param_list1 = (request.matchdict['search_params'].replace(',,', '='))
-    param_list = parse_qs(param_list1.replace('|', '&'))
+    param_list = parse_qs(request.matchdict['search_params'].replace(',,', '&'))
+
     set_composites = None
+
     # Have to make it.
     assemblies = ASSEMBLY_MAPPINGS.get(assembly, [assembly])
     params = {
-        'files.file_format': BIGBED_FILE_TYPES + HIC_FILE_TYPES + BIGWIG_FILE_TYPES,
+        'files.file_format': BIGBED_FILE_TYPES + BIGWIG_FILE_TYPES,
     }
     params.update(param_list)
     params.update({
@@ -1747,13 +1989,12 @@ def generate_batch_trackDb(request, hide=False, regen=False):
         params['frame'] = ['object']
     else:
         params['frame'] = ['embedded']
-        
+
     view = 'search'
     if 'region' in param_list:
         view = 'variant-search'
     path = '/%s/?%s' % (view, urlencode(params, True))
     results = request.embed(path, as_user=True)['@graph']
-    
     if not USE_CACHE:
         log.debug("len(results) = %d   %.3f secs" %
                   (len(results), (time.time() - PROFILE_START_TIME)))
@@ -1764,59 +2005,61 @@ def generate_batch_trackDb(request, hide=False, regen=False):
         del results
 
     acc_composites = {}
-    acc_composites1 = []
     found = 0
     made = 0
     if USE_CACHE and not regen:
         es_keys = [acc + "_" + assembly for acc in accs]
         acc_composites = search_es(request, es_keys)
         found = len(acc_composites.keys())
-    accs = [result['accession'] for result in results]
-    
+
     missing_accs = []
     if found == 0:
         missing_accs = accs
     # Don't bother if cache is primed.
-    elif found < (len(accs) * 3 / 4):  # some heuristic to decide when too few means regenerate
-        missing_accs = list(set(accs) - set(acc_composites.keys()))
+    # elif found < (len(accs) * 3 / 4):  # some heuristic to decide when too few means regenerate
+    #     missing_accs = list(set(accs) - set(acc_composites.keys()))
 
     if len(missing_accs) > 0:  # if 0 were found in cache try generating (for pre-primed-cache access)
-        #if not USE_CACHE: # already have dataset
-        for dataset in results:
-            acc = dataset['accession']
-            (found_or_made, acc_composite) = find_or_make_acc_composite(request, assembly, acc,
+        if not USE_CACHE: # already have dataset
+            for dataset in results:
+                acc = dataset['accession']
+                if acc not in missing_accs:
+                    continue
+                (found_or_made, acc_composite) = find_or_make_acc_composite(request, assembly, acc,
                                                                             dataset, hide=hide,
                                                                             regen=True)
-            made += 1
-            acc_composites = acc_composite
-            acc_composites1.extend(acc_composites)
-        #else:       # will have to fetch embedded dataset
-        #    for acc in missing_accs:
-        #        (found_or_made, acc_composite) = find_or_make_acc_composite(request, assembly, acc,
-        #                                                                    None, hide=hide,
-        #                                                                    regen=regen)
-        #        if found_or_made == "made":
-        #            made += 1
+                made += 1
+                acc_composites[acc] = acc_composite
+        else:       # will have to fetch embedded dataset
+            for acc in missing_accs:
+                (found_or_made, acc_composite) = find_or_make_acc_composite(request, assembly, acc,
+                                                                            None, hide=hide,
+                                                                            regen=regen)
+                if found_or_made == "made":
+                    made += 1
                     # log.debug("%s composite %s" % (found_or_made,acc))
-        #        else:
-        #            found += 1
-        #        acc_composites[acc] = acc_composite
+                else:
+                    found += 1
+                acc_composites[acc] = acc_composite
 
     blob = ""
     set_composites = {}
-    if made > 0:
+    if found > 0 or made > 0:
         if ihec_out:
             ihec_json = remodel_acc_to_ihec_json(acc_composites, request)
             blob = json.dumps(ihec_json, indent=4, sort_keys=True)
-        if json_out:
-            blob = json.dumps(acc_composites1, indent=4, sort_keys=True)
-            
-        #else:
-        #    set_composites = remodel_acc_to_set_composites(acc_composites, hide_after=100)
+        if vis_json:
+            blob = json.dumps(acc_composites, indent=4, sort_keys=True)
+        else:
+            set_composites = remodel_acc_to_set_composites(acc_composites, hide_after=100)
 
-        #    json_out = (request.url.find("jsonout") > -1)  # ...&bly=hg19&jsonout/hg19/trackDb.txt
-        #    if json_out:
-        #        blob = json.dumps(set_composites, indent=4, sort_keys=True)
+            json_out = (request.url.find("jsonout") > -1)  # ...&bly=hg19&jsonout/hg19/trackDb.txt
+            if json_out:
+                blob = json.dumps(set_composites, indent=4, sort_keys=True)
+            else:
+                for composite_tag in sorted(set_composites.keys()):
+                    blob += ucsc_trackDb_composite_blob(set_composites[composite_tag],
+                                                        composite_tag)
 
     if regen:  # Want to see message if regen was requested
         log.info("acc_composites: %s generated, %d found, %d set(s). len(txt):%s  %.3f secs" %
@@ -1824,121 +2067,7 @@ def generate_batch_trackDb(request, hide=False, regen=False):
     else:
         log.debug("acc_composites: %s generated, %d found, %d set(s). len(txt):%s  %.3f secs" %
                   (made, found, len(set_composites), len(blob), (time.time() - PROFILE_START_TIME)))
-    
-    return blob
 
-
-def generate_batch_trackDb1(request, hide=False, regen=False):
-    '''Returns string content for a requested multi-experiment for DGA epigenome hub.'''
-    # local test: RNA-seq: curl https://../batch_hub/type=Experiment,,assay_title=RNA-seq,,award.rfa=ENCODE3,,status=released,,assembly=GRCh38,,replicates.library.biosample.biosample_type=induced+pluripotent+stem+cell+line/GRCh38/trackDb.txt
-
-    (page,suffix,cmd) = urlpage(request.url)
-    json_out = (suffix == 'json')
-    vis_json = (page == 'vis_blob' and json_out)  # ...&bly=hg19&accjson/hg19/trackDb.txt
-    ihec_out = (page == 'ihec' and json_out)
-    if not regen:
-        regen = ('regen' in cmd)
-        if not regen: # TODO temporary
-            regen = ihec_out
-    assembly = str(request.matchdict['assembly'])
-    log.debug("Request for %s trackDb begins   %.3f secs" %
-              (assembly, (time.time() - PROFILE_START_TIME)))
-    # for track hubs on epigenome browser
-    param_list1 = (request.matchdict['search_params'].replace(',,', '='))
-    param_list = parse_qs(param_list1.replace('|', '&'))
-    set_composites = None
-    # Have to make it.
-    assemblies = ASSEMBLY_MAPPINGS.get(assembly, [assembly])
-    params = {
-        'files.file_format': BIGBED_FILE_TYPES + HIC_FILE_TYPES + BIGWIG_FILE_TYPES,
-    }
-    params.update(param_list)
-    params.update({
-        'assembly': assemblies,
-        'limit': ['all'],
-    })
-    if USE_CACHE:
-        params['frame'] = ['object']
-    else:
-        params['frame'] = ['embedded']
-        
-    view = 'search'
-    if 'region' in param_list:
-        view = 'variant-search'
-    path = '/%s/?%s' % (view, urlencode(params, True))
-    results = request.embed(path, as_user=True)['@graph']
-    
-    if not USE_CACHE:
-        log.debug("len(results) = %d   %.3f secs" %
-                  (len(results), (time.time() - PROFILE_START_TIME)))
-    else:
-        # Note: better memory usage to get acc array from non-embedded results,
-        # since acc_composites should be in cache
-        accs = [result['accession'] for result in results]
-        del results
-
-    acc_composites = {}
-    acc_composites1 = []
-    found = 0
-    made = 0
-    if USE_CACHE and not regen:
-        es_keys = [acc + "_" + assembly for acc in accs]
-        acc_composites = search_es(request, es_keys)
-        found = len(acc_composites.keys())
-    accs = [result['accession'] for result in results]
-    
-    missing_accs = []
-    if found == 0:
-        missing_accs = accs
-    # Don't bother if cache is primed.
-    elif found < (len(accs) * 3 / 4):  # some heuristic to decide when too few means regenerate
-        missing_accs = list(set(accs) - set(acc_composites.keys()))
-
-    if len(missing_accs) > 0:  # if 0 were found in cache try generating (for pre-primed-cache access)
-        #if not USE_CACHE: # already have dataset
-        for dataset in results:
-            acc = dataset['accession']
-            (found_or_made, acc_composite) = find_or_make_acc_composite1(request, assembly, acc,
-                                                                            dataset, hide=hide,
-                                                                            regen=True)
-            made += 1
-            acc_composites = acc_composite
-            acc_composites1.extend(acc_composites)
-        #else:       # will have to fetch embedded dataset
-        #    for acc in missing_accs:
-        #        (found_or_made, acc_composite) = find_or_make_acc_composite(request, assembly, acc,
-        #                                                                    None, hide=hide,
-        #                                                                    regen=regen)
-        #        if found_or_made == "made":
-        #            made += 1
-                    # log.debug("%s composite %s" % (found_or_made,acc))
-        #        else:
-        #            found += 1
-        #        acc_composites[acc] = acc_composite
-
-    blob = ""
-    set_composites = {}
-    if made > 0:
-        if ihec_out:
-            ihec_json = remodel_acc_to_ihec_json(acc_composites, request)
-            blob = json.dumps(ihec_json, indent=4, sort_keys=True)
-        if json_out:
-            blob = json.dumps(acc_composites1, indent=4, sort_keys=True)
-            
-        #else:
-        #    set_composites = remodel_acc_to_set_composites(acc_composites, hide_after=100)
-
-        #    json_out = (request.url.find("jsonout") > -1)  # ...&bly=hg19&jsonout/hg19/trackDb.txt
-        #    if json_out:
-        #        blob = json.dumps(set_composites, indent=4, sort_keys=True)
-
-    if regen:  # Want to see message if regen was requested
-        log.info("acc_composites: %s generated, %d found, %d set(s). len(txt):%s  %.3f secs" %
-                 (made, found, len(set_composites), len(blob), (time.time() - PROFILE_START_TIME)))
-    else:
-        log.debug("acc_composites: %s generated, %d found, %d set(s). len(txt):%s  %.3f secs" %
-                  (made, found, len(set_composites), len(blob), (time.time() - PROFILE_START_TIME)))
-    
     return blob
 
 
@@ -2065,11 +2194,9 @@ def browsers_available(assemblies, status, files, types, item_type=None):
             browsers.add('ensembl')
         if 'quickview' in mapped_assembly:
             browsers.add('quickview')
-        if 'epigenomebrowser' in mapped_assembly:
-            browsers.add('epigenomebrowser')
     if status not in VISIBLE_DATASET_STATUSES:
-        #if status not in QUICKVIEW_STATUSES_BLOCKED:
-        #    return ["quickview"]
+        if status not in QUICKVIEW_STATUSES_BLOCKED:
+            return ["quickview"]
         return []
     return list(browsers)
 def object_is_visualizable(obj,assembly=None):
@@ -2089,25 +2216,24 @@ def vis_format_url(browser, path, assembly, position=None):
     if browser == "ucsc":
         ucsc_assembly = mapped_assembly.get('ucsc_assembly')
         if ucsc_assembly is not None:
-            external_url = 'https://www.browser.t2depigenome.org/browser-slim/?genome='
-            external_url += assembly + path +  '/jsonout/trackDb.json'
+            external_url = 'http://genome.ucsc.edu/cgi-bin/hgTracks?hubClear='
+            external_url += path + '&db=' + ucsc_assembly
             if position is not None:
                 external_url += '&position={}'.format(position)
-            log.warn(path)
             return external_url
-    #elif browser == "ensembl":
-    #    ensembl_host = mapped_assembly.get('ensembl_host')
-    #    if ensembl_host is not None:
-    #        external_url = 'http://' + ensembl_host + '/Trackhub?url='
-    #        external_url += path + ';species=' + mapped_assembly.get('species').replace(' ','_')
+    elif browser == "ensembl":
+        ensembl_host = mapped_assembly.get('ensembl_host')
+        if ensembl_host is not None:
+            external_url = 'http://' + ensembl_host + '/Trackhub?url='
+            external_url += path + ';species=' + mapped_assembly.get('species').replace(' ','_')
             ### TODO: remove redirect=no when Ensembl fixes their mirrors
             #external_url += ';redirect=no'
             ### TODO: remove redirect=no when Ensembl fixes their mirrors
 
-    #        if position is not None:
-    #            if position.startswith('chr'):
-    #                position = position[3:]  # ensembl position r=19:7069444-7087968
-    #            external_url += '&r={}'.format(position)
+            if position is not None:
+                if position.startswith('chr'):
+                    position = position[3:]  # ensembl position r=19:7069444-7087968
+                external_url += '&r={}'.format(position)
             # GRCh38:   http://www.ensembl.org/Trackhub?url=https://www.encodeproject.org/experiments/ENCSR596NOF/@@hub/hub.txt
             # GRCh38:   http://www.ensembl.org/Trackhub?url=https://www.encodeproject.org/experiments/ENCSR596NOF/@@hub/hub.txt;species=Homo_sapiens
             # hg19/GRCh37:     http://grch37.ensembl.org/Trackhub?url=https://www.encodeproject.org/experiments/ENCSR596NOF/@@hub/hub.txt;species=Homo_sapiens
@@ -2116,24 +2242,11 @@ def vis_format_url(browser, path, assembly, position=None):
             # BDGP6:    http://www.ensembl.org/Trackhub?url=https://www.encodeproject.org/experiments/ENCSR040UNE@@hub/hub.txt;species=Drosophila_melanogaster
             # BDGP5:    http://dec2014.archive.ensembl.org/Trackhub?url=https://www.encodeproject.org/experiments/ENCSR040UNE@@hub/hub.txt;species=Drosophila_melanogaster
             # ce11/WBcel235: http://www.ensembl.org/Trackhub?url=https://www.encodeproject.org/experiments/ENCSR475TDY@@hub/hub.txt;species=Caenorhabditis_elegans
-    #        return external_url
+            return external_url
     elif browser == "quickview":
-        file_formats = '&file_format=bigBed&file_format=bigWig&file_format=hic'
+        file_formats = '&file_format=bigBed&file_format=bigWig'
         file_inclusions = '&status=released&status=in+progress'
         return ('/search/?type=File&assembly=%s&dataset=%s%s%s#browser' % (assembly,path,file_formats,file_inclusions))
-    # http://www.epigenome-browser.t2depigenome.org:3000/browser/?genome=hg19&hicUrl=https://www.t2depigenome.org/files/DFF873SGR/@@download/DFF873SGR.hic
-    elif browser == "epigenomebrowser":
-        external_url = 'https://www.browser.t2depigenome.org/browser/?genome='
-        external_url += assembly + '&hub=' + path + assembly + '/trackDb.json'
-        if position is not None:
-            external_url += '&position={}'.format(position)
-        return external_url
-    elif browser == "epigenomebrowser-slim":
-        external_url = 'https://www.browser.t2depigenome.org/browser-slim/?genome='
-        external_url += assembly + '&hub=' + path + assembly + '/trackDb.json'
-        if position is not None:
-            external_url += '&position={}'.format(position)
-        return external_url
 
     #else:
         # ERROR: not supported at this time
@@ -2264,70 +2377,6 @@ def generate_batch_hubs(context, request):
         data_policy = ('<br /><a href="http://encodeproject.org/ENCODE/terms.html">'
                        'ENCODE data use policy</p>')
         return generate_html(context, request) + data_policy
-def generate_batch_hubs1(context, request):
-    '''search for the input params and return the trackhub'''
-    global PROFILE_START_TIME
-    PROFILE_START_TIME = time.time()
-
-    results = {}
-    (page,suffix,cmd) = urlpage(request.url)
-    log.debug('Requesting %s.%s#%s' % (page,suffix,cmd))
-    if (suffix == 'txt' and page == 'trackDb') or (suffix == 'json' and page in ['trackDb','ihec','vis_blob']):
-        return generate_batch_trackDb1(request)
-        
-    elif page == 'hub' and suffix == 'txt':
-        terms = request.matchdict['search_params'].replace(',,', '&')
-        pairs = terms.split('&')
-        label = "search:"
-        for pair in sorted(pairs):
-            (var, val) = pair.split('=')
-            if var not in ["type", "assembly", "status", "limit"]:
-                label += " %s" % val.replace('+', ' ')
-        return NEWLINE.join(get_hub(label, request.url))
-    elif page == 'genomes' and suffix == 'txt':
-        search_params = request.matchdict['search_params']
-        if search_params.find('bed6+') > -1:
-            search_params = search_params.replace('bed6+,,','bed6%2B,,')
-        log.debug('search_params: %s' % (search_params))
-        #param_list = parse_qs(request.matchdict['search_params'].replace(',,', '&'))
-        param_list = parse_qs(search_params.replace(',,', '&'))
-        log.debug('parse_qs: %s' % (param_list))
-        view = 'search'
-        if 'region' in param_list:
-            view = 'variant-search'
-        path = '/%s/?%s' % (view, urlencode(param_list, True))
-        log.debug('Path in hunt for assembly %s' % (path))
-        results = request.embed(path, as_user=True)
-        # log.debug("generate_batch(genomes) len(results) = %d   %.3f secs" %
-        #           (len(results),(time.time() - PROFILE_START_TIME)))
-        g_text = ''
-        if 'assembly' in param_list:
-            g_text = get_genomes_txt(param_list.get('assembly'))
-        else:
-            for facet in results['facets']:
-                if facet['field'] == 'assembly':
-                    assemblies = []
-                    for term in facet['terms']:
-                        if term['doc_count'] != 0:
-                            assemblies.append(term['key'])
-                    if len(assemblies) > 0:
-                        g_text = get_genomes_txt(assemblies)
-            if g_text == '':
-                log.debug('Requesting %s.%s#%s NO ASSEMBLY !!!' % (page,suffix,cmd))
-                g_text = json.dumps(results,indent=4)
-                assemblies = [result['assemblies'] for result in results['@graph']]
-                assembly_set = set(assemblies)
-                assemblies = list(assembly_set)
-                log.debug('Found %d ASSEMBLY !!!' % len(assemblies))
-#/search/?type=Experiment&lab.title=Ali+Mortazavi%2C+UCI&assay_title=microRNA+counts&status=released&replicates.library.biosample.donor.organism.scientific_name=Mus+musculus&files.file_type=bigBed+bed6%2B&organ_slims=intestine
-#/search/?type=Experimentlab.title=Ali+Mortazavi%2C+UCI&&assay_title=microRNA+counts&status=released&replicates.library.biosample.donor.organism.scientific_name=Mus+musculus&files.file_type=bigBed+bed6+organ_slims=intestine&
-#/search/?assay_title=microRNA+counts&organ_slims=intestine&replicates.library.biosample.donor.organism.scientific_name=Mus+musculus&type=Experiment&files.file_type=bigBed+bed6+&lab.title=Ali+Mortazavi%2C+UCI&status=released
-        return g_text
-    else:
-        # Should generate a HTML page for requests other than those supported
-        data_policy = ('<br /><a href="http://encodeproject.org/ENCODE/terms.html">'
-                       'ENCODE data use policy</p>')
-        return generate_html(context, request) + data_policy
 
 def respond_with_text(request, text, content_mime):
     '''Resonse that can handle range requests.'''
@@ -2395,12 +2444,4 @@ def batch_hub(context, request):
     ''' View for batch track hubs '''
 
     text = generate_batch_hubs(context, request)
-    return respond_with_text(request, text, 'text/plain')
-
-@view_config(route_name='browser_hub')
-@view_config(route_name='browser_hub:trackdb')
-def browser_hub(context, request):
-    ''' View for batch track hubs '''
-
-    text = generate_batch_hubs1(context, request)
     return respond_with_text(request, text, 'text/plain')

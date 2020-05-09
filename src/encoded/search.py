@@ -511,12 +511,6 @@ def search_result_actions(request, doc_types, es_results, position=None):
                     pos = None
                     if 'variant-search' in request.url and position is not None:
                         pos = position
-                    epigenome_url = vis_format_url("epigenomebrowser", hub_url, assembly, pos)
-                    epigenome_url_slim = vis_format_url("epigenomebrowser-slim", hub_url, assembly, pos)
-                    if epigenome_url is not None:
-                        browser_urls['EpigenomeBrowser'] = epigenome_url
-                    if epigenome_url_slim is not None:
-                        browser_urls1['EpigenomeSlim'] = epigenome_url_slim
                     if browser_urls:
                         viz[assembly] = browser_urls
                         # actions.setdefault('visualize_batch', {})[assembly] = browser_urls  # formerly 'batch_hub'

@@ -498,7 +498,6 @@ export const BrowserSelector = createReactClass({
 								     <div key={browser} className="browser-selector__browser">
 								     <a href={assemblyBrowsers[browser]} disabled={!loggedIn && browser === 'Epigenome Browser'}onClick={this.handleClick} rel="noopener noreferrer" target="_blank">
 								     {browser}
-								     {browser === 'Epigenome Browser' ? <span className="beta-badge">BETA</span> : null}
 								     </a>
 								     </div>
 								    )}

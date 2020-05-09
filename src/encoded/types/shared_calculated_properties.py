@@ -289,10 +289,6 @@ class CalculatedVisualize:
             if assembly_name in viz:
                 continue
             browser_urls = {}
-            if 'epigenomebrowser' in browsers:
-                epigenomebrowser_url = vis_format_url("epigenomebrowser", request.path, assembly_name)
-                if epigenomebrowser_url is not None:
-                    browser_urls['Epigenome Browser'] = epigenomebrowser_url
             if 'quickview' in browsers:
                 quickview_url = vis_format_url("quickview", request.path, assembly_name)
                 if quickview_url is not None:
