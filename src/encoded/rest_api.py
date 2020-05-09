@@ -45,6 +45,8 @@ _tsv_mapping = OrderedDict([
     ('Annotation accession', ['accession']),
     ('Assay', ['assay_term_name']),
     ('Annotation', ['annotation_type']),
+    ('Status', ['status']),
+    ('Collection Tags',  ['collection_tags']),
     ('Biosample term id', ['biosample_term_id']),
     ('Biosample term name', ['biosample_term_name']),
     ('Biosample type', ['biosample_type']),
@@ -192,131 +194,82 @@ _states_maps = {
     }
 _high_states = ['Enhancer_Active_1', 'Enhancer_Active_2',  'Promoter_Active']
 _biosample_color = {
-    "brain microvascular": "#d6d1d1",
-    "cardiac fibroblast": "#66ffff",
-    "epithelial cell of proximal tubule": "#7fff00",
-    "hindlimb muscle": "#d6d1d1",
-    "kidney glomerular epithelial cell": "#7fff00",
-    "left kidney": "#7fff00",
-    "muscle of leg": "#d6d1d1",
-    "omental fat pad": "#d6d1d1",
-    "retinal pigment": "#d6d1d1",
-    "Adipose SGBS cell line (adipocyte)": "#d6d1d1",
-    "Ammon's horn": "#d6d1d1",
-    "Ammon's horn(Hippocampus)": "#d6d1d1",
+    "pancreatic alpha cell":"#add8e6",
+    "pancreatic beta cell":"#add8e6",
+    "pancreatic delta cell":"#add8e6",
+    "pancreatic acinar cell":"#add8e6",
+    "pancreatic ductal cell":"#add8e6",
+    "pancreatic polypeptide-secreting cell":"#add8e6",
+    "pancreatic stellate cell":"#add8e6",
+    "pancreas":"#add8e6",
+    "EndoC_BH1":"#add8e6",
+    "islet of Langerhans": "#add8e6",
+    "liver": "#ff7f50",
+    "HepG2": "#ff7f50",
+    "heart left ventricle": "#ff0000",
+    "heart right ventricle": "#ff0000",
+    "heart": "#ff0000",
+    "right cardiac atrium": "#ff0000",
+    "adipose tissue": "#654321",
+    "white adipose cell": "#654321",
+    "psoas muscle" : "#8b0000",
+    "cardiomyocytes (cardiac muscle cell)" : "#8b0000",
+    "cardiac precursors (cardiac muscle cell)" : "#8b0000",
+    "Ammon's horn": "#ffd700", 
+    "dorsolateral prefrontal cortex": "#ffd700",
+    "aorta": "#66ffff",
+    "endothelial cell of umbilical vein": "#66ffff",
+   "lung": "#d6d1d1",
+    "CD4-positive, alpha-beta T cell": "#d6d1d1",
+    "CD8-positive, alpha-beta T cell": "#d6d1d1",
+    "activated CD4-positive, alpha-beta T cell": "#d6d1d1",
+    "macrophage": "#d6d1d1",
+    "lymphocyte of B lineage (iPSC)": "#d6d1d1",
+    "megakaryocyte": "#d6d1d1",
+    "monocyte": "#d6d1d1",
+    "naive thymus-derived CD4-positive, alpha-beta T cell": "#d6d1d1",
+    "naive thymus-derived CD8-positive, alpha-beta T cell": "#d6d1d1",
+    "B cell": "#d6d1d1",
     "B-lymphoblastoid cell line": "#d6d1d1",
-    "C1 segment of cervical spinal cord": "#d6d1d1",
-    "Cardiomyocytes (cardiac muscle cell)": "#ff0000",
-    "EndoC_BH1": "#add8e6",
-    "Heart fetal (heart)": "#ff0000",
-    "HepG2": "#ffd700",
-    "Liver fetal (hepatocyte)": "#ffd700",
-    "Pancreatic progenitors (progenitor cell of endocrine pancreas)": "#add8e6",
-    "Preadipose SGBS cell line (adipocyte)": "#add8e6",
-    "adipocyte": "#66ffff",
-    "adipose tissue": "#66ffff",
-    "adrenal gland": "#d6d1d1",
-    "amygdala": "#d6d1d1",
-    "anterior cingulate cortex": "#d6d1d1",
-    "aorta": "#d6d1d1",
-    "ascending aorta": "#d6d1d1",
-    "astrocyte of the cerebellum": "#d6d1d1",
-    "astrocyte of the hippocampus": "#d6d1d1",
+    "activated CD8-positive, alpha-beta T cell": "#d6d1d1",
+    "adult endothelial progenitor cell": "#d6d1d1",
+    "alternatively activated macrophage": "#d6d1d1",
     "bladder (urinary bladder)": "#d6d1d1",
-    "body of pancreas": "#add8e6",
-    "brain": "#d6d1d1",
-    "brain pericyte": "#d6d1d1",
-    "cardiac muscle cell": "#d6d1d1",
-    "cardiac precursors (cardiac muscle cell)": "#d6d1d1",
-    "cardiomyocytes (cardiac muscle cell)": "#d6d1d1",
-    "caudate nucleus": "#d6d1d1",
-    "cerebellar cortex": "#d6d1d1",
-    "cerebellum": "#d6d1d1",
-    "cerebellum (Hemisphere)": "#d6d1d1",
-    "choroid plexus epithelial cell": "#d6d1d1",
-    "coronary artery": "#ff0000",
-    "dorsolateral prefrontal cortex": "#d6d1d1",
-    "dorsolateral prefrontal cortex(Brain - Frontal Cortex (BA9))": "#d6d1d1",
+    "conventional dendritic cell": "#d6d1d1",
     "embryonic stem cell": "#d6d1d1",
-    "endothelial cell of umbilical vein": "#d6d1d1",
+    "endothelial cell": "#d6d1d1",
+    "erythroblast": "#d6d1d1",
     "esophagus": "#d6d1d1",
     "fibroblast cell line": "#d6d1d1",
-    "forelimb muscle": "#d6d1d1",
-    "frontal cortex": "#d6d1d1",
     "gastric (mucosa of stomach)": "#d6d1d1",
-    "gastrocnemius medialis(Muscle - Skeletal)": "#d6d1d1",
-    "globus pallidus": "#d6d1d1",
-    "glomerular endothelial cell": "#7fff00",
-    "glomerular visceral epithelial cell": "#7fff00",
-    "heart": "#ff0000",
-    "heart left ventricle": "#ff0000",
-    "hepatic stellate cell": "#ffd700",
-    "hepatocyte": "#ffd700",
-    "hypothalamus": "#d6d1d1",
-    "islet of Langerhans": "#add8e6",
-    "kidney": "#7fff00",
-    "kidney epithelial cell": "#7fff00",
-    "kidney tubule cell": "#7fff00",
-    "left cardiac atrium": "#ff0000",
-    "left renal pelvis": "#7fff00",
-    "left ventricle myocardium": "#ff0000",
-    "liver": "#d6d1d1",
-    "lung": "#d6d1d1",
-    "lymphocyte of B lineage (iPSC)": "#d6d1d1",
-    "mesenchymal stem cell": "#66ffff",
+    "inflammatory macrophage": "#d6d1d1",
+    "memory B cell": "#d6d1d1",
+    "mesenchymal stem cell": "#d6d1d1",
     "mesendoderm": "#d6d1d1",
-    "middle frontal gyrus": "#d6d1d1",
-    "muscle of arm": "#d6d1d1",
-    "nephron tubule": "#7fff00",
+    "naive B cel": "#d6d1d1",
+    "naive B cell": "#d6d1d1",
+    "natural killer cell": "#d6d1d1",
+    "natural killer cell mediated cytotoxicity": "#d6d1d1",
     "neural progenitor cell (neural stem cell)": "#d6d1d1",
-    "nucleus accumbens": "#d6d1d1",
-    "occipital lobe": "#d6d1d1",
-    "omental fat pad": "#66ffff",
+    "neutrophil": "#d6d1d1",
+    "non-classical monocyte": "#d6d1d1",
     "ovary": "#d6d1d1",
-    "pancreas": "#add8e6",
-    "pancreatic acinar cell": "#add8e6",
-    "pancreatic alpha cell": "#add8e6",
-    "pancreatic beta cell": "#add8e6",
-    "pancreatic delta cell": "#add8e6",
-    "pancreatic ductal cell": "#add8e6",
-    "pancreatic endothelial cell": "#add8e6",
-    "pancreatic immune cell": "#add8e6",
-    "pancreatic polypeptide-secreting cell": "#add8e6",
-    "pancreatic stellate cell": "#add8e6",
-    "pons": "#d6d1d1",
-    "psoas muscle": "#d6d1d1",
-    "putamen": "#d6d1d1",
-    "renal cortex interstitium": "#7fff00",
-    "renal cortical epithelial cell": "#7fff00",
-    "renal glomerus": "#7fff00",
-    "renal pelvis": "#7fff00",
-    "retina": "#d6d1d1",
-    "right atrium auricular region": "#ff0000",
-    "right cardiac atrium": "#ff0000",
-    "right lobe of liver": "#ffd700",
-    "right renal pelvis": "#7fff00",
+    "plasmacytoid dendritic cell": "#d6d1d1",
+    "regulatory T cell": "#d6d1d1",
     "sigmoid colon": "#d6d1d1",
-    "skeletal muscle cell": "#d6d1d1",
     "small intestine": "#d6d1d1",
-    "smooth muscle cell of the brain vasculature": "#d6d1d1",
     "spleen": "#d6d1d1",
-    "subcutaneous adipose tissue": "#d6d1d1",
-    "substantia nigra": "#d6d1d1",
-    "superior temporal gyrus": "#d6d1d1",
-    "thoracic aorta": "#d6d1d1",
-    "thymus": "#d6d1d1",
-    "tibial artery": "#d6d1d1",
-    "tibial nerve": "#d6d1d1",
+    "stellate neuron": "#d6d1d1",
     "trophoblast": "#d6d1d1",
-    "visceral omenum": "#d6d1d1",
-    "white adipose cell": "#d6d1d1"
+    "adrenal gland": "#d6d1d1",
+    "thymus": "#d6d1d1"
 }
-biosample_term_list = ["brain microvascular endothelial cell", "cardiac fibroblast", "epithelial cell of proximal tubule", "hindlimb muscle", "kidney glomerular epithelial cell", "left kidney", "muscle of leg", "omental fat pad", "retinal pigment epithelial cell", "Adipose SGBS cell line (adipocyte)", "Ammon's horn", "Ammon's horn(Hippocampus)", "B-lymphoblastoid cell line", "C1 segment of cervical spinal cord", "Cardiomyocytes (cardiac muscle cell)", "EndoC_BH1", "Heart fetal (cardiac muscle cell)", "Heart fetal (heart)", "HepG2", "Liver fetal (hepatocyte)", "Pancreatic progenitors (progenitor cell of endocrine pancreas)", "Preadipose SGBS cell line (adipocyte)", "adipocyte", "adipose tissue", "adrenal gland", "amygdala", "anterior cingulate cortex", "aorta", "ascending aorta", "astrocyte of the cerebellum", "astrocyte of the hippocampus", "bladder (urinary bladder)", "body of pancreas", "brain", "brain pericyte", "cardiac muscle cell", "cardiac precursors (cardiac muscle cell)", "cardiomyocytes (cardiac muscle cell)", "caudate nucleus", "cerebellar cortex", "cerebellum", "cerebellum (Hemisphere)", "choroid plexus epithelial cell", "coronary artery", "dorsolateral prefrontal cortex", "dorsolateral prefrontal cortex(Brain - Frontal Cortex (BA9))", "embryonic stem cell", "endothelial cell of umbilical vein", "esophagus", "fibroblast cell line", "forelimb muscle", "frontal cortex", "gastric (mucosa of stomach)", "gastrocnemius medialis(Muscle - Skeletal)", "globus pallidus", "glomerular endothelial cell", "glomerular visceral epithelial cell", "heart", "heart left ventricle", "hepatic stellate cell", "hepatocyte", "hypothalamus", "islet of Langerhans", "kidney", "kidney capillary endothelial cell", "kidney epithelial cell", "kidney tubule cell", "left cardiac atrium", "left renal pelvis", "left ventricle myocardium", "liver", "lung", "lymphocyte of B lineage (iPSC)", "mesenchymal stem cell", "mesendoderm", "middle frontal gyrus", "muscle of arm", "nephron tubule", "neural progenitor cell (neural stem cell)", "nucleus accumbens", "occipital lobe", "omental fat pad", "ovary", "pancreas", "pancreatic acinar cell", "pancreatic alpha cell", "pancreatic beta cell", "pancreatic delta cell", "pancreatic ductal cell", "pancreatic endothelial cell", "pancreatic immune cell", "pancreatic polypeptide-secreting cell", "pancreatic stellate cell", "pons", "psoas muscle", "putamen", "renal cortex interstitium", "renal cortical epithelial cell", "renal glomerulus", "renal pelvis", "retina", "retina", "right atrium auricular region", "right cardiac atrium", "right lobe of liver", "right renal pelvis", "sigmoid colon", "skeletal muscle cell", "small intestine", "smooth muscle cell of the brain vasculature", "spleen", "subcutaneous adipose tissue", "superior temporal gyrus", "thoracic aorta", "thymus", "tibial artery", "trophoblast", "visceral omenum adipose", "white adipose cell"]
+biosample_term_list = ["pancreatic alpha cell", "pancreatic beta cell", "pancreatic delta cell", "pancreatic acinar cell", "pancreatic ductal cell", "pancreatic polypeptide-secreting cell", "pancreatic stellate cell", "pancreas", "EndoC_BH1", "islet of Langerhans", "liver", "HepG2", "heart left ventricle", "heart right ventricle", "heart", "right cardiac atrium", "adipose tissue", "white adipose cell", "psoas muscle", "cardiomyocytes (cardiac muscle cell)", "cardiac precursors (cardiac muscle cell)", "Ammon's horn", "dorsolateral prefrontal cortex", "aorta", "endothelial cell of umbilical vein", "lung", "CD4-positive, alpha-beta T cell", "CD8-positive, alpha-beta T cell", "activated CD4-positive, alpha-beta T cell", "macrophage", "lymphocyte of B lineage (iPSC)", "megakaryocyte", "monocyte", "naive thymus-derived CD4-positive, alpha-beta T cell", "naive thymus-derived CD8-positive, alpha-beta T cell", "B cell", "B-lymphoblastoid cell line", "activated CD8-positive, alpha-beta T cell", "adult endothelial progenitor cell", "alternatively activated macrophage", "bladder (urinary bladder)", "conventional dendritic cell", "embryonic stem cell", "endothelial cell", "erythroblast", "esophagus", "fibroblast cell line", "gastric (mucosa of stomach)", "inflammatory macrophage", "memory B cell", "mesenchymal stem cell", "mesendoderm", "naive B cel", "naive B cell", "natural killer cell", "natural killer cell mediated cytotoxicity", "neural progenitor cell (neural stem cell)", "neutrophil", "non-classical monocyte", "ovary", "plasmacytoid dendritic cell", "regulatory T cell", "sigmoid colon", "small intestine", "spleen", "stellate neuron", "trophoblast", "adrenal gland", "thymus"]
 variant_allelic_effects = ['variant allelic effects']
 EQTL = ['eQTL']
 accessible_chromatin = ['accessible chromatin']
 allelic_effect_accessible_chromatin = ['variant allelic effects', 'accessible chromatin']
-target_gene_prediction_annotation = ['target gene predictions']
+target_gene_prediction_annotation = ['Chromatin interaction target genes', 'Coaccessible target genes']
 def get_file_uuids(result_dict):
     file_uuids = []
     for item in result_dict['@graph']:
@@ -454,7 +407,7 @@ def variant_graph_new(context, request):
     biosample_annotation = {}
     variant_coordinates = results['coordinates']
     #variant node
-    json_doc['nodes'].append({'path':query,'id':query, 'color':'LightGrey', 'link':'region=' + query + '&genome=GRCh37','label':query, 'name': query, 'type':'rsid','biosample':'-', 'annotation_type':'-', 'accession_ids':'-', 'level': 1, 'state_len': 2, 'score': None, 'distance': None})
+    json_doc['nodes'].append({'path':query,'id':query, 'color':'LightGrey', 'link':'region=' + query + '&genome=GRCh37','label':query, 'name': query, 'type':'rsid','biosample':'-', 'annotation_type':'-', 'accession_ids':'-', 'level': 1, 'state_len': 1.5, 'score': None, 'distance': None})
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
@@ -502,12 +455,12 @@ def variant_graph_new(context, request):
             if annotation in target_gene_prediction_annotation:
                 if biosample in biosample_term_list:
                     if biosample not in biosample_check:
-                        log.warn(biosamples_annotation_both)
-                        #log.warn(biosamples_annotation_allelic)
                         link_color = '#003399' if biosample in biosamples_annotation_allelic and biosamples_annotation_accessible else '#bfcce6' if biosample in biosamples_annotation_allelic else '#738fc7' if biosample in biosamples_annotation_accessible else '#BEBEBE'
-                        link = 'biosample_term_name=' + biosample if biosample in biosamples_annotation_allelic else None
-                        json_doc['nodes'].append({'path': biosample, 'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 3, 'score': None, 'distance': None})
-                        json_doc['links'].append({'source': query, 'target': biosample, 'id': query + biosample, 'link_color': link_color, 'length': 30, 'linkout': link})
+                        link = 'biosample_term_name=' + biosample
+                        label = 'allelic effect & accessible chromatin' if biosample in biosamples_annotation_allelic and biosamples_annotation_accessible else 'allelic effect' if biosample in biosamples_annotation_allelic else 'accessible chromatin' if biosample in biosamples_annotation_accessible else None
+                        width = 3 if biosample in biosamples_annotation_allelic and biosamples_annotation_accessible else 3 if biosample in biosamples_annotation_allelic else 3 if biosample in biosamples_annotation_accessible else 1
+                        json_doc['nodes'].append({'path': biosample, 'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 1, 'score': None, 'distance': None})
+                        json_doc['links'].append({'source': query, 'target': biosample, 'id': query + biosample, 'link_color': link_color, 'length': 30, 'linkout': link, 'label': label, 'width': width})
                         biosample_check.append(biosample)
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
@@ -553,11 +506,11 @@ def variant_graph_new(context, request):
                     if new_state not in json_doc4:
                         json_doc4[new_state] = []
                         json_doc4[new_state].append(
-                            software
+                            annotation
                         )
                     else:
                         json_doc4[new_state].append(
-                            software
+                            annotation
                         )
                     if new_state not in json_doc5:
                         json_doc5[new_state] = []
@@ -608,14 +561,17 @@ def variant_graph_new(context, request):
                     distances = [str(abs(int(i) - int(variant_gene_first_coordinate))) for i in target_gene_first_coordinate]
                     distance = ", ".join(distances)
                     if biosample_term in biosample_term_list:
-                        state_len = (len(set(json_doc3[new_state]))+2)
+                        state_count = (len(set(json_doc3[new_state])))
+                        #state_len = state_count + 0.7 if state_count <= 2 else 3.1 
+                        state_len = 2
                         links = "&accession=".join(target_gene_accession)
                         accession_ids = ", ".join(target_gene_accession)
                         method = ", ".join(method)
                         score = ", ".join(json_doc5[new_state])
+                        state_color = '#FFC0CB' if state_count == 1 else '#FF69B4' if state_count == 2 else '#DB7093' if state_count == 3 else '#C71585' 
                         link_color = '#BEBEBE'
-                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': 'pink', 'link': 'accession=' + links, 'label': new_state, 'name': 'accession: ' + accession_ids + '\n' + 'evidence: ' + method + '\n' + 'score: ' + score + '\n' +'distance: ' + distance,  'type':'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 1, 'state_len': state_len, 'score': val, 'distance': distance}) 
-                        json_doc['links'].append({'source': biosample, 'link_color':link_color, 'target': new_state, 'id': biosample + new_state, 'length': 40, 'link':None})
+                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': state_color, 'link': 'accession=' + links, 'label': new_state, 'name': 'accession: ' + accession_ids + '\n' + 'evidence: ' + method + '\n' + 'score: ' + score + '\n' +'distance: ' + distance,  'type':'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 3, 'state_len': state_len, 'score': val, 'distance': distance}) 
+                        json_doc['links'].append({'source': biosample, 'link_color':link_color, 'target': new_state, 'id': biosample + new_state, 'length': 50, 'link':None, 'label': None, 'width': 1})
                 #unique by id (aka. unique by same state & same tissue/cell)
                 json_doc2['nodes'] = list({v['id']:v for v in json_doc['nodes']}.values())
                 #unique by source
@@ -690,13 +646,13 @@ def variant_all_graph(context, request):
                         )
                 accession_ids = ", ".join(json_doc1[state_biosample])
                 score = ",".join(json_doc3[state_biosample])
-                table_id = harmonized_state + ',' + biosample_term + ',' + annotation +  ',' + accession_ids
-                if harmonized_state in _high_states or annotation == 'accessible chromatin' or annotation == 'variant allelic effects' or annotation == 'target gene predictions' or annotation == 'binding sites' or annotation == 'gene expression' or annotation == 'eQTL':
+                table_id = state + ',' + biosample_term + ',' + annotation +  ',' + accession_ids
+                if harmonized_state in _high_states or annotation == 'accessible chromatin' or annotation == 'variant allelic effects' or annotation == 'Coaccessible target genes' or annotation == 'Chromatin interaction target genes' or annotation == 'binding sites' or annotation == 'gene expression' or annotation == 'eQTL':
                     if biosample_term in biosample_term_list:                    
                         links = "&accession=".join(json_doc1[state_biosample])
                         accession_ids = ", ".join(json_doc1[state_biosample])
                         score = ",".join(json_doc3[state_biosample])
-                        json_doc['nodes'].append({'id':state_biosample, 'link': 'accession=' + links, 'label': harmonized_state, 'biosample':biosample_term, 'annotation_type':annotation, 'accession_ids':accession_ids, 'table_id': table_id, 'score': score }) 
+                        json_doc['nodes'].append({'id':state_biosample, 'link': 'accession=' + links, 'label': state, 'biosample':biosample_term, 'annotation_type':annotation, 'accession_ids':accession_ids, 'table_id': table_id, 'score': score }) 
                 #unique by id (aka. unique by same state & same tissue/cell)
                 json_doc2['nodes'] = list({v['id']:v for v in json_doc['nodes']}.values())
     if 'variant_all_graph.json' in request.url:
@@ -897,6 +853,8 @@ def annotation_metadata(context, request):
                     })
         annotation_id = annotation_json['accession']
         annotation_type = annotation_json['annotation_type']
+        dataset_status = annotation_json['status']
+        collection_tags = None if annotation_json.get('collection_tags')== None else annotation_json['collection_tags']
         software = None if annotation_json.get("software_used")== None else annotation_json["software_used"][0]["software"]["title"]
         biosample_term_name = annotation_json.get("biosample_term_name", None)
         biosample_synonyms = annotation_json['biosample_synonyms'] if 'biosample_synonyms' in annotation_json else None
@@ -923,7 +881,9 @@ def annotation_metadata(context, request):
                     'system_slims': system_slims,
                     'harmonized_states': harmonized_states,
                     'file_download': files,
-                    'annotation_method': software
+                    'annotation_method': software,
+                    'dataset_status': dataset_status,
+                    'collection_tags': collection_tags
                 })  
             else:
                 json_doc[annotation_type].append({
@@ -938,7 +898,9 @@ def annotation_metadata(context, request):
                     'system_slims':system_slims,
                     'harmonized_states': harmonized_states,
                     'file_download': files,
-                    'annotation_method': software
+                    'annotation_method': software,
+                    'dataset_status': status,
+                    'collection_tags': collection_tags
                     }) 
             
     if 'annotation_metadata.json' in request.url:
