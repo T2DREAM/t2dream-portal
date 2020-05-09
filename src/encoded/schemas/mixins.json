@@ -62,7 +62,7 @@
                 "description": "A lab specific identifier to reference an object.",
                 "comment": "Current convention is colon separated lab name and lab identifier. (e.g. john-doe:42).",
                 "type":  "string",
-                "pattern": "^(?:kyle-gaulton|bing-ren|mark-mccarthy|anna-gloyn|stephen-parker|karen-mohlke|maike-sander|kelly-frazer|amp-t2d|amp-t2d-consortium|hpap|encode|gtex):[a-zA-Z\\d_$.+!*,()'-]+(?:\\s[a-zA-Z\\d_$.+!*,()'-]+)*$"
+                "pattern": "^(?:kyle-gaulton|bing-ren|katalin-susztak|mark-mccarthy|anna-gloyn|stephen-parker|karen-mohlke|maike-sander|kelly-frazer|amp-t2d|amp-t2d-consortium|t1d|hpap|encode|gtex):[a-zA-Z\\d_$.+!*,()'-]+(?:\\s[a-zA-Z\\d_$.+!*,()'-]+)*$"
             }
         }
     },
@@ -221,7 +221,7 @@
             "description": "Ontology identifier describing biosample.",
             "comment": "NTR is a new term request identifier provided by the DCC.",
             "type": "string",
-            "pattern": "^(UBERON|BTO|EFO|CL|NTR|FBbt|WBbt):[0-9]{2,8}$"
+            "pattern": "^(UBERON|BTO|EFO|CL|NTR|GO|FBbt|WBbt):[0-9]{2,8}$"
         },
         "biosample_term_name": {
             "title": "Ontology term",
