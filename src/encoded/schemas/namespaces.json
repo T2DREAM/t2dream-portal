@@ -24,6 +24,7 @@
     "EFO": "http://www.ebi.ac.uk/efo/EFO_",
     "CL": "http://purl.obolibrary.org/obo/CL_",
     "UBERON": "http://purl.obolibrary.org/obo/UBERON_",
+    "OMIT": "http://www.ontobee.org/ontology/OMIT",
     "OBI": "http://purl.obolibrary.org/obo/OBI_",
     "FBbt": "http://purl.obolibrary.org/obo/FBbt_",
     "WBbt": "http://purl.obolibrary.org/obo/WBbt_",

@@ -95,7 +95,7 @@ class AntibodyLot(SharedItem):
                 "description": "Ontology identifier describing biosample.",
                 "comment": "NTR is a new term request identifier provided by the DCC.",
                 "type": "string",
-                "pattern": "^(UBERON|EFO|CL|NTR|GO|FBbt|WBbt):[0-9]{2,8}$"
+                "pattern": "^(UBERON|EFO|OMIT|CL|NTR|GO|FBbt|WBbt):[0-9]{2,8}$"
             },
             "biosample_term_name": {
                 "title": "Ontology term",
