@@ -98,6 +98,16 @@
             "comment": "The model should be something like version 1.0",
             "type": "string"
         },
+        "collection_tags": {
+            "title": "Collection Tags",
+            "description": "The collection tags such as dataset resource and disease type for annotation.",
+            "type": "array",
+	    "items": {
+		"title": "Collection Tag",
+		"description": "The collection tags such as dataset resource and disease type for annotation.",
+		"type": "string"
+		}
+        },
         "organism": {
             "title": "Organism",
             "comment": "See organism.json for available identifiers.",
@@ -270,6 +280,10 @@
     "columns": {
         "accession": {
             "title": "Accession",
+            "type": "string"
+        },
+        "collection_tags": {
+            "title": "Collection Tags",
             "type": "string"
         },
         "files.replicate.experiment.assay_term_name": {

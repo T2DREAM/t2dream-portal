@@ -232,6 +232,15 @@ const AnnotationComponent = createReactClass({
                                         </dd>
                                     </div>
 
+                                    <div data-test="collectiontags">
+                                        <dt>Collection Tags</dt>
+                                        <dd>
+                                            {context.collection_tags && context.collection_tags ?
+                                                <DbxrefList values={context.collection_tags} />
+                                            : <em>None submitted</em> }
+                                        </dd>
+                                    </div>
+
                                     {references ?
                                         <div data-test="references">
                                             <dt>Publications</dt>
