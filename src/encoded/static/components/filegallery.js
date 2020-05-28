@@ -1498,7 +1498,7 @@ const FileGalleryRenderer = createReactClass({
 		{/* Display the strip of filgering controls */}
 	    
 	    <FilterControls selectedFilterValue={this.state.selectedFilterValue} filterOptions={filterOptions} handleFilterChange={this.handleFilterChange} />
-	    <TabPanel tabs={{ graph: 'Association graph', tables: 'File details', browser: 'Epigenome Browser' && context.visualize ?<h8>Epigenome Browser <span className="beta-badge">BETA</span></h8> : null }}>	        
+	    <TabPanel tabs={{ graph: 'Association graph', tables: 'File details' }}>	        
 		<TabPanelPane key="graph">
 		{!hideGraph ?
 		 <FileGraph
@@ -1540,16 +1540,6 @@ const FileGalleryRenderer = createReactClass({
 	    noDefaultClasses
 	    adminUser={!!(this.context.session_properties && this.context.session_properties.admin)}
 	    />
-	    </TabPanelPane>
-	    <TabPanelPane key="browser">
-	  
-	    {loggedIn ?
-	    <div style={{'height': '800px'}}>
-            {context.visualize ?
-	              <Iframe url={'https://www.browser.t2depigenome.org/browser-slim/?genome=' + selectedAssembly + '&hub=https://diabetesepigenome.org' + assay + '@@hub/' + selectedAssembly + '/jsonout/trackDb.json'} height="450px" width="1140px" />
-	     : <p className="browser-error">Files must be in bigBed or bigWig file format to be visualized on Epigenome Browser</p> }
-             </div>
-	     : <p className="browser-error">Your account is not allowed to view this page. Please sign in to view this page.</p> }
 	    </TabPanelPane>
 	    </TabPanel>
             </Panel>
