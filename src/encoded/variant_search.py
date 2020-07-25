@@ -137,7 +137,11 @@ def sanitize_coordinates(term):
     if term.count(':') != 1 or term.count('-') > 1:
         return ('', '', '')
     terms = term.split(':')
-    chromosome = terms[0]
+    chromosome_test = terms[0]
+    if chromosome_test.startswith('chr'):
+        chromosome = chromosome_test
+    else:
+        chromosome = 'chr' + chromosome_test
     positions = terms[1].split('-')
     if len(positions) == 1:
         start = end = positions[0].replace(',', '')
@@ -296,7 +300,7 @@ def variant_search(context, request):
     result['genome'] = assembly
     if annotation != '*':
         if annotation.lower().startswith('ens'):
-            chromosome, start, end = get_ensemblid_coordinates(annotation, assembly)
+            chromosome, start, end = get_ensemblid_coordinates(annotation, assembly)        
         else:
             chromosome, start, end = get_annotation_coordinates(es, annotation, assembly)
     elif region != '*':
@@ -311,6 +315,8 @@ def variant_search(context, request):
             chromosome, start, end = sanitize_coordinates(region)
     else:
         chromosome, start, end = ('', '', '')
+    #
+    chromosome_index = chromosome, chromosome.replace('chr', '')
     result['query'] = region
     # Check if there are valid coordinates
     if not chromosome or not start or not end:
@@ -329,7 +335,7 @@ def variant_search(context, request):
         # including inner hits is very slow
         peak_query = get_peak_query(start, end, with_inner_hits=True, within_peaks=region_inside_peak_status)
         peak_results = snp_es.search(body=peak_query,
-                                     index=chromosome.lower(),
+                                     index=chromosome_index,
                                      doc_type=_GENOME_TO_ALIAS[assembly],
                                      size=99999)
     except Exception:
