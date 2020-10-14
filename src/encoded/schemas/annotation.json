@@ -312,6 +312,10 @@
             "title": "Collection Tags",
             "type": "string"
         },
+        "annotation_type_category": {
+            "title": "Category",
+            "type": "string"
+        },
         "files.replicate.experiment.assay_term_name": {
             "title": "Assay Type",
             "type": "string"

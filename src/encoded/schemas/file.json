@@ -493,7 +493,12 @@
             "title": "Platform multiple files",
             "description": "The measurement device used to collect data.",
             "comment": "This field is required for csfasta, csqual, rcc, idat and CEL file formats. See platform.json for identifer format.",
-            "type": "array"
+            "type": "array",
+            "items": {
+                "title": "Platforms for multiple fastq files in zip folder for single cell assays",
+                "description": " ",
+                "type":  "string"
+            }
         },
         "read_length": {
             "title": "Read length",
@@ -505,7 +510,12 @@
             "title": "Read length",
             "description": "For high-throughput sequencing, the number of contiguous nucleotides determined by sequencing.",
             "comment": "This field is required for fastq, fasta, csfasta, csqual and sra file formats that are zipped containing sequencing reads.",
-            "type": "array"
+            "type": "array",
+            "items": {
+                "title": "Read length for multiple fastq files in zip folder for single cell assays",
+                "description": "Read length for multiple fastq files in zip folder for single cell assays",
+                "type":  "string"
+            }
         },
         "run_type": {
             "title": "Run type for sequencing files",
