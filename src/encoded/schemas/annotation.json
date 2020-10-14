@@ -56,6 +56,7 @@
             "type": "string",
             "enum": [
 	    	"accessible chromatin",
+		"histone modifications",
 		"binding footprints",
                 "binding sites",
                 "blacklist",
@@ -76,8 +77,10 @@
                 "validated enhancers",
                 "variant calls",
 		"Chromatin interaction target genes",
+		"target gene predictions",
 		"Coaccessible target genes",
 		"variant allelic effects",
+		"caQTL",
                 "overlap",
                 "other"
             ]
@@ -85,12 +88,35 @@
 	"annotation_type_category": {
             "title": "Category",
             "description": "The category that best describes the annotation sub-set.",
-            "type": "string",
-            "enum": [
-	    "pCHi-C",
-	    "Hi-C",
-	    "other"
-            ]
+            "type": "array",
+	    "items": {
+		"type": "string",
+		"enum": [
+                    "ChIP-seq",
+                    "RNA-seq",
+                    "DNase-seq",
+                    "eCLIP",
+                    "GRO-seq",
+                    "snDrop-seq",
+                    "pCHi-C",
+                    "RNA microarray",
+                    "RRBS",
+                    "WGBS",
+                    "single cell RNA-seq",		
+                    "Capture-C",
+                    "ChIA-PET",
+                    "FAIRE-seq",
+                    "ATAC-seq",
+                    "HiC",
+		    "H3K27ac ChIP-Seq",
+                    "small RNA-seq",
+                    "Bru-seq",
+                    "BruChase-seq",
+                    "genetic modification followed by DNase-seq",
+                    "snATAC-seq",
+		    "other"
+		]
+		}
         },
         "encyclopedia_version": {
             "title": "ENCODE encyclopedia version",

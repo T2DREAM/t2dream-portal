@@ -1901,8 +1901,8 @@ def find_or_make_acc_composite(request, assembly, acc, dataset=None, hide=False,
             host = "https://t2depigenome.org"
 
         acc_composite = make_acc_composite(dataset, assembly, host=host, hide=hide)
-        if USE_CACHE:
-            add_to_es(request, es_key, acc_composite)
+        #if USE_CACHE:
+        #    add_to_es(request, es_key, acc_composite)
         found_or_made = "made"
 
         if request_dataset:  # Manage meomory

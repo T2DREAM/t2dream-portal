@@ -143,10 +143,9 @@
             "comment": "Files with output_type reads and file format fastq, fatsa, csfasta, csqual and sra require read_length to be specified.",
             "oneOf":[
                 {
-                    "required": ["read_length"],
                     "properties": {
                         "file_format": {
-                            "enum": ["fastq", "fasta", "csfasta", "csqual","sra"]
+                            "enum": ["fastq", "fasta", "csfasta", "csqual","sra","zippedFastqFolder"]
                         },
                         "output_type": {
                              "enum": ["reads"]
@@ -334,6 +333,7 @@
                         "bigWig",
                         "fasta",
                         "fastq",
+			"bedgraph",
                         "gff",
                         "gtf",
                         "hdf5",
@@ -343,6 +343,9 @@
                         "rcc",
                         "CEL",
                         "tsv",
+			"xls",
+			"zippedFastqFolder",
+			"txt",
                         "csv",
                         "sam",
                         "tar",
@@ -382,7 +385,7 @@
                         "bed9",
                         "bed9+",
                         "bed12",
-                        "bedGraph",
+                        "bedgraph",
                         "bedLogR",
                         "bedMethyl",
                         "broadPeak",
@@ -484,13 +487,25 @@
             "description": "The measurement device used to collect data.",
             "comment": "This field is required for csfasta, csqual, rcc, idat and CEL file formats. See platform.json for identifer format.",
             "type": "string",
-            "linkTo": "Platform"
+	    "linkTo": "Platform"
+        },
+        "platforms_multiple_files": {
+            "title": "Platform multiple files",
+            "description": "The measurement device used to collect data.",
+            "comment": "This field is required for csfasta, csqual, rcc, idat and CEL file formats. See platform.json for identifer format.",
+            "type": "array"
         },
         "read_length": {
             "title": "Read length",
             "description": "For high-throughput sequencing, the number of contiguous nucleotides determined by sequencing.",
             "comment": "This field is required for fastq, fasta, csfasta, csqual and sra file formats containing sequencing reads.",
             "type": "integer"
+        },
+        "read_length_zip_files": {
+            "title": "Read length",
+            "description": "For high-throughput sequencing, the number of contiguous nucleotides determined by sequencing.",
+            "comment": "This field is required for fastq, fasta, csfasta, csqual and sra file formats that are zipped containing sequencing reads.",
+            "type": "array"
         },
         "run_type": {
             "title": "Run type for sequencing files",
@@ -624,6 +639,7 @@
                         "idat green channel",
                         "idat red channel",
                         "reads",
+			"sample index",
                         "intensity values",
                         "reporter code counts",
                         
@@ -681,6 +697,8 @@
                         "filtered regions",
                         "DHS peaks",
                         "peaks",
+			"FDR cut rate",
+			"normalized signal of significant reads",
                         "replicated peaks",
                         "RNA-binding protein associated mRNAs",           
                         "splice junctions",
@@ -694,7 +712,8 @@
                         "candidate regulatory elements",
                         "representative dnase hypersensitivity sites",
                         "sequence alignability",
-                        
+                        "predicted genes",
+
                         "genome reference",
                         "transcriptome reference",
                         "transcriptome index",
@@ -724,7 +743,15 @@
 
 			"matrix eQTL results",
 			
-			"RPKM counts matrix"
+			"normalized counts",
+			"median normalized counts",
+			"mean normalized counts",
+
+			"RPKM counts matrix",
+			
+			"TPM counts matrix",
+			"Raw count matrix",
+			"barcode info"
                     ]
                 },
                 {
@@ -975,11 +1002,11 @@
         "read_length": {
             "title": "Read length"
         },
-        "mapped_read_length": {
-            "title": "Mapped read length"
+        "read_length_zip_files": {
+            "title": "Read length for zipped fastq files"
         },
         "read_length_units": {
-            "title": "Read length units"
+            "title": "Mapped read length"
         },
         "md5sum": {
             "title": "MD5 Sum"
@@ -1020,6 +1047,7 @@
         "idat red channel": "raw data",
         "intensity values": "raw data",
         "reads": "raw data",
+	"sample index": "raw data",
         "rejected reads": "raw data",
         "raw data": "raw data",
         "reporter code counts": "raw data",
@@ -1073,6 +1101,7 @@
         "unfiltered peptide quantification": "quantification",
         "replication timing profile": "quantification",
         "motif model": "quantification",
+	"FDR cut rate": "quantification",
 
         "hotspots": "annotation",
         "long range chromatin interactions": "annotation",
@@ -1110,6 +1139,7 @@
         "candidate enhancers": "annotation",
         "candidate promoters": "annotation",
         "predicted transcription start sites": "annotation",
+	"normalized signal of significant reads": "annotation",
         "transcription start sites": "annotation",
         "candidate regulatory elements": "annotation",
         "representative dnase hypersensitivity sites":"annotation",
@@ -1119,6 +1149,9 @@
         "phased variant calls": "annotation",
         "filtered SNPs": "annotation",
         "filtered indels": "annotation",
+	"normalized counts": "annotation",
+	"median normalized counts": "annotation",
+	"mean normalized counts": "annotation",
 
         "transcriptome reference": "reference",
         "transcriptome index": "reference",
@@ -1144,8 +1177,8 @@
         "validation": "validation",
         
         "HMM predicted chromatin state": "annotation",
-        "semi-automated genome annotation": "annotation"
-        
+        "semi-automated genome annotation": "annotation",
+        "predicted genes": "annotation"
 	
     },
     "file_format_file_extension": {
@@ -1155,6 +1188,8 @@
         "bed": ".bed.gz",
         "bedpe": ".bedpe.gz",
         "chain": ".chain",
+	"txt": "txt",
+	"xls": "xls",
         "bigBed": ".bigBed",
         "bigWig": ".bigWig",
         "btr": ".btr",
@@ -1165,8 +1200,10 @@
         "gff": ".gff.gz",
         "gtf": ".gtf.gz",
         "hic": ".hic",
+	"bedgraph": ".bedgraph.gz",
 	"ibed": ".ibed",
         "hdf5": ".h5",
+	"zippedFastqFolder": ".zippedFastqFolder.zip",
         "idat": ".idat",
         "PWM":".pwm",
         "rcc": ".rcc",

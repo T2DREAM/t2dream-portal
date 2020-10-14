@@ -606,6 +606,7 @@ def audit_file_chip_seq_control_read_depth(value, system,
                                                          'ENCODE2',
                                                          'ENCODE',
                                                          'HPAP',
+                                                         'T1D',
                                                          'AMP-T2D',
                                                          'Roadmap')):
     '''

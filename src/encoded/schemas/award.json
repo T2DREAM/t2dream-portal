@@ -81,6 +81,7 @@
                 "GGR",
 		"AMP",
 		"HPAP",
+		"T1D",
                 "Roadmap",
                 "modENCODE",
                 "modERN",
@@ -97,6 +98,7 @@
                 "Roadmap",
 		"AMP",
 		"HPAP",
+		"T1D",
                 "modENCODE",
                 "modERN",
                 "community"
@@ -112,9 +114,13 @@
                 "GGR",
 		"AMP",
 		"HPAP",
+		"patrick-ellinor",
 		"gaulton-lab-internal",
+		"AMP-RFP8b",
+		"susztak-katalin",
 		"ren-lab-internal",
 		"reviwer",
+		"reviwer2020",
                 "REMC",
                 "community"
             ]

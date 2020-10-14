@@ -277,10 +277,12 @@ module.exports.dbxref_prefix_map = {
     "ENSEMBL": "http://www.ensembl.org/Homo_sapiens/Gene/Summary?g=",
     "GeneID": "https://www.ncbi.nlm.nih.gov/gene/",
     "GEO": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=",
+    "SRA":"https://www.ncbi.nlm.nih.gov/sra/?term=",
     "EBI": "https://www.ebi.ac.uk/arrayexpress/experiments/",
     "GEOSAMN": "https://www.ncbi.nlm.nih.gov/biosample/",
     "IHEC": "http://www.ebi.ac.uk/vg/epirr/view/",
     "Caltech": "http://jumpgate.caltech.edu/library/",
+    "HPAP": "https://hpap.pmacs.upenn.edu/explore/donor/",
     "Cellosaurus": "http://web.expasy.org/cellosaurus/",
     "FlyBase": "http://flybase.org/cgi-bin/quicksearch_solr.cgi?caller=quicksearch&tab=basic_tab&data_class=FBgn&species=Dmel&search_type=all&context=",
     // This WormBase link is strictly for Fly strains

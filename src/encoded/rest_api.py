@@ -31,8 +31,9 @@ def includeme(config):
     config.add_route('variant_all_graph', '/variant_all_graph/{search_params}/{json}')
     config.add_route('variant_table', '/variant_table/{search_params}/{json}')
     config.add_route('region_metadata', '/region_metadata/{search_params}/{tsv}')
-    config.add_route('experiment_metadata', '/experiment_metadata/{search_params}/{tsv}')
+    config.add_route('experiment_metadata', '/experiment_metadata/{search_params}/{json}')
     config.add_route('annotation_metadata', '/annotation_metadata/{search_params}/{tsv}')
+    config.add_route('target_gene_metadata', '/target_gene_metadata/{search_params}/{tsv}')
     config.add_route('data_filters', '/data_filters/{search_params}/{tsv}')
     config.scan(__name__)
 
@@ -45,6 +46,7 @@ _tsv_mapping = OrderedDict([
     ('Annotation accession', ['accession']),
     ('Assay', ['assay_term_name']),
     ('Annotation', ['annotation_type']),
+    ('Assay Type', ['annotation_type_category']),
     ('Status', ['status']),
     ('Collection Tags',  ['collection_tags']),
     ('Biosample term id', ['biosample_term_id']),
@@ -100,7 +102,15 @@ _tsv_mapping = OrderedDict([
     ('Platform', ['files.platform.title']),
     ('Controlled by', ['files.controlled_by']),
     ('External Source', ['dbxrefs']),
-    ('File Status', ['files.status'])
+    ('Publications', ['references']),
+    ('references_title',['references.title']),
+    ('references_identifiers',['references.identifiers']), 
+    ('File Status', ['files.status']),
+    ('Documents Status', ['documents.status']),
+    ('documents_uuid', ['documents.uuid']),
+    ('Documents Description', ['documents.description']),
+    ('documents_md5sum', ['documents.attachment.md5sum']),
+    ('documents_href', ['documents.attachment.href'])
 ])
 
 varshney_chromhmm_states = {
@@ -269,7 +279,7 @@ variant_allelic_effects = ['variant allelic effects']
 EQTL = ['eQTL']
 accessible_chromatin = ['accessible chromatin']
 allelic_effect_accessible_chromatin = ['variant allelic effects', 'accessible chromatin']
-target_gene_prediction_annotation = ['Chromatin interaction target genes', 'Coaccessible target genes']
+target_gene_prediction_annotation = ['target gene predictions', 'Coaccessible target genes']
 def get_file_uuids(result_dict):
     file_uuids = []
     for item in result_dict['@graph']:
@@ -827,31 +837,62 @@ def annotation_metadata(context, request):
             else:
                 state_descriptor = 'none'
                 value_descriptor = 'none'
-            if f['file_format'] == 'bed':
+            if f['file_format'] == 'bed' and f['status'] != 'archived' and f['assembly'] != 'GRCh38':
                 if title not in files:
                     files[title] = []
                     files[title].append({
-                        'md5sum': md5sum,
-                        'date_created': date_created,
-                        'href': href,
-                        'status': status,
-                        'lab': lab,
-                        'assembly': assembly,
-                        'value_descriptor': value_descriptor,
-                        'state_descriptor': state_descriptor
+                        'files_md5sum': md5sum,
+                        'files_date_created': date_created,
+                        'files_href': href,
+                        'files_status': status,
+                        'files_lab': lab,
+                        'files_assembly': assembly,
+                        'files_value_descriptor': value_descriptor,
+                        'files_state_descriptor': state_descriptor
                     })
                 else:
                     files[title].append({
-                        'md5sum': md5sum,
-                        'date_created': date_created,
-                        'href': href,
-                        'status': status,
-                        'lab': lab,
-                        'assembly': assembly,
-                        'value_descriptor': value_descriptor,
-                        'state_descriptor': state_descriptor
+                        'files_md5sum': md5sum,
+                        'files_date_created': date_created,
+                        'files_href': href,
+                        'files_status': status,
+                        'files_lab': lab,
+                        'files_assembly': assembly,
+                        'files_value_descriptor': value_descriptor,
+                        'files_state_descriptor': state_descriptor
+                    })
+        references = []
+        for r in annotation_json['references']:
+            identifier = 'identifiers'
+            if  identifier in r:
+                identifiers = r['identifiers']
+            else:
+                identifiers = []
+            references.extend(identifiers)
+        documents = {}
+        for d in annotation_json['documents']:
+            href = request.host_url + d['attachment']['href']
+            md5sum = d['attachment']['md5sum']
+            description = d['description']
+            uuid = d['uuid']
+            status = d['status']
+            if uuid not in documents:
+                documents[uuid] = []
+                documents[uuid].append({
+                    'documents_md5sum': md5sum,
+                    'documents_description': description,
+                    'documents_href': href,
+                    'documents_status': status
+                })
+            else:
+                documents[uuid].append({
+                    'documents_md5sum': md5sum,
+                    'documents_description': description,
+                    'documents_href': href,
+                    'documents_status': status
                     })
         annotation_id = annotation_json['accession']
+        project = annotation_json['award']['project']
         annotation_type = annotation_json['annotation_type']
         dataset_status = annotation_json['status']
         collection_tags = None if annotation_json.get('collection_tags')== None else annotation_json['collection_tags']
@@ -861,9 +902,9 @@ def annotation_metadata(context, request):
         system_slims = annotation_json['system_slims'] if 'system_slims' in annotation_json else None
         organ_slims = annotation_json['organ_slims'] if 'organ_slims' in annotation_json else None
         biosample_type = annotation_json.get("biosample_type", None)
-        #log.warn(biosample_type)
+        #publication = None if annotation_json.get("references")== None else annotation_json['references']['identifiers']
         biosample_term_id = annotation_json['biosample_term_id'] if 'biosample_term_id' in annotation_json else None
-        dbxrefs = annotation_json['dbxrefs'] 
+        dbxrefs = annotation_json['dbxrefs']
         harmonized_states = varshney_chromhmm_states if dbxrefs == ['dbGaP:phs001188.v1.p1'] and dbxrefs != ['ENCODE:ENCSR123'] else None  if annotation_type != 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else roadmap_chromhmm_states  
         #harmonized_states = roadmap_chromhmm_states if annotation_type == 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else None  if annotation_type != 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else varshney_chromhmm_states  
         if files:
@@ -878,18 +919,22 @@ def annotation_metadata(context, request):
                     'biosample_synonyms': biosample_synonyms,
                     'biosample_type': biosample_type,
                     'organ_slims': organ_slims,
+                    'project': project,
                     'system_slims': system_slims,
                     'harmonized_states': harmonized_states,
                     'file_download': files,
+                    'documents': documents,
                     'annotation_method': software,
                     'dataset_status': dataset_status,
-                    'collection_tags': collection_tags
+                    'collection_tags': collection_tags,
+                    'publications': references
                 })  
             else:
                 json_doc[annotation_type].append({
                     'annotation_type': annotation_type,
                     'annotation_id': annotation_id,
                     'dbxrefs': dbxrefs,
+                    'project': project,
                     'biosample_term_id': biosample_term_id,
                     'biosample_term_name': biosample_term_name,
                     'biosample_synonyms': biosample_synonyms,
@@ -898,16 +943,102 @@ def annotation_metadata(context, request):
                     'system_slims':system_slims,
                     'harmonized_states': harmonized_states,
                     'file_download': files,
+                    'documnents': documents,
                     'annotation_method': software,
                     'dataset_status': status,
-                    'collection_tags': collection_tags
-                    }) 
-            
+                    'collection_tags': collection_tags,
+                    'publications': references
+                    })             
     if 'annotation_metadata.json' in request.url:
         return Response(
             content_type='text/plain',
             body=json.dumps(json_doc,indent=2,sort_keys=True),
             content_disposition='attachment;filename="%s"' % 'annotation_metadata.json'
+    )
+@view_config(route_name= 'target_gene_metadata', request_method='GET')
+def target_gene_metadata(context, request):
+    param_list = parse_qs(request.matchdict['search_params'])
+    if 'referrer' in param_list:
+        search_path = '/{}/'.format(param_list.pop('referrer')[0])
+    else:
+        search_path = '/search/'
+    param_list['field'] = []
+    file_attributes = []
+    for prop in _tsv_mapping:
+        param_list['field'] = param_list['field'] + _tsv_mapping[prop]
+        if _tsv_mapping[prop][0].startswith('files'):
+            file_attributes = file_attributes + [_tsv_mapping[prop][0]]
+    param_list['limit'] = ['all']
+    path = '{}?{}'.format(search_path, urlencode(param_list, True))
+    results = request.embed(path, as_user=True)
+    json_doc = {}
+    for annotation_json in results['@graph']:
+        files = {}
+        for f in annotation_json['files']:
+            title = f['title']
+            md5sum = f['md5sum']
+            date_created = f['date_created']
+            lab = f['lab']['title']
+            href = request.host_url + f['href']
+            status = f['status']
+            assembly = f['assembly']
+            if f['file_format'] == 'bed' and f['status'] != 'archived' and f['assembly'] != 'GRCh38':
+                if title not in files:
+                    files[title] = []
+                    files[title].append({
+                        'files_href': href,
+                        'files_status': status,
+                        'files_lab': lab,
+                        'files_assembly': assembly,
+                    })
+                else:
+                    files[title].append({
+                        'files_href': href,
+                        'files_status': status,
+                        'files_lab': lab,
+                        'files_assembly': assembly,
+                    })
+        references = []
+        for r in annotation_json['references']:
+            identifier = 'identifiers'
+            if  identifier in r:
+                identifiers = r['identifiers']
+            else:
+                identifiers = []
+            references.extend(identifiers)
+        annotation_id = annotation_json['accession']
+        assay_type = annotation_json.get("annotation_type_category", None)
+        annotation_type = annotation_json['annotation_type']
+        software = None if annotation_json.get("software_used")== None else annotation_json["software_used"][0]["software"]["title"]
+        biosample_term_name = annotation_json.get("biosample_term_name", None)
+        biosample_term_id = annotation_json['biosample_term_id'] if 'biosample_term_id' in annotation_json else None
+        dbxrefs = annotation_json['dbxrefs']
+        if annotation_type == 'target gene predictions' or annotation_type == 'Coaccessible target genes':
+            if annotation_type not in json_doc:
+                json_doc[annotation_type] = []
+                json_doc[annotation_type].append({
+                    'annotation_type': annotation_type,
+                    'annotation_id': annotation_id,
+                    'dbxrefs': dbxrefs,
+                    'biosample_term_name': biosample_term_name,
+                    'assay_type': assay_type,
+                    'annotation_method': software,
+                    'publications': references
+                })  
+            else:
+                json_doc[annotation_type].append({
+                    'annotation_type': annotation_type,
+                    'annotation_id': annotation_id,
+                    'dbxrefs': dbxrefs,
+                    'biosample_term_name': biosample_term_name,
+                    'assay_type': assay_type,
+                    'annotation_method': software,
+                    'publications': references
+                    })             
+    if 'target_gene_metadata.json' in request.url:
+        return Response(
+            content_type='text/plain',
+            body=json.dumps(json_doc,indent=2,sort_keys=True),
     )
 
 @view_config(route_name='data_filters', request_method='GET')

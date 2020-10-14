@@ -30,22 +30,19 @@ log.setLevel(logging.INFO)
 # hashmap of assays and corresponding file types that are being indexed
 _INDEXED_DATA = {
     'accessible chromatin': {
-        'file_type': ['bed bed3+']
+        'output_type': ['peaks']
     },
     'variant allelic effects': {
         'output_type': ['variant calls']
-        },
+    },
     'Coaccessible target genes': {
         'file_type': ['bed bed3+']
-        },
-    'Chromatin interaction target genes': {
+    },
+    'target gene predictions': {
         'file_type': ['bed bed3+']
-        },
-    'binding sites': {
-        'output_type': ['signal']
     },
     'chromatin state': {
-        'file_type': ['bed bed3+', 'bed bed9']
+        'file_type': ['bed bed3+']
     },
     'eQTL': {
         'file_type': ['bed bed3+']

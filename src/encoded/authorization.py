@@ -23,8 +23,11 @@ def groupfinder(login, request):
         elif localname in ['TEST_AUTHENTICATED']:
             return ['viewing_group.HPAP']
         elif localname in ['TEST_AUTHENTICATED']:
+            return ['viewing_group.susztak-katalin']
+        elif localname in ['TEST_AUTHENTICATED']:
             return ['viewing_group.reviwer']
-
+        elif localname in ['TEST_AUTHENTICATED']:
+            return ['viewing_group.reviwer2020']
     if namespace in ('mailto', 'remoteuser', 'auth0'):
         users = collections.by_item_type['user']
         try:

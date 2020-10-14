@@ -175,6 +175,7 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 	var results = context['@graph'];
         var variants = context['regions'];
 	var coordinates = variants.coordinates;
+        var key = variants.coordinates && variants.state && variants.state;
         var columns = context['columns'];
         var notification = context['notification'];
         var assembly = ['hg19'];
@@ -266,7 +267,7 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 						  <div class="data-row">
 						  <div><strong>Annotation type: </strong>{result.annotation_type}</div>
 						  <div><strong>Biosample: </strong>{result.biosample_term_name}</div>
-						  <div style={{'height': '100px', 'overflow-y':'scroll', 'display': 'block'}}><table className="table table-panel table-striped table-hover"><thead><tr><th>Overlapping Coordinate</th><th>State</th><th>Value</th></tr></thead><tbody>{variants.map(function (result_variant){ while (result['accession'] == result_variant['@id']) {return(<tr key={result_variant.coordinates && result_variant.state && result_variant.value}><td>{result_variant.coordinates}</td><td> {result_variant.state}</td><td> {result_variant.value}</td></tr>);																				       }})}
+						  <div style={{'height': '100px', 'overflow-y':'scroll', 'display': 'block'}}><table className="table table-panel table-striped table-hover"><thead><tr><th>Overlapping Coordinate</th><th>State</th><th>Value</th></tr></thead><tbody>{variants.map(function (result_variant){ while (result['accession'] == result_variant['@id']) {return(<tr key={key}><td>{result_variant.coordinates}</td><td> {result_variant.state}</td><td> {result_variant.value}</td></tr>);																				       }})}
 					      </tbody>
 						  </table>
 					      </div>

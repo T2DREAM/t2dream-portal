@@ -177,6 +177,12 @@ const AnnotationComponent = createReactClass({
                                             <dd className="sentence-case">{context.annotation_type}</dd>
                                         </div>
                                     : null}
+                                    {context.annotation_type_category ?
+                                        <div data-test="type">
+                                            <dt>Underlying assay</dt>
+                                            <dd className="sentence-case">{context.annotation_type_category.map(function(item){ return <div className="item">{item}</div>; })}</dd>
+                                        </div>
+                                    : null}
 
                                     {context.target ?
                                         <div data-test="target">

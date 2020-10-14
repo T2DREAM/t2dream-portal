@@ -445,6 +445,13 @@ class FileComponent extends React.Component {
                                         </div>
                                     : null}
 
+                                    {context.read_length_zip_files ?
+                                        <div data-test="readlengthzipped">
+                                            <dt>Read length for zipped fastq files</dt>
+                                            <dd>{context.read_length_zip_files.map(function(item){ return <div className="item">{item}</div>; })}</dd>
+                                        </div>
+                                    : null}
+
                                     {context.file_size ?
                                         <div data-test="filesize">
                                             <dt>File size</dt>
@@ -537,7 +544,7 @@ class FileComponent extends React.Component {
                     </div>
                 </Panel>
 
-                {context.file_format === 'fastq' ?
+                {context.file_format === 'fastq'|| 'zippedFastqFolder' ?
                     <SequenceFileInfo file={context} />
                 : null}
 
@@ -592,6 +599,13 @@ class SequenceFileInfo extends React.Component {
                             <div data-test="platform">
                                 <dt>Platform</dt>
                                 <dd><a href={file.platform} title="View page for this platform">{platformAccession}</a></dd>
+                            </div>
+                        : null}
+
+                        {file.platforms_multiple_files ?
+                            <div data-test="platforms">
+                                <dt>Platforms</dt>
+			        <dd>{file.platforms_multiple_files.map(function(item){ return <div className="item">{item}</div>; })}</dd>
                             </div>
                         : null}
 

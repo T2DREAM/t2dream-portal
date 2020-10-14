@@ -179,7 +179,13 @@
                     "enhancer validation",
 		    "matrix eQTL results",
                     "semi-automated genome annotation",
+		    "predicted genes",
                     "blacklisted regions",
+		    "normalized counts",
+		    "median normalized counts",
+		    "mean normalized counts",
+		    "FDR cut rate",
+		    "normalized signal of significant reads",
                     "mitochondria blacklisted regions"
                 ]
             }
@@ -287,6 +293,12 @@
                     "stable peaks",
                     "enhancer validation",
                     "semi-automated genome annotation",
+		    "predicted genes",
+		    "mean normalized counts",
+		    "median normalized counts",
+		    "normalized counts",
+		    "FDR cut rate",
+		    "normalized signal of significant reads",
                     "blacklisted regions",
                     "mitochondria blacklisted regions"
                 ]

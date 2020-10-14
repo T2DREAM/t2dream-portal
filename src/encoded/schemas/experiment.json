@@ -119,7 +119,7 @@
                 "title": "External identifier",
                 "description": "A unique identifier from external resource.",
                 "type":  "string",
-                "pattern": "^(UCSC-ENCODE-mm9:wgEncodeEM\\d+|UCSC-ENCODE-hg19:wgEncodeEH\\d+|GEO:(GSM|GSE|SRX)\\d+|ENCODE:(ENCSR)\\S+|T2DREAM:()\\S+TSTSR|GEO-obsolete:(GSM|GSE|SRX)\\d+|RBPImage:[^\\s].*|EBI:(E-)\\S+)$"
+                "pattern": "^(UCSC-ENCODE-mm9:wgEncodeEM\\d+|UCSC-ENCODE-hg19:wgEncodeEH\\d+|HPAP:HPAP-\\d+|http://\\S+|https://\\S+|GEO:(GSM|GSE|SRX)\\d+|ENCODE:(ENCSR)\\S+|T2DREAM:()\\S+TSTSR|GEO-obsolete:(GSM|GSE|SRX)\\d+|RBPImage:[^\\s].*|EBI:(E-)\\S+)$"
             }
         },
         "documents": {

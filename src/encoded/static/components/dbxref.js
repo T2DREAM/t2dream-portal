@@ -24,7 +24,9 @@ export function dbxref(attributes) {
     if (prefix === 'GEO' && local.substr(0, 4) === 'SAMEA') {
         prefix = 'GEOSAMEA';
     }
-
+    if (prefix === 'HPAP') {
+	prefix = 'HPAP';
+	}
     // Handle two different kinds of WormBase IDs -- Target vs Strain
     if (prefix === 'WormBase' && attributes.target_ref) {
         prefix = 'WormBaseTargets';

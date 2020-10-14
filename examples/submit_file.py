@@ -115,6 +115,8 @@ validate_map = {
     ('gtf', None): None,
     ('tar', None): None,
     ('tsv', None): None,
+    ('txt', None): None,
+    ('xls', None): None,
     ('csv', None): None,
     ('2bit', None): None,
     ('csfasta', None): ['-type=csfasta'],

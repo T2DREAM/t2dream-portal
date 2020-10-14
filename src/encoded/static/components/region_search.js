@@ -184,7 +184,7 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
         var assembly = ['hg19'];
         var files = [];
         var id = url.parse(this.context.location_href, true);
-        var region = context['region'] || '';
+        var regions = context['region'] || '';
         var searchBase = url.parse(this.context.location_href).search || '';
         var trimmedSearchBase = searchBase.replace(/[\?|\&]limit=all/, "");
         var filters = context['filters'];
@@ -201,7 +201,6 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
                 return (aLower > bLower) ? 1 : ((aLower < bLower) ? -1 : 0);
             });
         }
-
         return (
             <div>
                 <h2>Search variants and regions</h2>
@@ -260,8 +259,11 @@ var RegionSearch = module.exports.RegionSearch = createReactClass({
 </div>
                                   <hr />
                                   <ul className="nav result-table" id="result-table">
-                                      {results.map(function (result) {
-                                          return listing({context:result, columns: columns, key: result['@id']});
+                                      {region.map(function (result) {
+                                          console.log(result);
+					  console.log(columns);
+					  console.log(result['state']);
+                                          return listing({context:result, columns: columns, key: result['state']});
                                       })}
                                   </ul>
                                 </div>

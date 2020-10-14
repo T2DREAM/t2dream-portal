@@ -798,7 +798,7 @@ def main():
         del terms[term]['id'], terms[term]['data'], terms[term]['data_with_develops_from']
     
     terms.update(ntr_assays)
-    with open('ontology.json', 'w') as outfile:
+    with open('ontology1.json', 'w') as outfile:
         json.dump(terms, outfile)
 
 
