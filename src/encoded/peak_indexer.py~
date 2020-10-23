@@ -29,36 +29,36 @@ log.setLevel(logging.INFO)
 
 # hashmap of assays and corresponding file types that are being indexed
 _INDEXED_DATA = {
-#    'accessible chromatin': {
-#        'file_type': ['bed bed3+']
-#    },
-#    'histone modifications': {
-#        'file_type': ['bed bed3+']
-#    },
-#    'candidate regulatory regions': {
-#        'file_type': ['bed bed3+']
-#    },
-#    'binding sites': {
-#        'file_type': ['bed bed3+']
-#    },
-#    'variant allelic effects': {
-#        'file_type': ['bed bed3+']
-#    },
-#    'caQTL': {
-#        'file_type': ['bed bed3+']
-#    },
-#    'Coaccessible target genes': {
-#        'file_type': ['bed bed3+']
-#    },
-#    'target gene predictions': {
-#        'file_type': ['bed bed3+']
-#    },
-#    'chromatin state': {
-#        'file_type': ['bed bed3+']
-#    },
-#    'eQTL': {
-#        'file_type': ['bed bed3+']
-#        }
+    'accessible chromatin': {
+        'file_type': ['bed bed3+']
+    },
+    'histone modifications': {
+        'file_type': ['bed bed3+']
+    },
+    'candidate regulatory regions': {
+        'file_type': ['bed bed3+']
+    },
+    'binding sites': {
+        'file_type': ['bed bed3+']
+    },
+    'variant allelic effects': {
+        'file_type': ['bed bed3+']
+    },
+    'caQTL': {
+        'file_type': ['bed bed3+']
+    },
+    'Coaccessible target genes': {
+        'file_type': ['bed bed3+']
+    },
+    'target gene predictions': {
+        'file_type': ['bed bed3+']
+    },
+    'chromatin state': {
+        'file_type': ['bed bed3+']
+    },
+    'eQTL': {
+        'file_type': ['bed bed3+']
+        }
 }
 
 # Species and references being indexed
