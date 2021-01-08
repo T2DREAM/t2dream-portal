@@ -18,7 +18,7 @@
 /session-secret.b64
 /src/encoded/static/css/
 /src/encoded/static/scss/_variables.original.scss
-
+/.t2dream-venv/
 *.DS_Store
 *.egg-info
 *.pyc
