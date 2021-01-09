@@ -158,7 +158,7 @@ write_files:
 
     cloud.aws.region: us-west-2
 
-    discovery.ec2.groups: elasticsearch-https, ssh-http-https
+    discovery.ec2.groups: ES, ssh-http-https
 
     # discovery.zen.minimum_master_nodes: 2
 
