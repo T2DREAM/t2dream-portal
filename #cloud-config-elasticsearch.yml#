@@ -1,4 +1,4 @@
-#cloud-config
+e#cloud-config
 
 # Instance
 ssh_authorized_keys:
@@ -153,7 +153,7 @@ write_files:
 
     cloud.aws.region: us-west-2
 
-    discovery.ec2.groups: ES, ssh-http-https
+    discovery.ec2.groups: elasticsearch-https, ssh-http-https
 
     indices.query.bool.max_clause_count: 8192
 

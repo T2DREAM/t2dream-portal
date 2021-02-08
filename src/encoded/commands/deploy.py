@@ -328,7 +328,7 @@ def run(
             'CLUSTER_NAME': cluster_name,
         }
         user_data = get_user_data(commit, config_file, data_insert, profile_name)
-        security_groups = ['elasticsearch-https']
+        security_groups = ['ES']
         iam_role = 'elasticsearch-instance'
         count = int(cluster_size)
 
