@@ -10,6 +10,7 @@ text = type(u'')
 logger = logging.getLogger('encoded')
 logger.setLevel(logging.INFO)  # doesn't work to shut off sqla INFO
 
+
 ORDER = [
     'user',
     'award',
@@ -21,15 +22,7 @@ ORDER = [
     'document',
     'antibody_lot',
     'antibody_characterization',
-    'antibody_approval',
     'treatment',
-    'construct',
-    'construct_characterization',
-    'rnai',
-    'rnai_characterization',
-    'talen',
-    'tale',
-    'crispr',
     'genetic_modification',
     'genetic_modification_characterization',
     'mouse_donor',
@@ -65,7 +58,6 @@ ORDER = [
     'bismark_quality_metric',
     'cpg_correlation_quality_metric',
     'chipseq_filter_quality_metric',
-    'fastqc_quality_metric',
     'samtools_flagstats_quality_metric',
     'mad_quality_metric',
     'correlation_quality_metric',
@@ -78,6 +70,7 @@ ORDER = [
     'trimming_quality_metric',
     'samtools_stats_quality_metric',
     'idr_quality_metric',
+    'histone_chipseq_quality_metric',
     'generic_quality_metric',
     'image',
     'page'
@@ -331,6 +324,7 @@ def request_url(item_type, method):
 
     return component
 
+
 def make_request(testapp, item_type, method):
     json_method = getattr(testapp, method.lower() + '_json')
 
@@ -417,7 +411,7 @@ def pipeline_logger(item_type, phase):
 
         loaded = created + updated
         logger.info('Loaded %d of %d %s (phase %s). CREATED: %d, UPDATED: %d, SKIPPED: %d, ERRORS: %d' % (
-             loaded, count, item_type, phase, created, updated, skipped, errors))
+            loaded, count, item_type, phase, created, updated, skipped, errors))
 
     return component
 
@@ -547,16 +541,25 @@ PHASE1_PIPELINES = {
         remove_keys('lab', 'submits_for'),
     ],
     'biosample': [
-        remove_keys('derived_from', 'pooled_from', 'part_of'),
+        remove_keys('derived_from', 'pooled_from', 'part_of', 'host'),
     ],
     'library': [
         remove_keys('spikeins_used'),
     ],
     'experiment': [
-        remove_keys('possible_controls', 'related_files'),
+        remove_keys('possible_controls', 'related_files', 'supersedes'),
+    ],
+    'mouse_donor': [
+        remove_keys('parent_strains'),
+    ],
+    'fly_donor': [
+        remove_keys('parent_strains'),
+    ],
+    'worm_donor': [
+        remove_keys('outcrossed_strain', 'parent_strains'),
     ],
     'human_donor': [
-        remove_keys('parents', 'children', 'siblings', 'fraternal_twin', 'identical_twin'),
+        remove_keys('parents', 'children', 'siblings', 'twin'),
     ],
     'publication': [
         remove_keys('datasets'),
@@ -595,11 +598,15 @@ PHASE1_PIPELINES = {
         remove_keys('related_datasets'),
     ],
     'file': [
-        remove_keys('derived_from', 'controlled_by')
+        remove_keys('derived_from', 'controlled_by', 'supersedes')
     ],
     'analysis_step': [
         remove_keys('parents')
+    ],
+    'treatment': [
+        remove_keys('biosamples_used')
     ]
+
 }
 
 
@@ -615,16 +622,25 @@ PHASE2_PIPELINES = {
         skip_rows_missing_all_keys('lab', 'submits_for'),
     ],
     'biosample': [
-        skip_rows_missing_all_keys('derived_from', 'pooled_from', 'part_of'),
+        skip_rows_missing_all_keys('derived_from', 'pooled_from', 'part_of', 'host'),
     ],
     'library': [
         skip_rows_missing_all_keys('spikeins_used'),
     ],
     'experiment': [
-        skip_rows_missing_all_keys('related_files', 'possible_controls'),
+        skip_rows_missing_all_keys('related_files', 'possible_controls', 'supersedes'),
     ],
     'human_donor': [
-        skip_rows_missing_all_keys('parents', 'children ', 'siblings', 'fraternal_twin', 'identical_twin'),
+        skip_rows_missing_all_keys('parents', 'children ', 'siblings', 'twin'),
+    ],
+    'mouse_donor': [
+        skip_rows_missing_all_keys('parent_strains'),
+    ],
+    'worm_donor': [
+        skip_rows_missing_all_keys('outcrossed_strain', 'parent_strains'),
+    ],
+    'fly_donor': [
+        skip_rows_missing_all_keys('parent_strains'),
     ],
     'annotation': [
         skip_rows_missing_all_keys('related_files', 'software_used'),
@@ -663,10 +679,13 @@ PHASE2_PIPELINES = {
         skip_rows_missing_all_keys('datasets'),
     ],
     'file': [
-        skip_rows_missing_all_keys('derived_from', 'controlled_by')
+        skip_rows_missing_all_keys('derived_from', 'controlled_by', 'supersedes')
     ],
     'analysis_step': [
         skip_rows_missing_all_keys('parents')
+    ],
+    'treatment': [
+        skip_rows_missing_all_keys('biosamples_used')
     ]
 }
 

@@ -19,7 +19,7 @@
    ],
     "properties": {
         "schema_version": {
-            "default": "6"
+            "default": "7"
         },
         "% of reads mapped to multiple loci": {
             "title": "% reads mapped to multiple loci",
@@ -140,6 +140,14 @@
             "title": "# of uniquely mapped reads",
             "description": "STAR Uniquely mapped reads number",
             "type": "number"
+        }
+    },
+    "facets": {
+        "assay_term_name": {
+            "title": "Assay name"
+        },
+        "status": {
+            "title": "Status"
         }
     },
     "changelog": "/profiles/changelogs/star_quality_metric.md"

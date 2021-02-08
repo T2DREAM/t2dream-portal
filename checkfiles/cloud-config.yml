@@ -51,6 +51,8 @@ runcmd:
 - sudo -u build git clone --no-checkout https://github.com/T2DREAM/t2dream-portal.git /opt/encoded
 - sudo -u build git -C /opt/encoded checkout %(COMMIT)s
 - chmod +x /opt/encoded/checkfiles/script
+
+- chmod +x /opt/encoded/checkfiles/script
 - cd /opt/encoded/checkfiles
 - sudo -u build pyvenv .
 - sudo -u build bin/pip install -r requirements.txt

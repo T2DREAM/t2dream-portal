@@ -46,7 +46,12 @@ assay_terms = {
       'BruChase-seq': 'OBI:0002114',
       'genetic modification followed by DNase-seq': 'NTR:0004774',
       'CRISPRi followed by RNA-seq': 'NTR:0004619',
+      'genotype phasing by HiC': 'NTR:0004875',
+      'Circulome-seq': 'NTR:0005023',
+      'whole genome sequencing assay': 'OBI:0002117',
+      'BruUV-seq': 'NTR:0004739',
+      'Mint-ChIP-seq': 'NTR:0005141',
       'single-nuclei ATAC-seq': 'NTR:0000438',
-      'single-cell ATAC-seq': 'NTR:0000444',
-      'genotyping by Hi-C': 'NTR:0004875'
+      'icSHAPE': 'NTR:0000433',
+      'single-cell ATAC-seq': 'NTR:0000444'
 }

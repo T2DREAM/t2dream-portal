@@ -86,7 +86,7 @@ def test_have_primary_missing_secondary(testapp,
     characterization_review = {
         'biosample_term_name': 'K562',
         'biosample_term_id': 'EFO:0002067',
-        'biosample_type': 'immortalized cell line',
+        'biosample_type': 'cell line',
         'organism': human['@id'],
         'lane': 1
     }
@@ -200,7 +200,7 @@ def test_multiple_secondary_one_primary(testapp,
     characterization_review = {
         'biosample_term_name': 'K562',
         'biosample_term_id': 'EFO:0002067',
-        'biosample_type': 'immortalized cell line',
+        'biosample_type': 'cell line',
         'organism': human['@id'],
         'lane': 1,
         'lane_status': 'compliant'
@@ -222,7 +222,7 @@ def test_multiple_secondary_one_primary(testapp,
     testapp.patch_json(sec_char2['@id'], {'status': 'exempt from standards',
                                           'reviewed_by': wrangler['@id'],
                                           'documents': [document['@id']],
-                                          'comment': 'Required plea for exemption',
+                                          'submitter_comment': 'Required plea for exemption',
                                           'notes': 'Required reviewer note'})
     res = testapp.get(antibody_lot['@id'] + '@@index-data')
     ab = res.json['object']
@@ -260,7 +260,7 @@ def test_histone_mod_characterizations(testapp,
     characterization_review_human = {
         'biosample_term_name': 'liver',
         'biosample_term_id': 'UBERON:0002107',
-        'biosample_type': 'immortalized cell line',
+        'biosample_type': 'tissue',
         'organism': human['@id'],
         'lane': 1,
         'lane_status': 'compliant'
@@ -268,7 +268,7 @@ def test_histone_mod_characterizations(testapp,
     characterization_review_mouse = {
         'biosample_term_name': 'liver',
         'biosample_term_id': 'UBERON:0002107',
-        'biosample_type': 'immortalized cell line',
+        'biosample_type': 'tissue',
         'organism': mouse['@id'],
         'lane': 1,
         'lane_status': 'not compliant'
@@ -286,7 +286,7 @@ def test_histone_mod_characterizations(testapp,
                                                 'characterization_reviews': [
                                                     characterization_review_mouse]})
     testapp.patch_json(sec_char['@id'], {'status': 'exempt from standards',
-                                         'comment': 'Please exempt this.',
+                                         'submitter_comment': 'Please exempt this.',
                                          'notes': 'OK.',
                                          'reviewed_by': wrangler['@id'],
                                          'documents': [document['@id']],
@@ -315,7 +315,7 @@ def test_histone_mod_characterizations(testapp,
 
     testapp.patch_json(prim_char_mouse2['@id'], {'status': 'exempt from standards',
                                                  'reviewed_by': wrangler['@id'],
-                                                 'comment': 'Please exempt this.',
+                                                 'submitter_comment': 'Please exempt this.',
                                                  'notes': 'OK',
                                                  'documents': [document['@id']],
                                                  'target': mouse_target_H3K9me3['@id'],
@@ -350,28 +350,28 @@ def test_multi_lane_primary(testapp,
     characterization_review = {
         'biosample_term_name': 'K562',
         'biosample_term_id': 'EFO:0002067',
-        'biosample_type': 'immortalized cell line',
+        'biosample_type': 'cell line',
         'organism': human['@id'],
         'lane': 1,
         'lane_status': 'compliant'
     }
     characterization_review_2 = {'biosample_term_name': 'HepG2',
                                  'biosample_term_id': 'EFO:0001187',
-                                 'biosample_type': 'immortalized cell line',
+                                 'biosample_type': 'cell line',
                                  'organism': human['@id'],
                                  'lane': 2,
                                  'lane_status': 'not compliant'}
 
     characterization_review_3 = {'biosample_term_name': 'GM12878',
                                  'biosample_term_id': 'EFO:0002784',
-                                 'biosample_type': 'immortalized cell line',
+                                 'biosample_type': 'cell line',
                                  'organism': human['@id'],
                                  'lane': 3,
                                  'lane_status': 'exempt from standards'}
     testapp.patch_json(prim_char['@id'], {'status': 'compliant',
                                           'reviewed_by': wrangler['@id'],
                                           'documents': [document['@id']],
-                                          'comment': 'Please exempt this.',
+                                          'submitter_comment': 'Please exempt this.',
                                           'notes': 'OK.',
                                           'target': target['@id'],
                                           'characterization_reviews': [characterization_review,
@@ -426,7 +426,7 @@ def test_bonus_char_reviews_in_primary(testapp,
     characterization_review1 = {
         'biosample_term_name': 'K562',
         'biosample_term_id': 'EFO:0002067',
-        'biosample_type': 'immortalized cell line',
+        'biosample_type': 'cell line',
         'organism': human['@id'],
         'lane': 1,
         'lane_status': 'pending dcc review'
@@ -444,7 +444,7 @@ def test_bonus_char_reviews_in_primary(testapp,
     characterization_review2 = {
         'biosample_term_name': 'HepG2',
         'biosample_term_id': 'EFO:0001187',
-        'biosample_type': 'immortalized cell line',
+        'biosample_type': 'cell line',
         'organism': human['@id'],
         'lane': 1,
         'lane_status': 'pending dcc review'
@@ -468,7 +468,7 @@ def test_bonus_char_reviews_in_primary(testapp,
                                          'target': target['@id'],
                                          'reviewed_by': wrangler['@id'],
                                          'documents': [document['@id']],
-                                         'comment': 'Please exempt this.',
+                                         'submitter_comment': 'Please exempt this.',
                                          'notes': 'OK.'})
     res = testapp.get(antibody_lot['@id'] + '@@index-data')
     ab = res.json['object']

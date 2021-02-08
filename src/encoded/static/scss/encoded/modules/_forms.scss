@@ -10,8 +10,35 @@ $inputFocusBorderColor: darken(#fff, 26%) !default;
 }
 
 .form-control {
-        max-width: 100%;
 	padding: 4px 6px;
+}
+
+.form-control--select {
+	@extend .form-control;
+
+	select {
+		position: relative;
+		height: 30px;
+		padding-right: 30px;
+		font-size: 0.9rem;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+
+		&:after {
+			content: '\f0dc';
+			font-family: FontAwesome;
+			padding: 8px;
+			position: absolute;
+			right: 10px;
+			top: 5px;
+			z-index: 1;
+			width: 10px;
+			line-height: 50%;
+			font-size: 0.86rem;
+			color: #428bca;
+			pointer-events: none;
+		}
+	}
 }
 
 input[type="text"], input[type="password"], input[type="date"], input[type="datetime"], input[type="email"], input[type="number"], input[type="search"], input[type="tel"], input[type="time"], input[type="url"], textarea, select {
@@ -33,9 +60,9 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
 	}
 }
 
-// home search
+// Navbar search
 #home-search {
-	max-width: 75%;
+        max-width: 75%;
 	max-height: 30px;
 	padding: 3px 26px 4px 14px;
 	padding-top: 3px;
@@ -56,20 +83,22 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
 	.form-control {
 		display: inline;
 	}
-        vertical-align: middle;
+	vertical-align: middle;
         padding-left: 15px;
         padding-right: 35px;
 	padding-top: 10px;	
 }
 
 .search-wrapper {
-	display:inline;
+	display: inline;
+
 	&:after {
 		font-family: "FontAwesome";
 		position: relative;
 		top: 0;
 		left: -24px;
 		color: gray;	
+
 		@media(min-width: $screen-sm-min) {
 			top: 2px;
 		}
@@ -162,8 +191,19 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
 	}
 }
 
+// 'x' button to clear form entries.
+.clear-button {
+	display: inline;
+	padding: 0;
+	border: none;
+	background: transparent;
+	color: #428bca;
+}
+
+
+
 /*** SEARCH BUTTON ***/
-.submit_3{
+.submit_3 {
 background: #63abed;/* Fallback color for non-css3 browsers */
 border: 0;
 color: #eee;
@@ -190,8 +230,7 @@ background: #5ba5ea; /* Fallback color for non-css3 browsers */
 
 }
 .submit_3:active {
-background: #5ba5ea; /* Fallback color for non-css3 browsers */
-
+    background: #5ba5ea; /* Fallback color for non-css3 browsers */
 }
 
 .submit_4{
@@ -222,6 +261,4 @@ background: #5ba5ea; /* Fallback color for non-css3 browsers */
 }
 .submit_4:active {
 background: #5ba5ea; /* Fallback color for non-css3 browsers */
-
 }
-

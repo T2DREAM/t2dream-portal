@@ -4,7 +4,6 @@ from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.view import view_config
 from pyramid.response import Response
 from snovault import TYPES
-from collections import OrderedDict
 from snovault.util import simple_path_ids
 from urllib.parse import (
     parse_qs,
@@ -12,25 +11,21 @@ from urllib.parse import (
 )
 from .search import iter_search_results
 from .search import list_visible_columns_for_schemas
-import pprint
 import csv
 import io
 import json
-import subprocess
-import requests
-import shlex
-import sys
-import logging
-import re
-log = logging.getLogger(__name__)
-#log.setLevel(logging.INFO)
+import datetime
+
+currenttime = datetime.datetime.now()
+
 
 def includeme(config):
     config.add_route('batch_download', '/batch_download/{search_params}')
     config.add_route('metadata', '/metadata/{search_params}/{tsv}')
-    config.add_route('peak_download', '/peak_download/{search_params}/{tsv}')
+    config.add_route('peak_metadata', '/peak_metadata/{search_params}/{tsv}')
     config.add_route('report_download', '/report.tsv')
     config.scan(__name__)
+
 
 # includes concatenated properties
 _tsv_mapping = OrderedDict([
@@ -38,15 +33,10 @@ _tsv_mapping = OrderedDict([
     ('File format', ['files.file_type']),
     ('Output type', ['files.output_type']),
     ('Experiment accession', ['accession']),
-    ('Annotation accession', ['accession']),
     ('Assay', ['assay_term_name']),
-    ('Annotation', ['annotation_type']),
     ('Biosample term id', ['biosample_term_id']),
     ('Biosample term name', ['biosample_term_name']),
     ('Biosample type', ['biosample_type']),
-    ('Biosample synonyms', ['biosample_synonyms']),
-    ('System slims', ['system_slims']),
-    ('Organ slims', ['organ_slims']),
     ('Biosample life stage', ['replicates.library.biosample.life_stage']),
     ('Biosample sex', ['replicates.library.biosample.sex']),
     ('Biosample Age', ['replicates.library.biosample.age',
@@ -83,10 +73,6 @@ _tsv_mapping = OrderedDict([
     ('Size', ['files.file_size']),
     ('Lab', ['files.lab.title']),
     ('md5sum', ['files.md5sum']),
-    ('bed_file_state', ['files.bed_file_state']),
-    ('bed_file_value', ['files.bed_file_value']),
-    ('file_format', ['files.file_format']),
-    ('files.date_created', ['files.date_created']),
     ('dbxrefs', ['files.dbxrefs']),
     ('File download URL', ['files.href']),
     ('Assembly', ['files.assembly']),
@@ -109,6 +95,7 @@ _audit_mapping = OrderedDict([
                      'audit.ERROR.category',
                      'audit.ERROR.detail'])
 ])
+
 
 def get_file_uuids(result_dict):
     file_uuids = []
@@ -135,23 +122,15 @@ def get_peak_metadata_links(request):
     else:
         search_params = request.query_string
 
-    peak_download_tsv_link = '{host_url}/peak_download/{search_params}/peak_download.tsv'.format(
-        host_url=request.host_url,
-        search_params= search_params
-    )
-    return [peak_download_tsv_link]
-
-def get_region_metadata_links(request):
-    if request.matchdict.get('search_params'):
-        search_params = request.matchdict['search_params']
-    else:
-        search_params = request.query_string
-
-    region_metadata_tsv_link = '{host_url}/region_metadata/{search_params}/region_metadata.tsv'.format(
+    peak_metadata_tsv_link = '{host_url}/peak_metadata/{search_params}/peak_metadata.tsv'.format(
         host_url=request.host_url,
         search_params=search_params
     )
-    return [region_metadata_tsv_link]
+    peak_metadata_json_link = '{host_url}/peak_metadata/{search_params}/peak_metadata.json'.format(
+        host_url=request.host_url,
+        search_params=search_params
+    )
+    return [peak_metadata_tsv_link, peak_metadata_json_link]
 
 def make_cell(header_column, row, exp_data_row):
     temp = []
@@ -189,13 +168,14 @@ def make_audit_cell(header_column, experiment_json, file_json):
             data.append(categories[i])
     return ', '.join(list(set(data)))
 
-@view_config(route_name='peak_download', request_method='GET')
-def peak_download(context, request):
+
+@view_config(route_name='peak_metadata', request_method='GET')
+def peak_metadata(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
     param_list['field'] = []
-    header = ['annotation_type', 'source', 'coordinates', 'file.accession', 'annotation.accession']
+    header = ['assay_term_name', 'coordinates', 'target.label', 'biosample.accession', 'file.accession', 'experiment.accession']
     param_list['limit'] = ['all']
-    path = '/variant-search/?{}&{}'.format(urlencode(param_list, True),'referrer=download_metadata')
+    path = '/variant-search/?{}&{}'.format(urlencode(param_list, True),'referrer=peak_metadata')
     results = request.embed(path, as_user=True)
     uuids_in_results = get_file_uuids(results)
     rows = []
@@ -203,22 +183,33 @@ def peak_download(context, request):
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
-            annotation_json = request.embed(file_json['dataset'])
+            experiment_json = request.embed(file_json['dataset'])
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
-                chrom = '{}'.format(row['_index'])
-                assembly = '{}'.format(row['_type'])
-                start = int('{}'.format(hit['_source']['start']))
-                stop = int('{}'.format(hit['_source']['end']))
-                state = '{}'.format(hit['_source']['state'])
-                val = '{}'.format(hit['_source']['val'])
-                file_accession = file_json['accession']
-                annotation_accession = annotation_json['accession']
                 coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
-                annotation = annotation_json['annotation_type']
-                biosample_term = annotation_json['biosample_term_name']
-                data_row.extend([annotation, biosample_term, coordinates, file_accession, annotation_accession])
+                file_accession = file_json['accession']
+                experiment_accession = experiment_json['accession']
+                assay_name = experiment_json['assay_term_name']
+                target_name = experiment_json.get('target', {}).get('label') # not all experiments have targets
+                biosample_accession = get_biosample_accessions(file_json, experiment_json)
+                data_row.extend([assay_name, coordinates, target_name, biosample_accession, file_accession, experiment_accession])
                 rows.append(data_row)
+                if assay_name not in json_doc:
+                    json_doc[assay_name] = []
+                else:
+                    json_doc[assay_name].append({
+                        'coordinates': coordinates,
+                        'target.name': target_name,
+                        'biosample.accession': list(biosample_accession.split(', ')),
+                        'file.accession': file_accession,
+                        'experiment.accession': experiment_accession
+                    })
+    if 'peak_metadata.json' in request.url:
+        return Response(
+            content_type='text/plain',
+            body=json.dumps(json_doc),
+            content_disposition='attachment;filename="%s"' % 'peak_metadata.json'
+        )
     fout = io.StringIO()
     writer = csv.writer(fout, delimiter='\t')
     writer.writerow(header)
@@ -228,6 +219,7 @@ def peak_download(context, request):
         body=fout.getvalue(),
         content_disposition='attachment;filename="%s"' % 'peak_metadata.tsv'
     )
+
 
 @view_config(route_name='metadata', request_method='GET')
 def metadata_tsv(context, request):
@@ -257,7 +249,7 @@ def metadata_tsv(context, request):
 
             f_attributes = ['files.title', 'files.file_type',
                             'files.output_type']
-            
+
             for f in experiment_json['files']:
                 if 'files.file_type' in param_list:
                     if f['file_type'] not in param_list['files.file_type']:
@@ -299,11 +291,12 @@ def metadata_tsv(context, request):
         content_disposition='attachment;filename="%s"' % 'metadata.tsv'
     )
 
+
 @view_config(route_name='batch_download', request_method='GET')
 def batch_download(context, request):
     # adding extra params to get required columns
     param_list = parse_qs(request.matchdict['search_params'])
-    param_list['field'] = ['files.href', 'files.file_type']
+    param_list['field'] = ['files.href', 'files.file_type', 'files']
     param_list['limit'] = ['all']
     path = '/search/?%s' % urlencode(param_list, True)
     results = request.embed(path, as_user=True)
@@ -314,7 +307,7 @@ def batch_download(context, request):
     files = [metadata_link]
     if 'files.file_type' in param_list:
         for exp in results['@graph']:
-            for f in exp['files']:
+            for f in exp.get('files', []):
                 if f['file_type'] in param_list['files.file_type']:
                     files.append('{host_url}{href}'.format(
                         host_url=request.host_url,
@@ -322,7 +315,7 @@ def batch_download(context, request):
                     ))
     else:
         for exp in results['@graph']:
-            for f in exp['files']:
+            for f in exp.get('files', []):
                 files.append('{host_url}{href}'.format(
                     host_url=request.host_url,
                     href=f['href']
@@ -332,6 +325,7 @@ def batch_download(context, request):
         body='\n'.join(files),
         content_disposition='attachment; filename="%s"' % 'files.txt'
     )
+
 
 def lookup_column_value(value, path):
     nodes = [value]
@@ -353,7 +347,12 @@ def lookup_column_value(value, path):
     if nodes and hasattr(nodes[0], '__contains__') and '@id' in nodes[0]:
         nodes = [node['@id'] for node in nodes]
     seen = set()
-    deduped_nodes = [n for n in nodes if not (n in seen or seen.add(n))]
+    deduped_nodes = []
+    for n in nodes:
+        if isinstance(n, dict):
+            n = str(n)
+        if n not in seen:
+            deduped_nodes.append(n)
     return u','.join(u'{}'.format(n) for n in deduped_nodes)
 
 
@@ -372,9 +371,16 @@ def report_download(context, request):
     # Make sure we get all results
     request.GET['limit'] = 'all'
 
-    schemas = [request.registry[TYPES][types[0]].schema]
+    type = types[0]
+    schemas = [request.registry[TYPES][type].schema]
     columns = list_visible_columns_for_schemas(request, schemas)
-    
+    type = type.replace("'", '')
+
+    def format_header(seq):
+        newheader="%s\t%s%s?%s\r\n" % (currenttime, request.host_url, '/report/', request.query_string)
+        return(bytes(newheader, 'utf-8'))
+       
+
     # Work around Excel bug; can't open single column TSV with 'ID' header
     if len(columns) == 1 and '@id' in columns:
         columns['@id']['title'] = 'id'
@@ -382,12 +388,14 @@ def report_download(context, request):
     header = [column.get('title') or field for field, column in columns.items()]
 
     def generate_rows():
+        yield format_header(header)
         yield format_row(header)
         for item in iter_search_results(context, request):
             values = [lookup_column_value(item, path) for path in columns]
             yield format_row(values)
+
     # Stream response using chunked encoding.
     request.response.content_type = 'text/tsv'
-    request.response.content_disposition = 'attachment;filename="%s"' % 'report.tsv'
+    request.response.content_disposition = 'attachment;filename="%s"' % '%(doctype)s Report %(yyyy)s/%(mm)s/%(dd)s.tsv' % {'yyyy': currenttime.year, 'mm': currenttime.month, 'dd': currenttime.day, 'doctype': type} #change file name
     request.response.app_iter = generate_rows()
     return request.response

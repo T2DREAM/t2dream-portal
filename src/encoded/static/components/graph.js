@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import createReactClass from 'create-react-class';
 import _ from 'underscore';
-import { Panel } from '../libs/bootstrap/panel';
-import { BrowserFeat } from './browserfeat';
 import { svgIcon } from '../libs/svg-icons';
+import { BrowserFeat } from './browserfeat';
+import * as globals from './globals';
+import { requestFiles } from './objectutils';
+import { fileStatusList } from './typeutils';
 
 
 // Zoom slider constants
@@ -154,132 +155,52 @@ export class JsonGraph {
 }
 
 
-export const Graph = createReactClass({
-    propTypes: {
-        graph: PropTypes.object, // JSON graph object to render
-        nodeClickHandler: PropTypes.func, // Function to call to handle clicks in a node
-        noDefaultClasses: PropTypes.bool, // True to supress default CSS classes on <Panel> components
-        children: PropTypes.node,
-    },
+// Handle graphing throws. Exported for Jest tests.
+export function GraphException(message, file0, file1) {
+    this.message = message;
+    if (file0) {
+        this.file0 = file0;
+    }
+    if (file1) {
+        this.file1 = file1;
+    }
+}
 
-    getInitialState: () => ({
-        dlDisabled: false, // Download button disabled because of IE
-        verticalGraph: false, // True for vertically oriented graph, false for horizontal
-        zoomLevel: null, // Graph zoom level; null to indicate not set
-    }),
 
-    componentDidMount: function () {
-        if (BrowserFeat.getBrowserCaps('svg')) {
-            // Delay loading dagre for Jest testing compatibility;
-            // Both D3 and Jest have their own conflicting JSDOM instances
-            require.ensure(['dagre-d3', 'd3'], (require) => {
-                if (this.refs.graphdisplay) {
-                    this.d3 = require('d3');
-                    this.dagreD3 = require('dagre-d3');
+// Display the file status legend for the file graph.
+const GraphLegend = (props, context) => {
+    // Get array of all possible file status strings given the current login state, i.e. logged
+    // out, logged in, and logged in as admin.
+    const statusList = fileStatusList(context.session, context.session_properties);
 
-                    const el = this.refs.graphdisplay;
+    return (
+        <div className="file-status-legend">
+            {statusList.map((status) => {
+                // Get a CSS class for the current status to render.
+                const statusClass = globals.statusClass(status, 'file-status-legend__item file-status-legend__item--', true);
 
-                    // Add SVG element to the graph component, and assign it classes, sizes, and a group
-                    const svg = this.d3.select(el).insert('svg', '#graph-node-info')
-                        .attr('id', 'pipeline-graph')
-                        .attr('preserveAspectRatio', 'none')
-                        .attr('version', '1.1');
-                    this.cv.savedSvg = svg;
+                return (
+                    <div key={status} className={statusClass}>
+                        <i className="icon icon-circle file-status-legend__icon" />
+                        {status}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
 
-                    // Draw the graph into the panel; get the graph's view box and save it for
-                    // comparisons later
-                    const { viewBoxWidth, viewBoxHeight } = this.drawGraph(el);
-                    this.cv.viewBoxWidth = viewBoxWidth;
-                    this.cv.viewBoxHeight = viewBoxHeight;
+GraphLegend.contextTypes = {
+    session: PropTypes.object,
+    session_properties: PropTypes.object,
+};
 
-                    // Based on the size of the graph and view box, set the initial zoom level to
-                    // something that fits well.
-                    const initialZoomLevel = this.setInitialZoomLevel(el, svg);
-                    this.setState({ zoomLevel: initialZoomLevel });
 
-                    // Bind node/subnode click handlers to parent component handlers
-                    this.bindClickHandlers(this.d3, el);
-                }
-            });
-        } else {
-            // Output text indicating that graphs aren't supported.
-            let el = this.refs.graphdisplay;
-            const para = document.createElement('p');
-            para.className = 'browser-error';
-            para.innerHTML = 'Graphs not supported in your browser. You need a more modern browser to view it.';
-            el.appendChild(para);
-
-            // Disable the download button
-            el = this.refs.dlButton;
-            el.setAttribute('disabled', 'disabled');
-        }
-
-        // Disable download button if running on Trident (IE non-Spartan) browsers
-        if (BrowserFeat.getBrowserCaps('uaTrident') || BrowserFeat.getBrowserCaps('uaEdge')) {
-            this.setState({ dlDisabled: true });
-        }
-    },
-
-    // State change; redraw the graph
-    componentDidUpdate: function () {
-        if (this.dagreD3 && !this.cv.zoomMouseDown) {
-            const el = this.refs.graphdisplay; // Change in React 0.14
-            const { viewBoxWidth, viewBoxHeight } = this.drawGraph(el);
-
-            // Bind node/subnode click handlers to parent component handlers
-            this.bindClickHandlers(this.d3, el);
-
-            // If the viewbox has changed since the last time, need to recalculate the zooming
-            // parameters.
-            if (Math.abs(viewBoxWidth - this.cv.viewBoxWidth) > 10 || Math.abs(viewBoxHeight - this.cv.viewBoxHeight) > 10) {
-                // Based on the size of the graph and view box, set the initial zoom level to
-                // something that fits well.
-                const initialZoomLevel = this.setInitialZoomLevel(el, this.cv.savedSvg);
-                this.setState({ zoomLevel: initialZoomLevel });
-            }
-
-            this.cv.viewBoxWidth = viewBoxWidth;
-            this.cv.viewBoxHeight = viewBoxHeight;
-        }
-    },
-
-    // For the given container element and its svg, calculate an initial zoom level that fits the
-    // graph into the container element. Returns the zoom level appropriate for the initial zoom.
-    // Also sets component variables for later zoom calculations, and sets the "width" and "height"
-    // of the SVG to scale it to fit the container element.
-    setInitialZoomLevel: function (el, svg) {
-        let svgWidth;
-        let svgHeight;
-        const viewBox = svg.attr('viewBox').split(' ');
-        const viewBoxWidth = viewBox[2];
-        const viewBoxHeight = viewBox[3];
-
-        // Calculate minimum and maximum pixel width, and zoom factor which is the amount each
-        // slider value gets multiplied by to get a new graph width. Save all these in component
-        // variables.
-        const minZoomWidth = viewBoxWidth / 4;
-        const maxZoomWidth = viewBoxWidth * 2;
-        this.cv.zoomFactor = (maxZoomWidth - minZoomWidth) / 100;
-        this.cv.minZoomWidth = minZoomWidth;
-        this.cv.aspectRatio = viewBoxWidth / viewBoxHeight;
-
-        // Get the width of the graph panel
-        if (el.clientWidth >= viewBoxWidth) {
-            svgWidth = viewBoxWidth;
-            svgHeight = viewBoxHeight;
-        } else {
-            svgWidth = el.clientWidth;
-            svgHeight = svgWidth / this.cv.aspectRatio;
-        }
-        const zoomLevel = (svgWidth - this.cv.minZoomWidth) / this.cv.zoomFactor;
-        svg.attr('width', svgWidth).attr('height', svgHeight);
-        return zoomLevel;
-    },
-
+export class Graph extends React.Component {
     // Take a JsonGraph object and convert it to an SVG graph with the Dagre-D3 library.
     // jsonGraph: JsonGraph object containing nodes and edges.
     // graph: Initialized empty Dagre-D3 graph.
-    convertGraph: function (jsonGraph, graph) {
+    static convertGraph(jsonGraph, graph) {
         // graph: dagre graph object
         // parent: JsonGraph node to insert nodes into
         function convertGraphInner(subgraph, parent) {
@@ -313,13 +234,159 @@ export const Graph = createReactClass({
         jsonGraph.edges.forEach((edge) => {
             graph.setEdge(edge.source, edge.target, { lineInterpolate: 'basis' });
         });
-    },
+    }
+
+    constructor() {
+        super();
+
+        // Set initial React component state.
+        this.state = {
+            dlDisabled: false, // Download button disabled because of IE
+            verticalGraph: false, // True for vertically oriented graph, false for horizontal
+            zoomLevel: null, // Graph zoom level; null to indicate not set
+            contributingFiles: {}, // List of contributing file objects we've requested; acts as a cache too
+            coalescedFiles: [],
+        };
+
+        // Component state variables we don't want to cause a rerender.
+        this.cv = {
+            graph: null, // Currently rendered JSON graph object
+            viewBoxWidth: 0, // Width of the SVG's viewBox
+            viewBoxHeight: 0, // Height of the SVG's viewBox
+            aspectRatio: 0, // Aspect ratio of graph -- width:height
+            zoomMouseDown: false, // Mouse currently controlling zoom slider
+            dagreLoaded: false, // Dagre JS library has been loaded
+            zoomFactor: 0, // Amount zoom slider value changes should change width of graph
+        };
+
+        // Bind `this` to non-React methods.
+        this.setInitialZoomLevel = this.setInitialZoomLevel.bind(this);
+        this.drawGraph = this.drawGraph.bind(this);
+        this.bindClickHandlers = this.bindClickHandlers.bind(this);
+        this.handleOrientationClick = this.handleOrientationClick.bind(this);
+        this.handleDlClick = this.handleDlClick.bind(this);
+        this.nodeIdClick = this.nodeIdClick.bind(this);
+        this.rangeChange = this.rangeChange.bind(this);
+        this.rangeMouseDown = this.rangeMouseDown.bind(this);
+        this.rangeMouseUp = this.rangeMouseUp.bind(this);
+        this.rangeDoubleClick = this.rangeDoubleClick.bind(this);
+    }
+
+    componentDidMount() {
+        if (this.props.graph) {
+            if (BrowserFeat.getBrowserCaps('svg')) {
+                // Delay loading dagre for Jest testing compatibility;
+                // Both D3 and Jest have their own conflicting JSDOM instances
+                require.ensure(['dagre-d3', 'd3'], (require) => {
+                    if (this.refs.graphdisplay) {
+                        this.d3 = require('d3');
+                        this.dagreD3 = require('dagre-d3');
+
+                        const el = this.refs.graphdisplay;
+
+                        // Add SVG element to the graph component, and assign it classes, sizes, and a group
+                        const svg = this.d3.select(el).insert('svg', '#graph-node-info')
+                            .attr('id', 'pipeline-graph')
+                            .attr('preserveAspectRatio', 'none')
+                            .attr('version', '1.1');
+                        this.cv.savedSvg = svg;
+
+                        // Draw the graph into the panel; get the graph's view box and save it for
+                        // comparisons later
+                        const { viewBoxWidth, viewBoxHeight } = this.drawGraph(el);
+                        this.cv.viewBoxWidth = viewBoxWidth;
+                        this.cv.viewBoxHeight = viewBoxHeight;
+
+                        // Based on the size of the graph and view box, set the initial zoom level to
+                        // something that fits well.
+                        const initialZoomLevel = this.setInitialZoomLevel(el, svg);
+                        this.setState({ zoomLevel: initialZoomLevel });
+
+                        // Bind node/subnode click handlers to parent component handlers
+                        this.bindClickHandlers(this.d3, el);
+                    }
+                });
+            } else {
+                // Output text indicating that graphs aren't supported.
+                let el = this.refs.graphdisplay;
+                const para = document.createElement('p');
+                para.className = 'browser-error';
+                para.innerHTML = 'Graphs not supported in your browser. You need a more modern browser to view it.';
+                el.appendChild(para);
+
+                // Disable the download button
+                el = this.refs.dlButton;
+                el.setAttribute('disabled', 'disabled');
+            }
+
+            // Disable download button if running on Trident (IE non-Spartan) browsers
+            if (BrowserFeat.getBrowserCaps('uaTrident') || BrowserFeat.getBrowserCaps('uaEdge')) {
+                this.setState({ dlDisabled: true });
+            }
+        }
+    }
+
+    // State change; redraw the graph
+    componentDidUpdate() {
+        if (this.dagreD3 && !this.cv.zoomMouseDown) {
+            const el = this.refs.graphdisplay; // Change in React 0.14
+            const { viewBoxWidth, viewBoxHeight } = this.drawGraph(el);
+
+            // Bind node/subnode click handlers to parent component handlers
+            this.bindClickHandlers(this.d3, el);
+
+            // If the viewbox has changed since the last time, need to recalculate the zooming
+            // parameters.
+            if (Math.abs(viewBoxWidth - this.cv.viewBoxWidth) > 10 || Math.abs(viewBoxHeight - this.cv.viewBoxHeight) > 10) {
+                // Based on the size of the graph and view box, set the initial zoom level to
+                // something that fits well.
+                const initialZoomLevel = this.setInitialZoomLevel(el, this.cv.savedSvg);
+                this.setState({ zoomLevel: initialZoomLevel });
+            }
+
+            this.cv.viewBoxWidth = viewBoxWidth;
+            this.cv.viewBoxHeight = viewBoxHeight;
+        }
+    }
+
+    // For the given container element and its svg, calculate an initial zoom level that fits the
+    // graph into the container element. Returns the zoom level appropriate for the initial zoom.
+    // Also sets component variables for later zoom calculations, and sets the "width" and "height"
+    // of the SVG to scale it to fit the container element.
+    setInitialZoomLevel(el, svg) {
+        let svgWidth;
+        let svgHeight;
+        const viewBox = svg.attr('viewBox').split(' ');
+        const viewBoxWidth = viewBox[2];
+        const viewBoxHeight = viewBox[3];
+
+        // Calculate minimum and maximum pixel width, and zoom factor which is the amount each
+        // slider value gets multiplied by to get a new graph width. Save all these in component
+        // variables.
+        const minZoomWidth = viewBoxWidth / 4;
+        const maxZoomWidth = viewBoxWidth * 2;
+        this.cv.zoomFactor = (maxZoomWidth - minZoomWidth) / 100;
+        this.cv.minZoomWidth = minZoomWidth;
+        this.cv.aspectRatio = viewBoxWidth / viewBoxHeight;
+
+        // Get the width of the graph panel
+        if (el.clientWidth >= viewBoxWidth) {
+            svgWidth = viewBoxWidth;
+            svgHeight = viewBoxHeight;
+        } else {
+            svgWidth = el.clientWidth;
+            svgHeight = svgWidth / this.cv.aspectRatio;
+        }
+        const zoomLevel = (svgWidth - this.cv.minZoomWidth) / this.cv.zoomFactor;
+        svg.attr('width', svgWidth).attr('height', svgHeight);
+        return zoomLevel;
+    }
 
     // Draw the graph on initial draw as well as on state changes. An <svg> element to draw into
     // must already exist in the HTML element in the el parm. This also sets the viewBox of the
     // SVG to its natural height. eslint exception for dagreD3.render call.
     /* eslint new-cap: ["error", { "newIsCap": false }] */
-    drawGraph: function (el) {
+    drawGraph(el) {
         const d3 = this.d3;
         const dagreD3 = this.dagreD3;
         d3.selectAll('svg#pipeline-graph > *').remove(); // http://stackoverflow.com/questions/22452112/nvd3-clear-svg-before-loading-new-chart#answer-22453174
@@ -335,7 +402,7 @@ export const Graph = createReactClass({
         const render = new dagreD3.render();
 
         // Convert from given node architecture to the dagre nodes and edges
-        this.convertGraph(this.props.graph, g);
+        Graph.convertGraph(this.props.graph, g);
 
         // Run the renderer. This is what draws the final graph.
         render(svg, g);
@@ -362,29 +429,104 @@ export const Graph = createReactClass({
         }
 
         // Return the SVG so callers can do more with this after drawing the unscaled graph
-        return { viewBoxWidth: viewBoxWidth, viewBoxHeight: viewBoxHeight };
-    },
+        return { viewBoxWidth, viewBoxHeight };
+    }
 
-    bindClickHandlers: function (d3, el) {
+    nodeIdClick(nodeId) {
+        let node;
+
+        // Find data matching selected node, if any
+        if (nodeId) {
+            if (nodeId.indexOf('qc:') >= 0) {
+                // QC subnode.
+                node = this.props.graph.getSubnode(nodeId);
+                node.schemas = this.props.schemas;
+            } else if (nodeId.indexOf('coalesced:') >= 0) {
+                // Coalesced contributing files.
+                const coalescedNode = this.props.graph.getNode(nodeId);
+                if (coalescedNode) {
+                    const currCoalescedFiles = this.state.coalescedFiles;
+                    if (currCoalescedFiles[coalescedNode.metadata.contributing]) {
+                        // We have the requested coalesced files in the cache, so just display
+                        // them.
+                        coalescedNode.metadata.coalescedFiles = currCoalescedFiles[coalescedNode.metadata.contributing];
+                        node = coalescedNode;
+                    } else if (!this.contributingRequestOutstanding) {
+                        // We don't have the requested coalesced files in the cache, so we have to
+                        // request them from the DB.
+                        this.contributingRequestOutstanding = true;
+                        requestFiles(coalescedNode.metadata.ref).then((contributingFiles) => {
+                            this.contributingRequestOutstanding = false;
+                            currCoalescedFiles[coalescedNode.metadata.contributing] = contributingFiles;
+                            coalescedNode.metadata.coalescedFiles = contributingFiles;
+                            this.props.nodeClickHandler(coalescedNode);
+                            node = null;
+                        }).catch(() => {
+                            this.contributingRequestOutstanding = false;
+                            currCoalescedFiles[coalescedNode.metadata.contributing] = [];
+                            node = null;
+                        });
+                    }
+                }
+            } else {
+                // A regular or contributing file.
+                node = this.props.graph.getNode(nodeId);
+                if (node) {
+                    node.schemas = this.props.schemas;
+                    if (node.metadata.contributing) {
+                        // This is a contributing file, and its @id is in
+                        // node.metadata.contributing. See if the file is in the cache.
+                        const currContributing = this.state.contributingFiles;
+                        if (currContributing[node.metadata.contributing]) {
+                            // We have this file's object in the cache, so just display it.
+                            node.metadata.ref = currContributing[node.metadata.contributing];
+                        } else if (!this.contributingRequestOutstanding) {
+                            // We don't have this file's object in the cache, so request it from
+                            // the DB.
+                            this.contributingRequestOutstanding = true;
+                            requestFiles([node.metadata.contributing]).then((contributingFile) => {
+                                this.contributingRequestOutstanding = false;
+                                currContributing[node.metadata.contributing] = contributingFile[0];
+                                node.metadata.ref = contributingFile[0];
+                                this.props.nodeClickHandler(node);
+                                node = null;
+                            }).catch(() => {
+                                this.contributingRequestOutstanding = false;
+                                currContributing[node.metadata.contributing] = {};
+                                node = null;
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        // Tell the upper-level rendering component to render the node information.
+        if (node) {
+            this.props.nodeClickHandler(node);
+        }
+    }
+
+    bindClickHandlers(d3, el) {
         // Add click event listeners to each node rendering. Node's ID is its ENCODE object ID
         const svg = d3.select(el);
         const nodes = svg.selectAll('g.node');
         const subnodes = svg.selectAll('g.subnode circle');
 
         nodes.on('click', (nodeId) => {
-            this.props.nodeClickHandler(nodeId);
+            this.nodeIdClick(nodeId);
         });
         subnodes.on('click', (subnode) => {
             d3.event.stopPropagation();
-            this.props.nodeClickHandler(subnode.id);
+            this.nodeIdClick(subnode.id);
         });
-    },
+    }
 
-    handleOrientationClick: function () {
+    handleOrientationClick() {
         this.setState({ verticalGraph: !this.state.verticalGraph });
-    },
+    }
 
-    handleDlClick: function () {
+    handleDlClick() {
         // Collect CSS styles that apply to the graph and insert them into the given SVG element
         function attachStyles(el) {
             let stylesText = '';
@@ -441,7 +583,7 @@ export const Graph = createReactClass({
         img.src = `data:image/svg+xml;base64,${window.btoa(svgXml)}`;
 
         // Once the svg is loaded into the image (purely in memory, not in DOM), draw it into a <canvas>
-        img.onload = function () {
+        img.onload = function onload() {
             // Make a new memory-based canvas and draw the image into it.
             const canvas = document.createElement('canvas');
             canvas.width = img.width;
@@ -457,9 +599,9 @@ export const Graph = createReactClass({
             document.body.appendChild(a);
             a.click();
         }.bind(this);
-    },
+    }
 
-    rangeChange: function (e) {
+    rangeChange(e) {
         // Called when the user clicks/drags the zoom slider; value comes from the slider 0-100
         const value = e.target.value;
 
@@ -474,62 +616,78 @@ export const Graph = createReactClass({
 
         // Remember zoom level as a state -- causes rerender remember!
         this.setState({ zoomLevel: value });
-    },
+    }
 
-    rangeMouseDown: function () {
+    rangeMouseDown() {
         // Mouse clicked in zoom slider
         this.cv.zoomMouseDown = true;
-    },
+    }
 
-    rangeMouseUp: function (e) {
+    rangeMouseUp(e) {
         // Mouse released from zoom slider
         this.cv.zoomMouseDown = false;
         this.rangeChange(e); // Fix for IE11 as onChange doesn't get called; at least call this after dragging
         // For IE11 fix, see https://github.com/facebook/react/issues/554#issuecomment-188288228
-    },
+    }
 
-    rangeDoubleClick: function () {
+    rangeDoubleClick() {
         // Handle a double click in the zoom slider
         const el = this.refs.graphdisplay;
         const zoomLevel = this.setInitialZoomLevel(el, this.cv.savedSvg);
-        this.setState({ zoomLevel: zoomLevel });
-    },
+        this.setState({ zoomLevel });
+    }
 
-    // Component state variables we don't want to cause a rerender
-    cv: {
-        viewBoxWidth: 0, // Width of the SVG's viewBox
-        viewBoxHeight: 0, // Height of the SVG's viewBox
-        aspectRatio: 0, // Aspect ratio of graph -- width:height
-        zoomMouseDown: false, // Mouse currently controlling zoom slider
-        dagreLoaded: false, // Dagre JS library has been loaded
-        zoomFactor: 0, // Amount zoom slider value changes should change width of graph
-    },
-
-    render: function () {
+    render() {
+        const { graph, colorize } = this.props;
         const orientBtnAlt = `Orient graph ${this.state.verticalGraph ? 'horizontally' : 'vertically'}`;
         const currOrientKey = this.state.verticalGraph ? 'orientH' : 'orientV';
-        const noDefaultClasses = this.props.noDefaultClasses;
 
-        return (
-            <Panel noDefaultClasses={noDefaultClasses}>
-                <div className="zoom-control-area">
-                    <table className="zoom-control">
-                        <tbody>
-                            <tr>
-                                <td className="zoom-indicator"><i className="icon icon-minus" /></td>
-                                <td className="zomm-controller"><input type="range" className="zoom-slider" min={minZoom} max={maxZoom} value={this.state.zoomLevel === null ? 0 : this.state.zoomLevel} onChange={this.rangeChange} onDoubleClick={this.rangeDoubleClick} onMouseUp={this.rangeMouseUp} onMouseDown={this.rangeMouseDown} /></td>
-                                <td className="zoom-indicator"><i className="icon icon-plus" /></td>
-                            </tr>
-                        </tbody>
-                    </table>
+        if (graph) {
+            return (
+                <div>
+                    <div className="zoom-control-area">
+                        <table className="zoom-control">
+                            <tbody>
+                                <tr>
+                                    <td className="zoom-indicator"><i className="icon icon-minus" /></td>
+                                    <td className="zomm-controller"><input type="range" className="zoom-slider" min={minZoom} max={maxZoom} value={this.state.zoomLevel === null ? 0 : this.state.zoomLevel} onChange={this.rangeChange} onDoubleClick={this.rangeDoubleClick} onMouseUp={this.rangeMouseUp} onMouseDown={this.rangeMouseDown} /></td>
+                                    <td className="zoom-indicator"><i className="icon icon-plus" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div ref="graphdisplay" className="graph-display" onScroll={this.scrollHandler} />
+                    {colorize ? <GraphLegend /> : null}
+                    <div className="graph-dl clearfix">
+                        <button className="btn btn-info btn-sm btn-orient" title={orientBtnAlt} onClick={this.handleOrientationClick}>{svgIcon(currOrientKey)}<span className="sr-only">{orientBtnAlt}</span></button>
+                        <button ref="dlButton" className="btn btn-info btn-sm" value="Test" onClick={this.handleDlClick} disabled={this.state.dlDisabled}>Download Graph</button>
+                    </div>
+                    {this.props.children}
                 </div>
-                <div ref="graphdisplay" className="graph-display" onScroll={this.scrollHandler} />
-                <div className="graph-dl clearfix">
-                    <button className="btn btn-info btn-sm btn-orient" title={orientBtnAlt} onClick={this.handleOrientationClick}>{svgIcon(currOrientKey)}<span className="sr-only">{orientBtnAlt}</span></button>
-                    <button ref="dlButton" className="btn btn-info btn-sm" value="Test" onClick={this.handleDlClick} disabled={this.state.dlDisabled}>Download Graph</button>
-                </div>
-                {this.props.children}
-            </Panel>
-        );
-    },
-});
+            );
+        }
+
+        return <p className="browser-error">Graph not applicable.</p>;
+    }
+}
+
+Graph.propTypes = {
+    graph: PropTypes.object.isRequired, // JsonGraph object representing the graph being rendered.
+    nodeClickHandler: PropTypes.func.isRequired, // Function to call to handle clicks in a node
+    schemas: PropTypes.object, // Schemas for QC metrics
+    colorize: PropTypes.bool, // True if file graph status colorization is turned on, and a legend is needed
+    children: PropTypes.node,
+};
+
+Graph.defaultProps = {
+    selectedAssembly: '',
+    selectedAnnotation: '',
+    schemas: null,
+    colorize: false,
+    children: null,
+};
+
+Graph.contextTypes = {
+    session: PropTypes.object,
+    session_properties: PropTypes.object,
+};

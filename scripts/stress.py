@@ -3,7 +3,7 @@ import requests
 import re
 from datetime import datetime
 
-URLS = ["https://www.t2depigenome.org"]
+URLS = ["https://www.diabetesepigenome.org"]
 MAX_URLS = 5000
 def query_list(base_url):
     arr = []

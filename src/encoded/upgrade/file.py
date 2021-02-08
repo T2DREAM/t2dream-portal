@@ -1,6 +1,6 @@
 from snovault import upgrade_step
 from pyramid.traversal import find_root
-from datetime import date, datetime, time
+from datetime import datetime, time
 
 
 @upgrade_step('file', '', '2')
@@ -511,7 +511,9 @@ def file_10_11(value, system):
             if '||' in aliases[i]:
                 scrub_parts = aliases[i].split('||')
                 date_split = scrub_parts[1].split(' ')
-                date = "-".join([date_split[1].strip(), date_split[2].strip(), date_split[5].strip()])
+                date = "-".join([date_split[1].strip(),
+                                date_split[2].strip(),
+                                date_split[5].strip()])                
                 scrubbed_list = [scrub_parts[0].strip(), date.strip(), scrub_parts[2].strip()]
                 if len(scrub_parts) == 4:
                     scrubbed_list.append(scrub_parts[3].strip())
@@ -547,3 +549,16 @@ def file_10_11(value, system):
         for a in aliases_to_remove:
             if a in aliases:
                 aliases.remove(a)
+
+@upgrade_step('file', '10', '11')
+def file_10_11(value, system):
+    # http://redmine.encodedcc.org/issues/5081                
+    # http://redmine.encodedcc.org/issues/5049
+    # http://redmine.encodedcc.org/issues/4924
+    if not value.get('no_file_available'):
+        value['no_file_available'] = False
+
+@upgrade_step('file', '11', '12')
+def file_11_12(value, system):
+    # https://encodedcc.atlassian.net/browse/ENCD-3347
+    return

@@ -1,21 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import url from 'url';
+var url = require('url');
 import moment from 'moment';
 import { FetchedData, FetchedItems, Param } from './fetched';
 import { Panel, PanelBody } from '../libs/bootstrap/panel';
-import DropdownButton from '../libs/bootstrap/button';
-import { DropdownMenu } from '../libs/bootstrap/dropdown-menu';
-import { FacetList, Listing } from './search';
-import * as globals from './globals';
-
-const newsUri = '/search/?type=Page&news=true&status=released';
 
 // Convert the selected organisms and assays into an encoded query.
 function generateQuery(selectedOrganisms, selectedAssayCategory) {
     // Make the base query.
-    let query = selectedAssayCategory === 'COMPPRED' ? '?type=Annotation&encyclopedia_version=3' : '?type=Experiment&status=released';
+    let query = selectedAssayCategory === 'COMPPRED' ? '?type=Annotation&encyclopedia_version=4' : '?type=Experiment&status=released';
 
     // Add the selected assay category, if any (doesn't apply to Computational Predictions).
     if (selectedAssayCategory && selectedAssayCategory !== 'COMPPRED') {
@@ -59,7 +53,7 @@ export default class Home extends React.Component {
         if (this.state.assayCategory === assayCategory) {
             this.setState({ assayCategory: '' });
         } else {
-            this.setState({ assayCategory: assayCategory });
+            this.setState({ assayCategory });
         }
     }
 
@@ -100,18 +94,17 @@ export default class Home extends React.Component {
                             <div className="graphs">
                                 <div className="row">
                                     <HomepageChartLoader organisms={this.state.organisms} assayCategory={this.state.assayCategory} query={currentQuery} />
-                                </div>
+                </div>
                             </div>
-                            
+
                                  <div className="social">
                                 <div className="social-news">
                                   <div className="news-header">
-                                        <h3>News <a href="/news/" title="Diabetes Epigenome Atlas news" className="search-ref">View all news...</a></h3>
+                                        <h3>News <a href="/news/" title="T2DREAM news" className="search-ref">View all news...</a></h3>
                                     </div>
                                     <NewsLoader newsLoaded={this.newsLoaded} />
 
-                                </div>
-                                     
+                                </div>		
                             </div>
                         </Panel>
                     </div>
@@ -125,7 +118,6 @@ export default class Home extends React.Component {
 // Given retrieved data, draw all home-page charts.
 const ChartGallery = props => (
     <PanelBody>
-    
     </PanelBody>
 );
 
@@ -189,20 +181,18 @@ class AssayClicking extends React.Component {
 				<p style={{'margin': '20px'}}>The Diabetes Epigenome Atlas project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
                             </div>
                         </div>
-		       <div className="site-banner-search">
-		       
-                                      <h4 className="search-header">Search Database: </h4>
-                                      <SearchEngine />
-		                      <h5 style={{'margin-left': '20px', 'margin-top': '0px', 'font-weight': 'normal', 'font-style': 'italic'}}>search experiment, annotation, biosample & <a href="help/getting-started">more</a></h5>
-                                      <AdvSearch />
+		       <div className="site-banner-search">	       
+                       <h4 className="search-header">Search Database: </h4>
+                       <SearchEngine />
+                       <h5 style={{'margin-left': '20px', 'margin-top': '0px', 'font-weight': 'normal', 'font-style': 'italic'}}>search experiment, annotation, biosample & <a href="help/getting-started">more</a></h5>		
+                       <AdvSearch />
 		       </div>
                     </div>
             </div>
             </div>
-        );
+        );	    
     }
 }
-
 AssayClicking.propTypes = {
     assayCategory: PropTypes.string.isRequired, // Test to display in each audit's detail, possibly containing @ids that this component turns into links automatically
 };
@@ -279,7 +269,7 @@ const HomepageChartLoader = (props) => {
     const { query, organisms, assayCategory } = props;
 
     return (
-        <FetchedData ignoreErrors>
+        <FetchedData>
             <Param name="data" url={`/search/${query}`} />
             <ChartGallery organisms={organisms} assayCategory={assayCategory} query={query} />
         </FetchedData>
@@ -377,9 +367,9 @@ class HomepageChart extends React.Component {
                 this.myPieChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: labels,
+                        labels,
                         datasets: [{
-                            data: data,
+                            data,
                             backgroundColor: colors,
                         }],
                     },
@@ -568,9 +558,9 @@ class HomepageChart2 extends React.Component {
                 this.myPieChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: labels,
+                        labels,
                         datasets: [{
-                            data: data,
+                            data,
                             backgroundColor: colors,
                         }],
                     },
@@ -603,12 +593,11 @@ class HomepageChart2 extends React.Component {
                         },
                         onClick: (e) => {
                             // React to clicks on pie sections
-                            const query = this.computationalPredictions ? 'biosample_type=' : 'replicates.library.biosample.biosample_type=';
                             const activePoints = this.myPieChart.getElementAtEvent(e);
                             if (activePoints[0]) {
                                 const clickedElementIndex = activePoints[0]._index;
                                 const term = this.myPieChart.data.labels[clickedElementIndex];
-                                this.context.navigate(`/matrix/${this.props.query}&${query}${term}`); // go to matrix view
+                                this.context.navigate(`/matrix/${this.props.query}&biosample_type=${term}`); // go to matrix view
                             }
                         },
                     },
@@ -790,9 +779,9 @@ class HomepageChart3 extends React.Component {
                 this.myPieChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: labels, // full labels
+                        labels, // full labels
                         datasets: [{
-                            data: data,
+                            data,
                             backgroundColor: colors,
                         }],
                     },
@@ -807,8 +796,8 @@ class HomepageChart3 extends React.Component {
                         },
                         animation: {
                             duration: 0,
-                            onProgress: function () { drawColumnSelects(selectedAssay, this.chart.ctx, this.data); },
-                            onComplete: function () { drawColumnSelects(selectedAssay, this.chart.ctx, this.data); },
+                            onProgress: function onProgress() { drawColumnSelects(selectedAssay, this.chart.ctx, this.data); },
+                            onComplete: function onComplete() { drawColumnSelects(selectedAssay, this.chart.ctx, this.data); },
                         },
                         scales: {
                             xAxes: [{
@@ -864,8 +853,8 @@ class HomepageChart3 extends React.Component {
         Chart.data.labels = labels;
         Chart.data.datasets[0].backgroundColor = colors;
         Chart.options.hover.mode = false;
-        Chart.options.animation.onProgress = function () { drawColumnSelects(selectedAssay, this.chart.ctx, this.data); };
-        Chart.options.animation.onComplete = function () { drawColumnSelects(selectedAssay, this.chart.ctx, this.data); };
+        Chart.options.animation.onProgress = function onProgress() { drawColumnSelects(selectedAssay, this.chart.ctx, this.data); };
+        Chart.options.animation.onComplete = function onComplete() { drawColumnSelects(selectedAssay, this.chart.ctx, this.data); };
         Chart.update();
     }
 
@@ -932,7 +921,7 @@ class News extends React.Component {
     }
 
     render() {
-        const { items, nodeRef } = this.props;
+        const { items } = this.props;
         if (items && items.length) {
             return (
                 <div ref={(node) => { this.nodeRef = node; }} className="news-listing">
@@ -956,7 +945,6 @@ class News extends React.Component {
 News.propTypes = {
     items: PropTypes.array,
     newsLoaded: PropTypes.func.isRequired, // Called parent once the news is loaded
-    nodeRef: PropTypes.func, // React ref callback so we can get the news-listing DOM element in a higher component
 };
 
 
@@ -964,7 +952,7 @@ News.propTypes = {
 // because we attach `ref` to this, and stateless components don't support that.
 class NewsLoader extends React.Component {
     render() {
-        return <FetchedItems {...this.props} url={`${newsUri}&limit=3`} Component={News} ignoreErrors newsLoaded={this.props.newsLoaded} />;
+        return <FetchedItems {...this.props} url={`${newsUri}&limit=3`} Component={News} newsLoaded={this.props.newsLoaded} />;
     }
 }
 
@@ -989,12 +977,11 @@ const Search = (props, context) => {
         <form className="home-form" action="/search/">
             <div className="search-wrapper">
                 <span>
-                <input type="hidden" name="searchTerm" />
                 <input
                     className="form-control search-query"
                     id="home-search"
                     type="text"
-                    placeholder="Enter search (e.g., Single Cell, Chromatin State)"
+                    placeholder="Enter Search..."
                     name="searchTerm"
                     defaultValue={searchTerm}
                     key={searchTerm}
@@ -1007,226 +994,6 @@ const Search = (props, context) => {
 };
 
 Search.contextTypes = {
-    location_href: PropTypes.string,
-};
-
-const regionGenomes = [
-    { value: 'GRCh37', display: 'hg19' },
-    { value: 'GRCh38', display: 'GRCh38' }
-];
-
-const AutocompleteBox = (props) => {
-    const terms = props.auto['@graph']; // List of matching terms from server                                                                                                                                                                                                 
-    const handleClick = props.handleClick;
-    const userTerm = props.userTerm && props.userTerm.toLowerCase(); // Term user entered                                                                                                                                                                                     
-
-    if (!props.hide && userTerm && userTerm.length && terms && terms.length) {
-        return (
-            <ul className="adv-search-autocomplete">
-                {terms.map((term) => {
-                    let matchEnd;
-                    let preText;
-                    let matchText;
-                    let postText;
-
-                    // Boldface matching part of term                                                                                                                                                                                                                         
-                    const matchStart = term.text.toLowerCase().indexOf(userTerm);
-                    if (matchStart >= 0) {
-                        matchEnd = matchStart + userTerm.length;
-                        preText = term.text.substring(0, matchStart);
-                        matchText = term.text.substring(matchStart, matchEnd);
-                        postText = term.text.substring(matchEnd);
-                    } else {
-                        preText = term.text;
-                    }
-                    return (
-                        <AutocompleteBoxMenu
-                            key={term.text}
-                            handleClick={handleClick}
-                            term={term}
-                            name={props.name}
-                            preText={preText}
-                            matchText={matchText}
-                            postText={postText}
-                        />
-                    );
-                }, this)}
-            </ul>
-        );
-    }
-
-    return null;
-};
-
-AutocompleteBox.propTypes = {
-    auto: PropTypes.object,
-    userTerm: PropTypes.string,
-    handleClick: PropTypes.func,
-    hide: PropTypes.bool,
-    name: PropTypes.string,
-};
-
-AutocompleteBox.defaultProps = {
-    auto: {}, // Looks required, but because it's built from <Param>, it can fail type checks.                                                                                                                                                                                
-    userTerm: '',
-    handleClick: null,
-    hide: false,
-    name: '',
-};
-
-// Draw the autocomplete box drop-down menu.                                                                                                                                                                                                                                  
-class AutocompleteBoxMenu extends React.Component {
-    constructor() {
-        super();
-
-        // Bind this to non-React methods.                                                                                                                                                                                                                                    
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    // Handle clicks in the drop-down menu. It just calls the parent's handleClick function, giving                                                                                                                                                                           
-    // it the parameters of the clicked item.                                                                                                                                                                                                                                 
-    handleClick() {
-        const { term, name } = this.props;
-        this.props.handleClick(term.text, term.payload.id, name);
-    }
-
-    render() {
-        const { preText, matchText, postText } = this.props;
-
-        return (
-            <li tabIndex="0" onClick={this.handleClick}>
-                {preText}<b>{matchText}</b>{postText}
-            </li>
-        );
-    }
-}
-AutocompleteBoxMenu.propTypes = {
-    handleClick: PropTypes.func.isRequired, // Parent function to handle a click in a drop-down menu item                                                                                                                                                                     
-    term: PropTypes.object.isRequired, // Object for the term being searched                                                                                                                                                                                                  
-    name: PropTypes.string,
-    preText: PropTypes.string, // Text before the matched term in the entered string                                                                                                                                                                                          
-    matchText: PropTypes.string, // Matching text in the entered string                                                                                                                                                                                                       
-    postText: PropTypes.string, // Text after the matched term in the entered string                                                                                                                                                                                          
-};
-
-AutocompleteBoxMenu.defaultProps = {
-    name: '',
-    preText: '',
-    matchText: '',
-    postText: '',
-};
-
-class AdvSearch extends React.Component {
-    constructor() {
-        super();
-
-        // Set intial React state.                                                                                                                                                                                                                                            
-        this.state = {
-            disclosed: false,
-            showAutoSuggest: false,
-            searchTerm: '',
-            coordinates: '',
-            genome: regionGenomes[0].value,
-            terms: {},
-        };
-
-        // Bind this to non-React methods.                                                                                                                                                                                                                                    
-        this.handleDiscloseClick = this.handleDiscloseClick.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleAutocompleteClick = this.handleAutocompleteClick.bind(this);
-        this.handleAssemblySelect = this.handleAssemblySelect.bind(this);
-        this.tick = this.tick.bind(this);
-    }
-
-    componentDidMount() {
-        // Use timer to limit to one request per second                                                                                                                                                                                                                       
-        this.timer = setInterval(this.tick, 1000);
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.timer);
-    }
-
-    handleDiscloseClick() {
-        this.setState(prevState => ({
-            disclosed: !prevState.disclosed,
-        }));
-    }
-
-    handleChange(e) {
-        this.setState({ showAutoSuggest: true, terms: {} });
-	this.newSearchTerm = e.target.value;
-    }
-
-    handleAutocompleteClick(term, id, name) {
-        const newTerms = {};
-        const inputNode = this.annotation;
-        inputNode.value = term;
-        newTerms[name] = id;
-        this.setState({ terms: newTerms, showAutoSuggest: false });
-        inputNode.focus();
-        // Now let the timer update the terms state when it gets around to it.                                                                                                                                                                                                
-    }
-
-    handleAssemblySelect(event) {
-        // Handle click in assembly-selection <select>                                                                                                                                                                                                                        
-        this.setState({ genome: event.target.value });
-    }
-
-    tick() {
-        if (this.newSearchTerm !== this.state.searchTerm) {
-            this.setState({ searchTerm: this.newSearchTerm });
-        }
-    }
-    render() {
-        const context = this.props.context;
-        const id = url.parse(this.context.location_href, true);
-        const region = id.query.region || '';
-
-        return (
-                    <form className="home-form" ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1" action="/variant-search/">
-                        <input type="hidden" name="annotation" value={this.state.terms.annotation} />
-
-                              <div className="form-group">
-                              <h4> Search variants & coordinates: </h4>
-                               <div className="input-group input-group-region-input">
-                                <input id="annotation" ref={(input) => { this.annotation = input; }} defaultValue={region} name="region" placeholder="Enter Search (e.g. rs7903146)
-" type="text" className="form-control" onChange={this.handleChange} />
-                               <div className="input-group-addon input-group-select-addon">
-                                    <select value={this.state.genome} name="genome" onChange={this.handleAssemblySelect}>
-                                        {regionGenomes.map(genomeId =>
-                                            <option key={genomeId.value} value={genomeId.value}>{genomeId.display}</option>
-                                        )}
-                                    </select>
-                               </div>
-                               <input type="submit" value="GO" className="submit_4 pull-right" />
-                              </div>
-                               </div>
-		    <h5 style={{'margin-left': '10px', 'margin-top': '0px', 'font-weight': 'normal', 'font-style': 'italic'}}>example: <a href='variant-search/?region=rs7903146&genome=GRCh37'>rs7903146</a>, <a href='variant-search/?region=chr10%3A66794059&genome=GRCh37'>chr10:66794059</a></h5>
-                    </form>
-        );
-    }
-}
-
-AdvSearch.propTypes = {
-    context: PropTypes.object.isRequired,
-};
-
-AdvSearch.contextTypes = {
-    autocompleteTermChosen: PropTypes.bool,
-    autocompleteHidden: PropTypes.bool,
-    onAutocompleteHiddenChange: PropTypes.func,
-    location_href: PropTypes.string,
-};
-
-AdvSearch.propTypes = {
-    context: PropTypes.object.isRequired,
-};
-
-AdvSearch.contextTypes = {
-    autocompleteTermChosen: PropTypes.bool,
-    autocompleteHidden: PropTypes.bool,
-    onAutocompleteHiddenChange: PropTypes.func,
     location_href: PropTypes.string,
 };
 
@@ -1265,22 +1032,21 @@ class TwitterWidget extends React.Component {
         return (
             <div ref="twitterwidget">
                 <div className="twitter-header">
-                    <h3>Twitter <a href="https://twitter.com/T2DREAM_AMP" title="T2DREAM Twitter page in a new window or tab" target="_blank" rel="noopener noreferrer"className="twitter-ref">@T2DREAM_AMP</a></h3>
+                    <h3>Twitter <a href="https://twitter.com/DGA_AMP" title="DGA Twitter page in a new window or tab" target="_blank" rel="noopener noreferrer"className="twitter-ref">@</a></h3>
                 </div>
                 {this.props.height ?
                     <a
                         ref={(anchor) => { this.anchor = anchor; }}
                         className="twitter-timeline"
-                        href="https://twitter.com/T2DREAM_AMP" // from T2DREAM twitter
+                        href="https://twitter.com/dga_amp" // from encodedcc twitter
                         data-chrome="noheader"
-                        data-screen-name="T2DREAM_AMP"
+                        data-screen-name="Diabetes Epigenome Atlas"
                         data-height={this.props.height.toString()} // height so it matches with rest of site
                     >
-                        @T2DREAM_AMP
+                        @DGA_AMP
                     </a>
                 : null}
             </div>
         );
     }
 }
-

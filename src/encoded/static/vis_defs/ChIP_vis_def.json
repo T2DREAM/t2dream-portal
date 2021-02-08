@@ -1,9 +1,9 @@
 {
     "ChIP": {
-        "rule": "'{assay_term_name}' == 'ChIP-seq' and 'histone' not in '{target.investigated_as}'",
+        "rule": "'{assay_term_name}' == 'ChIP-seq' and 'histone' not in '{target.investigated_as}' and '{award.rfa}' != 'GGR'",
         "assay_composite": {
-            "longLabel":  "Collection of Diabetes Epigenome Atlas ChIP-seq experiments",
-            "shortLabel": "Diabetes Epigenome Atlas ChIP-seq"
+            "longLabel":  "Collection of DGA ChIP-seq experiments",
+            "shortLabel": "DGA ChIP-seq"
         },
         "longLabel":  "{target} {assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{target} {assay_title} of {biosample_term_name} {accession}",
@@ -18,8 +18,9 @@
                     "visibility": "dense",
                     "type": "bigBed",
                     "file_format_type": [ "narrowPeak" ],
+                    "signalFilter": "0",
+                    "qValueFilter": "0",
                     "spectrum":"on",
-                    "scoreFilter": "100:1000",
                     "output_type": [ "optimal idr thresholded peaks" ]
                 },
                 "Conservative IDR thresholded peaks": {
@@ -27,8 +28,9 @@
                     "visibility": "hide",
                     "type": "bigBed",
                     "file_format_type": [ "narrowPeak" ],
+                    "signalFilter": "0",
+                    "qValueFilter": "0",
                     "spectrum":"on",
-                    "scoreFilter": "0:1000",
                     "output_type": [ "conservative idr thresholded peaks" ]
                 },
                 "Pseudoreplicated IDR thresholded peaks": {
@@ -36,8 +38,9 @@
                     "visibility": "dense",
                     "type": "bigBed",
                     "file_format_type": [ "narrowPeak" ],
+                    "signalFilter": "0",
+                    "qValueFilter": "0",
                     "spectrum":"on",
-                    "scoreFilter": "0:1000",
                     "output_type": [ "pseudoreplicated idr thresholded peaks" ]
                 },
                 "Peaks": {
@@ -45,7 +48,8 @@
                     "visibility": "hide",
                     "type": "bigBed",
                     "file_format_type": [ "narrowPeak" ],
-                    "scoreFilter": "0",
+                    "signalFilter": "0",
+                    "qValueFilter": "0",
                     "output_type": [ "peaks" ]
                 },
                 "Fold change over control": {
@@ -94,11 +98,11 @@
                     }
                 },
                 "Biosample": {
-                    "tag": "sample",
+                    "tag": "BS",
                     "groups": { "one": { "title_mask": "{biosample_term_name}"} }
                 },
                 "Targets": {
-                    "tag": "target",
+                    "tag": "TARG",
                     "groups": { "one": { "title_mask": "{target.label}", "url_mask": "targets/{target.name}"} }
                 }
             }

@@ -2,21 +2,27 @@
     "ChIA": {
         "rule": "'{assay_term_name}' == 'ChIA-PET'",
         "assay_composite": {
-            "longLabel":  "Collection of Diabetes Epigenome Atlas ChIA-PET experiments",
-            "shortLabel": "Diabetes Epigenome Atlas ChIA-PET"
+            "longLabel":  "Collection of DGA ChIA-PET experiments",
+            "shortLabel": "DGA ChIA-PET"
         },
         "longLabel":  "{target} {assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{target} {assay_title} of {biosample_term_name} {accession}",
         "sortOrder": [ "Biosample", "Targets", "Replicates", "Views" ],
         "Views": {
             "tag": "view",
-            "group_order": [ "Long range interactions", "Signal of unique reads", "Signal of all reads" ],
+            "group_order": [ "Long range interactions", "Peaks", "Signal of unique reads", "Signal of all reads" ],
             "groups": {
                 "Long range interactions": {
                     "tag": "LRCI",
                     "type": "bigBed",
                     "visibility": "dense",
                     "output_type": [ "long range chromatin interactions" ]
+                },
+                "Peaks": {
+                    "tag": "PEAKS",
+                    "type": "bigBed",
+                    "visibility": "dense",
+                    "output_type": [ "peaks" ]
                 },
                 "Signal of unique reads": {
                     "tag": "SIGBL",

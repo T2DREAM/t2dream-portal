@@ -100,6 +100,7 @@ class File(Item):
     }
 
     embedded = [
+        'platform',
         'award',
         'award.pi',
         'award.pi.lab',
@@ -120,21 +121,15 @@ class File(Item):
     audit_inherit = [
         'replicate',
         'replicate.experiment',
-        'replicate.experiment.lab',
         'replicate.experiment.target',
         'replicate.library',
-        'replicate.experiment.lab',
-        'replicate.experiment.target',
         'lab',
         'submitted_by',
         'analysis_step_version.analysis_step',
         'analysis_step_version.analysis_step.pipelines',
         'analysis_step_version.analysis_step.versions',
-        'analysis_step_version.analysis_step.versions.software_versions',
-        'analysis_step_version.analysis_step.versions.software_versions.software',
         'analysis_step_version.software_versions',
-        'analysis_step_version.software_versions.software',
-        'quality_metrics.step_run.analysis_step_version.analysis_step',
+        'analysis_step_version.software_versions.software'
     ]
 
     @property
@@ -179,7 +174,7 @@ class File(Item):
     @calculated_property(schema={
         "title": "Download URL",
         "description": "The download path for S3 to obtain the actual file.",
-        "comment": "Do not submit. This is issued by the server.", 
+        "comment": "Do not submit. This is issued by the server.",
         "type": "string",
     })
     def href(self, request, file_format, accession=None, external_accession=None):
@@ -191,7 +186,7 @@ class File(Item):
     @calculated_property(condition=show_upload_credentials, schema={
         "title": "Upload Credentials",
         "description": "The upload credentials for S3 to submit the file content.",
-        "comment": "Do not submit. This is issued by the server.", 
+        "comment": "Do not submit. This is issued by the server.",
         "type": "object",
     })
     def upload_credentials(self):
@@ -202,7 +197,7 @@ class File(Item):
     @calculated_property(schema={
         "title": "Read length units",
         "description": "The units for read length.",
-        "comment": "Do not submit. This is a fixed value.", 
+        "comment": "Do not submit. This is a fixed value.",
         "type": "string",
         "enum": [
             "nt"
@@ -320,6 +315,7 @@ class File(Item):
             "type": ['string', 'object'],
             "linkFrom": "QualityMetric.quality_metric_of",
         },
+        "notSubmittable": True,
     })
     def quality_metrics(self, request, quality_metrics):
         return paths_filtered_by_status(request, quality_metrics)
@@ -345,6 +341,7 @@ class File(Item):
             "type": ['string', 'object'],
             "linkFrom": "File.supersedes",
         },
+        "notSubmittable": True,
     })
     def superseded_by(self, request, superseded_by):
         return paths_filtered_by_status(request, superseded_by)
@@ -463,8 +460,8 @@ def download(context, request):
         conn = boto.connect_s3()
         location = conn.generate_url(
             36*60*60, request.method, external['bucket'], external['key'],
-            force_http=False, response_headers={
-                'content-type':'binary/octet-stream','response-content-disposition': "attachment; filename=" + filename,
+            force_http=proxy or use_download_proxy, response_headers={
+                'response-content-disposition': "attachment; filename=" + filename,
             })
     else:
         raise ValueError(external.get('service'))
@@ -477,13 +474,13 @@ def download(context, request):
             'expires': datetime.datetime.fromtimestamp(expires, pytz.utc).isoformat(),
         }
 
-    # if proxy:
-    #    return Response(headers={'X-Accel-Redirect': '/_proxy/' + str(location)})
+    if proxy:
+        return Response(headers={'X-Accel-Redirect': '/_proxy/' + str(location)})
 
     # We don't use X-Accel-Redirect here so that client behaviour is similar for
     # both aws and non-aws users.
-    # if use_download_proxy:
-    #    location = request.registry.settings.get('download_proxy', '') + str(location)
+    if use_download_proxy:
+        location = request.registry.settings.get('download_proxy', '') + str(location)
 
     # 307 redirect specifies to keep original method
     raise HTTPTemporaryRedirect(location=location)

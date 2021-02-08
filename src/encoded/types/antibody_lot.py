@@ -17,8 +17,8 @@ from .ab_lot_status_data import (
     name='antibodies',
     unique_key='accession',
     properties={
-        'title': 'Antibodies Registry',
-        'description': 'Listing of T2D consortium antibodies',
+        'title': 'Antibody lot',
+        'description': 'Listing of DGA antibodies',
     })
 class AntibodyLot(SharedItem):
     item_type = 'antibody_lot'
@@ -157,7 +157,7 @@ def lot_reviews(characterizations, targets, request):
             is_histone_mod = True
 
         organism = target['organism']
-        target_organisms = { 'all' : [] }
+        target_organisms = {'all': []}
         target_organisms['all'].append(organism)
         target_organisms[organism] = target['@id']
 

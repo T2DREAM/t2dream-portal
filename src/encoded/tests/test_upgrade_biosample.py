@@ -6,6 +6,7 @@ def biosample_0(submitter, lab, award, source, organism):
     return {
         'award': award['uuid'],
         'biosample_term_id': 'UBERON:349829',
+        'biosample_term_name': 'heart',
         'biosample_type': 'tissue',
         'lab': lab['uuid'],
         'organism': organism['uuid'],
@@ -151,6 +152,40 @@ def biosample_13(biosample_0, document):
         'submitter_comment': ' leading and trailing whitespace ',
         'product_id': ' leading and trailing whitespace ',
         'lot_id': ' leading and trailing whitespace '
+    })
+    return item
+
+
+@pytest.fixture
+def biosample_15(biosample_0, biosample):
+    item = biosample_0.copy()
+    item.update({
+        'date_obtained': '2017-06-06T20:29:37.059673+00:00',
+        'schema_version': '15',
+        'derived_from': biosample['uuid'],
+        'talens': []
+    })
+    return item
+
+
+@pytest.fixture
+def biosample_18(biosample_0, biosample):
+    item = biosample_0.copy()
+    item.update({
+        'biosample_term_id': 'EFO:0002067',
+        'biosample_term_name': 'K562',
+        'biosample_type': 'immortalized cell line',
+        'transfection_type': 'stable',
+        'transfection_method': 'electroporation'
+    })
+    return item
+
+
+@pytest.fixture
+def biosample_19(biosample_0, biosample):
+    item = biosample_0.copy()
+    item.update({
+        'biosample_type': 'immortalized cell line',
     })
     return item
 
@@ -444,3 +479,23 @@ def test_upgrade_biosample_13_to_14(root, upgrader, biosample, biosample_13, dum
     assert value['description'] == ' leading and trailing whitespace '.strip()
     assert value['product_id'] == ' leading and trailing whitespace '.strip()
     assert value['lot_id'] == ' leading and trailing whitespace '.strip()
+
+
+def test_upgrade_biosample_15_to_16(upgrader, biosample_15, biosample):
+    value = upgrader.upgrade('biosample', biosample_15, current_version='15', target_version='16')
+    assert value['originated_from'] == biosample['uuid']
+    assert 'derived_from' not in value
+    assert value['schema_version'] == '16'
+    assert value['date_obtained'] == '2017-06-06'
+    assert 'talens' not in value
+
+
+def test_upgrade_biosample_18_to_19(upgrader, biosample_18, biosample):
+    value = upgrader.upgrade('biosample', biosample_18, current_version='18', target_version='19')
+    assert 'transfection_type' not in value
+    assert 'transfection_method' not in value
+
+
+def test_upgrade_biosample_19_to_20(upgrader, biosample_19, biosample):
+    value = upgrader.upgrade('biosample', biosample_19, current_version='19', target_version='20')
+    assert value['biosample_type'] == 'cell line'

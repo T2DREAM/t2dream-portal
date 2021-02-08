@@ -9,11 +9,12 @@
     "mixinProperties": [
         { "$ref": "mixins.json#/schema_version" },
         { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/url" },
         { "$ref": "mixins.json#/shared_status" }
     ],
     "properties": {
         "schema_version": {
-            "default": "4"
+            "default": "5"
         },
         "name": {
             "title": "Name",
@@ -119,12 +120,14 @@
             "type": "string",
             "default": "",
             "format": "phone"
+        }
+    },
+    "facets": {
+        "awards.rfa": {
+            "title": "RFA"
         },
-        "url": {
-            "title": "URL",
-            "description": "An external resource with additional information about the lab.",
-            "type": "string",
-            "format": "uri"
+        "status": {
+            "title": "Status"
         }
     },
     "boost_values": {
@@ -133,5 +136,7 @@
         "awards.title":1.0,
         "institute_name": 1.0,
         "institute_label": 1.0
-    }
+    },
+    "changelog": "/profiles/changelogs/lab.md"
+
 }

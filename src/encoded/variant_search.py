@@ -1,6 +1,7 @@
 from pyramid.view import view_config
 from snovault import TYPES
 from snovault.elasticsearch.interfaces import ELASTIC_SEARCH
+from snovault.elasticsearch.indexer import MAX_CLAUSES_FOR_ES
 from pyramid.security import effective_principals
 from .search import (
     format_results,
@@ -10,19 +11,15 @@ from .search import (
     format_facets,
     search_result_actions
 )
-
 from .batch_download import get_peak_metadata_links
 from collections import OrderedDict
 import requests
 from urllib.parse import urlencode
-import pprint
+
 import logging
 import re
-import json
-from urllib.parse import (
-    parse_qs,
-    urlencode,
-)
+
+
 log = logging.getLogger(__name__)
 
 
@@ -39,8 +36,13 @@ _REGION_FIELDS = [
 ]
 
 _FACETS = [
-    ('annotation_type', {'title': 'Annotation'}),
+    ('assay_term_name', {'title': 'Assay'}),
     ('biosample_term_name', {'title': 'Biosample term'}),
+    ('target.label', {'title': 'Target'}),
+    ('replicates.library.biosample.donor.organism.scientific_name', {
+        'title': 'Organism'
+    }),
+    ('organ_slims', {'title': 'Organ'}),
     ('assembly', {'title': 'Genome assembly'}),
     ('files.file_type', {'title': 'Available data'})
 ]
@@ -65,12 +67,7 @@ def includeme(config):
     config.add_route('suggest', '/suggest{slash:/?}')
     config.scan(__name__)
 
-def get_file_uuids(result_dict):
-    file_uuids = []
-    for item in result_dict['@graph']:
-        for file in item['files']:
-            file_uuids.append(file['uuid'])
-    return list(set(file_uuids))
+
 def get_bool_query(start, end):
     must_clause = {
         'bool': {
@@ -102,32 +99,43 @@ def get_peak_query(start, end, with_inner_hits=False, within_peaks=False):
     """
     query = {
         'query': {
-            'filtered': {
+            'bool': {
                 'filter': {
                     'nested': {
                         'path': 'positions',
-                        'filter': {
+                        'query': {
                             'bool': {
                                 'should': []
                             }
                         }
                     }
-                },
-                '_cache': True,
-            }
-        },
+                }
+             }
+         },
         '_source': False,
     }
     search_ranges = {
+        'peaks_inside_range': {
+            'start': start,
+            'end': end
+        },
+        'range_inside_peaks': {
+            'start': end,
+            'end': start
+        },
         'peaks_overlap_start_range': {
             'start': start,
             'end': start
-            }
-    }        
+        },
+        'peaks_overlap_end_range': {
+            'start': end,
+            'end': end
+        }
+    }
     for key, value in search_ranges.items():
-        query['query']['filtered']['filter']['nested']['filter']['bool']['should'].append(get_bool_query(value['start'], value['end']))
+        query['query']['bool']['filter']['nested']['query']['bool']['should'].append(get_bool_query(value['start'], value['end']))
     if with_inner_hits:
-        query['query']['filtered']['filter']['nested']['inner_hits'] = {'size': 99999}
+        query['query']['bool']['filter']['nested']['inner_hits'] = {'size': 99999}
     return query
 
 
@@ -137,11 +145,7 @@ def sanitize_coordinates(term):
     if term.count(':') != 1 or term.count('-') > 1:
         return ('', '', '')
     terms = term.split(':')
-    chromosome_test = terms[0]
-    if chromosome_test.startswith('chr'):
-        chromosome = chromosome_test
-    else:
-        chromosome = 'chr' + chromosome_test
+    chromosome = terms[0]
     positions = terms[1].split('-')
     if len(positions) == 1:
         start = end = positions[0].replace(',', '')
@@ -254,26 +258,18 @@ def format_position(position, resolution):
 @view_config(route_name='variant-search', request_method='GET', permission='search')
 def variant_search(context, request):
     """
-    Search files by region.
+    Search files by variant.
     """
     types = request.registry[TYPES]
     result = {
         '@id': '/variant-search/' + ('?' + request.query_string.split('&referrer')[0] if request.query_string else ''),
         '@type': ['variant-search'],
-        'title': 'Search by variant',
+        'title': 'Search by Variant',
         'facets': [],
         '@graph': [],
-        'regions': [],
-        'peaks': [],
-        'viz': OrderedDict(),
         'columns': OrderedDict(),
         'notification': '',
-        'filters': [],
-        'query': '',
-        'genome':'',
-        'chromosome':'',
-        'start':'',
-        'end':''
+        'filters': []
     }
     principals = effective_principals(request)
     es = request.registry[ELASTIC_SEARCH]
@@ -283,24 +279,24 @@ def variant_search(context, request):
 
 
     # handling limit
-    size = request.params.get('limit', 100)
+    size = request.params.get('limit', 25)
     if size in ('all', ''):
         size = 99999
     else:
         try:
             size = int(size)
         except ValueError:
-            size = 100
+            size = 25
     if region == '':
         region = '*'
 
     assembly = request.params.get('genome', '*')
     annotation = request.params.get('annotation', '*')
     chromosome, start, end = ('', '', '')
-    result['genome'] = assembly
+
     if annotation != '*':
         if annotation.lower().startswith('ens'):
-            chromosome, start, end = get_ensemblid_coordinates(annotation, assembly)        
+            chromosome, start, end = get_ensemblid_coordinates(annotation, assembly)
         else:
             chromosome, start, end = get_annotation_coordinates(es, annotation, assembly)
     elif region != '*':
@@ -315,15 +311,9 @@ def variant_search(context, request):
             chromosome, start, end = sanitize_coordinates(region)
     else:
         chromosome, start, end = ('', '', '')
-    #
-    chromosome_index = chromosome, chromosome.replace('chr', '')
-    result['query'] = region
     # Check if there are valid coordinates
     if not chromosome or not start or not end:
         result['notification'] = 'No annotations found'
-        return result
-    elif start != end:
-        result['notification'] = 'Not a valid variant'
         return result
     else:
         result['coordinates'] = '{chr}:{start}-{end}'.format(
@@ -333,9 +323,13 @@ def variant_search(context, request):
     # Search for peaks for the coordinates we got
     try:
         # including inner hits is very slow
-        peak_query = get_peak_query(start, end, with_inner_hits=True, within_peaks=region_inside_peak_status)
+        # figure out how to distinguish browser requests from .embed method requests
+        if 'peak_metadata' in request.query_string:
+            peak_query = get_peak_query(start, end, with_inner_hits=True, within_peaks=region_inside_peak_status)
+        else:
+            peak_query = get_peak_query(start, end, within_peaks=region_inside_peak_status)
         peak_results = snp_es.search(body=peak_query,
-                                     index=chromosome_index,
+                                     index=chromosome.lower(),
                                      doc_type=_GENOME_TO_ALIAS[assembly],
                                      size=99999)
     except Exception:
@@ -347,84 +341,43 @@ def variant_search(context, request):
             file_uuids.append(hit['_id'])
     file_uuids = list(set(file_uuids))
     result['notification'] = 'No results found'
-    result['chromosome'] = chromosome
-    result['start'] = start
-    result['end'] = end
-    # if more than one peak found return the annotations with those peak files
-    if len(file_uuids):
-        query = get_filtered_query('', [], set(), principals, ['Annotation'])
+
+
+    # if more than one peak found return the experiments with those peak files
+    uuid_count = len(file_uuids)
+    if uuid_count > MAX_CLAUSES_FOR_ES:
+        log.error("REGION_SEARCH WARNING: region with %d file_uuids is being restricted to %d" % \
+                                                            (uuid_count, MAX_CLAUSES_FOR_ES))
+        file_uuids = file_uuids[:MAX_CLAUSES_FOR_ES]
+        uuid_count = len(file_uuids)
+
+    if uuid_count:
+        query = get_filtered_query('', [], set(), principals, ['Experiment'])
         del query['query']
-        query['filter']['and']['filters'].append({
+        query['post_filter']['bool']['must'].append({
             'terms': {
                 'embedded.files.uuid': file_uuids
             }
         })
         used_filters = set_filters(request, query, result)
         used_filters['files.uuid'] = file_uuids
-        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Annotation'])
-        schemas = (types[item_type].schema for item_type in ['Annotation'])
+        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Experiment'])
+        schemas = (types[item_type].schema for item_type in ['Experiment'])
         es_results = es.search(
-            body=query, index='snovault', doc_type='annotation', size=size
+            body=query, index='experiment', doc_type='experiment', size=size, request_timeout=60
         )
         result['@graph'] = list(format_results(request, es_results['hits']['hits']))
-        result['total'] = total = es_results['hits']['total']                
+        result['total'] = total = es_results['hits']['total']
         result['facets'] = format_facets(es_results, _FACETS, used_filters, schemas, total, principals)
         result['peaks'] = list(peak_results['hits']['hits'])
-        result['regions'] = rows = []
-        # Plug filters for annotation visulizatiom tool, filter on @graph accession ids
-        rows_accesions = []
-        for row in result['@graph']:
-            accessions = row['accession']
-            rows_accesions.append(accessions)
-        for row in result['peaks']:
-            if row['_id'] in file_uuids:
-                file_json = request.embed(row['_id'])
-                annotation_json = request.embed(file_json['dataset'])
-                for hit in row['inner_hits']['positions']['hits']['hits']:
-                    data_row = {}
-                    coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
-                    assembly = '{}'.format(row['_type'])
-                    state = '{}'.format(hit['_source']['state'])
-                    val = '{}'.format(hit['_source']['val'])
-                    file_accession = file_json['accession']
-                    annotation_accession = annotation_json['accession']
-                    description = annotation_json['description']
-                    annotation = annotation_json['annotation_type']
-                    biosample_term = annotation_json['biosample_term_name']
-                    data_row.update({'annotation_type':annotation, 'biosample_term_name':biosample_term, 'coordinates':coordinates, 'state':state, 'value':val, '@id':annotation_accession, 'description':description})
-                    rows.append(data_row)
-        # Annotation Visulization clutser by annotation type, render state, biosample 
-        result['viz'] = rows = []
-        for row in result['peaks']:
-            if row['_id'] in file_uuids:
-                file_json = request.embed(row['_id'])
-                annotation_json = request.embed(file_json['dataset'])
-                for hit in row['inner_hits']['positions']['hits']['hits']:
-                    data_row = []
-                    chrom = '{}'.format(row['_index'])
-                    assembly = '{}'.format(row['_type'])
-                    start = int('{}'.format(hit['_source']['start']))
-                    stop = int('{}'.format(hit['_source']['end']))
-                    state = '{}'.format(hit['_source']['state'])
-                    val = '{}'.format(hit['_source']['val'])
-                    file_accession = file_json['accession']
-                    annotation_accession = annotation_json['accession']
-                    coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
-                    annotation = annotation_json['annotation_type']
-                    biosample_term = annotation_json['biosample_term_name']
-                    for row1 in rows_accesions:
-                        if row1 in annotation_json['accession']:
-                            if annotation in {item['id'] for item in rows}:
-                                index = tuple(item['id'] for item in rows).index(annotation)
-                                rows[index]['value'].append(biosample_term + ' : ' + state)
-                            else:
-                                rows.append({'id': annotation, 'value': [biosample_term + ' : ' + state]})
         result['download_elements'] = get_peak_metadata_links(request)
         if result['total'] > 0:
             result['notification'] = 'Success'
             position_for_browser = format_position(result['coordinates'], 200)
-            result.update(search_result_actions(request, ['RegionSearch'], es_results, position=position_for_browser))
+            result.update(search_result_actions(request, ['Experiment'], es_results, position=position_for_browser))
+
     return result
+
 
 @view_config(route_name='suggest', request_method='GET', permission='search')
 def suggest(context, request):
@@ -443,23 +396,25 @@ def suggest(context, request):
     }
     es = request.registry[ELASTIC_SEARCH]
     query = {
-        "suggester": {
-            "text": text,
-            "completion": {
-                "field": "name_suggest",
-                "size": 100
+        "suggest": {
+            "default-suggest": {
+                "text": text,
+                "completion": {
+                    "field": "suggest",
+                    "size": 100
+                }
             }
         }
     }
     try:
-        results = es.suggest(index='annotations', body=query)
+        results = es.search(index='annotations', body=query)
     except:
         return result
     else:
         result['@id'] = '/suggest/?' + urlencode({'genome': requested_genome, 'q': text}, ['q','genome'])
         result['@graph'] = []
-        for item in results['suggester'][0]['options']:
-            if _GENOME_TO_SPECIES[requested_genome].replace('_', ' ') == item['payload']['species']:
+        for item in results['suggest']['default-suggest'][0]['options']:
+            if _GENOME_TO_SPECIES[requested_genome].replace('_', ' ') == item['_source']['payload']['species']:
                 result['@graph'].append(item)
         result['@graph'] = result['@graph'][:10]
         return result

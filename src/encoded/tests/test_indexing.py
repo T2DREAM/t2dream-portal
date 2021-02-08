@@ -16,6 +16,7 @@ def app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_server)
     settings['create_tables'] = True
     settings['persona.audiences'] = 'http://%s:%s' % wsgi_server_host_port
     settings['elasticsearch.server'] = elasticsearch_server
+    settings['snp_search.server'] = elasticsearch_server  # NOTE: tfrom snovault/serverfixtures.py  Need a region_es version?
     settings['sqlalchemy.url'] = postgresql_server
     settings['collection_datastore'] = 'elasticsearch'
     settings['item_datastore'] = 'elasticsearch'
@@ -94,18 +95,31 @@ def test_indexing_workbook(testapp, indexer_testapp):
     res = indexer_testapp.post_json('/index', {'record': True})
     assert res.json['updated']
     assert res.json['indexed']
+    ### OPTIONAL: audit via 2-pass is coming...
+    #assert res.json['pass2_took']
+    ### OPTIONAL: audit via 2-pass is coming...
+
+    # NOTE: Both vis and region indexers are "followup" or secondary indexers
+    #       and must be staged by the primary indexer
+    res = indexer_testapp.post_json('/index_vis', {'record': True})
+    assert res.json['cycle_took']
+    assert res.json['title'] == 'vis_indexer'
+
+    res = indexer_testapp.post_json('/index_region', {'record': True})
+    assert res.json['cycle_took']
+    assert res.json['title'] == 'region_indexer'
+    assert res.json['indexed'] > 0
 
     res = testapp.get('/search/?type=Biosample')
     assert res.json['total'] > 5
 
 
 def test_indexing_simple(testapp, indexer_testapp):
+    import time
     # First post a single item so that subsequent indexing is incremental
     testapp.post_json('/testing-post-put-patch/', {'required': ''})
     res = indexer_testapp.post_json('/index', {'record': True})
     assert res.json['indexed'] == 1
-    assert 'txn_count' not in res.json
-
     res = testapp.post_json('/testing-post-put-patch/', {'required': ''})
     uuid = res.json['@graph'][0]['uuid']
     res = indexer_testapp.post_json('/index', {'record': True})
@@ -113,7 +127,43 @@ def test_indexing_simple(testapp, indexer_testapp):
     assert res.json['txn_count'] == 1
     assert res.json['updated'] == [uuid]
     res = testapp.get('/search/?type=TestingPostPutPatch')
-    assert res.json['total'] == 2
+    uuids = [indv_res['uuid'] for indv_res in res.json['@graph'] if 'uuid' in indv_res]
+    count = 0
+    while uuid not in uuids and count < 20:
+        time.sleep(1)
+        res = testapp.get('/search/?type=TestingPostPutPatch')
+        uuids = [indv_res['uuid'] for indv_res in res.json['@graph'] if 'uuid' in indv_res]
+        count += 1
+    assert res.json['total'] == 3
+
+
+def test_indexer_vis_state(dummy_request):
+    from encoded.vis_indexer import VisIndexerState
+    INDEX = dummy_request.registry.settings['snovault.elasticsearch.index']
+    es = dummy_request.registry['elasticsearch']
+    state = VisIndexerState(es,INDEX)
+    result = state.get_initial_state()
+    assert result['title'] == 'vis_indexer'
+    result = state.start_cycle(['1','2','3'], result)
+    assert result['cycle_count'] == 3
+    assert result['status'] == 'indexing'
+    cycles = result.get('cycles',0)
+    result = state.finish_cycle(result, [])
+    assert result['cycles'] == (cycles + 1)
+    assert result['status'] == 'done'
+
+
+def test_indexer_region_state(dummy_request):
+    from encoded.region_indexer import RegionIndexerState
+    INDEX = dummy_request.registry.settings['snovault.elasticsearch.index']
+    es = dummy_request.registry['elasticsearch']
+    state = RegionIndexerState(es,INDEX)
+    result = state.get_initial_state()
+    assert result['title'] == 'region_indexer'
+    assert result['status'] == 'idle'
+    display = state.display()
+    assert 'files_added' in display
+    assert 'files_dropped' in display
 
 
 def test_listening(testapp, listening_conn):

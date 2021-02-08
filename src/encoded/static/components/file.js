@@ -7,10 +7,11 @@ import { Panel, PanelHeading, PanelBody } from '../libs/bootstrap/panel';
 import { auditDecor } from './audit';
 import { DbxrefList } from './dbxref';
 import { DocumentsPanel } from './doc';
-import globals from './globals';
-import { requestFiles, requestObjects, requestSearch, RestrictedDownloadButton } from './objectutils';
+import * as globals from './globals';
+import { requestFiles, requestObjects, requestSearch, RestrictedDownloadButton, AlternateAccession } from './objectutils';
 import { ProjectBadge } from './image';
 import { QualityMetricsPanel } from './quality_metric';
+import { PickerActions } from './search';
 import { SortTablePanel, SortTable } from './sorttable';
 import StatusLabel from './statuslabel';
 
@@ -37,7 +38,7 @@ const derivingCols = {
     assembly: { title: 'Mapping assembly' },
     status: {
         title: 'File status',
-        display: item => <div className="characterization-meta-data"><StatusLabel status={item.status} /></div>,
+        display: item => <div className="characterization-meta-data"><StatusLabel status={item.status} fileStatus /></div>,
     },
 };
 
@@ -315,7 +316,7 @@ class FileComponent extends React.Component {
         const derivedFromFileIds = file.derived_from && file.derived_from.length ? file.derived_from : [];
         if (derivedFromFileIds.length) {
             requestFiles(derivedFromFileIds).then((derivedFromFiles) => {
-                this.setState({ derivedFromFiles: derivedFromFiles });
+                this.setState({ derivedFromFiles });
             });
         }
 
@@ -332,7 +333,6 @@ class FileComponent extends React.Component {
     render() {
         const { context } = this.props;
         const itemClass = globals.itemClass(context, 'view-item');
-        const altacc = (context.alternate_accessions && context.alternate_accessions.length) ? context.alternate_accessions.join(', ') : null;
         const aliasList = (context.aliases && context.aliases.length) ? context.aliases.join(', ') : '';
         const datasetAccession = globals.atIdToAccession(context.dataset);
         const adminUser = !!this.context.session_properties.admin;
@@ -360,13 +360,14 @@ class FileComponent extends React.Component {
                 <header className="row">
                     <div className="col-sm-12">
                         <h2>File summary for {context.title} (<span className="sentence-case">{context.file_format}</span>)</h2>
-                        {altacc ? <h4 className="repl-acc">Replaces {altacc}</h4> : null}
+                        <AlternateAccession altAcc={context.alternate_accessions} />
+                        {context.restricted ? <h4 className="superseded-acc">Restricted file</h4> : null}
                         {supersededBys.length ? <h4 className="superseded-acc">Superseded by {supersededBys.join(', ')}</h4> : null}
                         {supersedes.length ? <h4 className="superseded-acc">Supersedes {supersedes.join(', ')}</h4> : null}
                         <div className="status-line">
                             {context.status ?
                                 <div className="characterization-status-labels">
-                                    <StatusLabel title="Status" status={context.status} />
+                                    <StatusLabel title="Status" status={context.status} fileStatus />
                                 </div>
                             : null}
                             {this.props.auditIndicators(context.audit, 'file-audit', { session: this.context.session })}
@@ -444,14 +445,12 @@ class FileComponent extends React.Component {
                                             <dd>{context.read_length}</dd>
                                         </div>
                                     : null}
-
                                     {context.read_length_zip_files ?
                                         <div data-test="readlengthzipped">
                                             <dt>Read length for zipped fastq files</dt>
                                             <dd>{context.read_length_zip_files.map(function(item){ return <div className="item">{item}</div>; })}</dd>
                                         </div>
                                     : null}
-
                                     {context.file_size ?
                                         <div data-test="filesize">
                                             <dt>File size</dt>
@@ -514,7 +513,7 @@ class FileComponent extends React.Component {
                                     {context.dbxrefs && context.dbxrefs.length ?
                                         <div data-test="externalresources">
                                             <dt>External resources</dt>
-                                            <dd><DbxrefList values={context.dbxrefs} /></dd>
+                                            <dd><DbxrefList context={context} dbxrefs={context.dbxrefs} /></dd>
                                         </div>
                                     : null}
 
@@ -536,6 +535,13 @@ class FileComponent extends React.Component {
                                         <div data-test="submittedfilename">
                                             <dt>Original file name</dt>
                                             <dd className="sequence">{context.submitted_file_name}</dd>
+                                        </div>
+                                    : null}
+
+                                    {context.submitter_comment ?
+                                        <div data-test="submittercomment">
+                                            <dt>Submitter comment</dt>
+                                            <dd>{context.submitter_comment}</dd>
                                         </div>
                                     : null}
                                 </dl>
@@ -577,7 +583,7 @@ FileComponent.contextTypes = {
 
 const File = auditDecor(FileComponent);
 
-globals.content_views.register(File, 'File');
+globals.contentViews.register(File, 'File');
 
 
 // Display the sequence file summary panel for fastq files.
@@ -585,7 +591,6 @@ class SequenceFileInfo extends React.Component {
     render() {
         const { file } = this.props;
         const pairedWithAccession = file.paired_with ? globals.atIdToAccession(file.paired_with) : '';
-        const platformAccession = file.platform ? decodeURIComponent(globals.atIdToAccession(file.platform)) : '';
 
         return (
             <Panel>
@@ -598,17 +603,15 @@ class SequenceFileInfo extends React.Component {
                         {file.platform ?
                             <div data-test="platform">
                                 <dt>Platform</dt>
-                                <dd><a href={file.platform} title="View page for this platform">{platformAccession}</a></dd>
+                                <dd><a href={file.platform['@id']} title="View page for this platform">{file.platform.term_name}</a></dd>
                             </div>
                         : null}
-
                         {file.platforms_multiple_files ?
                             <div data-test="platforms">
                                 <dt>Platforms</dt>
 			        <dd>{file.platforms_multiple_files.map(function(item){ return <div className="item">{item}</div>; })}</dd>
                             </div>
                         : null}
-
                         {file.flowcell_details && file.flowcell_details.length ?
                             <div data-test="flowcelldetails">
                                 <dt>Flowcell</dt>
@@ -682,31 +685,42 @@ SequenceFileInfo.propTypes = {
 };
 
 
-class Listing extends React.Component {
+class ListingComponent extends React.Component {
     render() {
         const result = this.props.context;
 
         return (
             <li>
                 <div className="clearfix">
+                    <PickerActions {...this.props} />
                     <div className="pull-right search-meta">
                         <p className="type meta-title">File</p>
                         <p className="type">{` ${result.title}`}</p>
                         <p className="type meta-status">{` ${result.status}`}</p>
+                        {this.props.auditIndicators(result.audit, result['@id'], { session: this.context.session, search: true })}
                     </div>
                     <div className="accession"><a href={result['@id']}>{`${result.file_format}${result.file_format_type ? ` (${result.file_format_type})` : ''}`}</a></div>
                     <div className="data-row">
                         <div><strong>Lab: </strong>{result.lab.title}</div>
                         {result.award.project ? <div><strong>Project: </strong>{result.award.project}</div> : null}
                     </div>
+                    {this.props.auditDetail(result.audit, result['@id'], { session: this.context.session, except: result['@id'], forcedEditLink: true })}
                 </div>
             </li>
         );
     }
 }
 
-Listing.propTypes = {
+ListingComponent.propTypes = {
     context: PropTypes.object, // File object being rendered
+    auditIndicators: PropTypes.func, // Audit decorator function
+    auditDetail: PropTypes.func, // Audit decorator function
 };
 
-globals.listing_views.register(Listing, 'File');
+ListingComponent.contextTypes = {
+    session: PropTypes.object, // Login information from <App>
+};
+
+const Listing = auditDecor(ListingComponent);
+
+globals.listingViews.register(Listing, 'File');

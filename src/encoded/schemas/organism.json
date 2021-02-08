@@ -13,7 +13,7 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "3"
+            "default": "4"
         },
         "name": {
             "title": "Common name",
@@ -36,8 +36,14 @@
             "format": "^[0-9]+$"
         }
     },
+    "facets": {
+        "status": {
+            "title": "Status"
+        }
+    },
     "boost_values": {
         "name": 1.0,
         "scientific_name": 1.0
-    }
+    },
+    "changelog": "/profiles/changelogs/organism.md"
 }

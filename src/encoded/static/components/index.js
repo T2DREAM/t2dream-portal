@@ -1,5 +1,3 @@
-'use strict';
-
 // Require all components to ensure javascript load ordering
 require('./lib');
 require('./antibody');
@@ -25,7 +23,6 @@ require('./platform');
 require('./search');
 require('./report');
 require('./matrix');
-require('./talen');
 require('./target');
 require('./publication');
 require('./pipeline');
@@ -39,5 +36,6 @@ require('./user');
 require('./schema');
 require('./region_search');
 require('./variant_search');
+require('./auditmatrix');
 
 module.exports = require('./app');

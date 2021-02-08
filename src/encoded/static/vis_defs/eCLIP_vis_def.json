@@ -2,21 +2,21 @@
     "eCLIP": {
         "rule": "'{assay_term_name}' == 'eCLIP'",
         "assay_composite": {
-            "longLabel":  "Collection of Diabetes Epigenome Atlas eCLIP experiments",
-            "shortLabel": "Diabetes Epigenome Atlas eCLIP"
+            "longLabel":  "Collection of DGA eCLIP experiments",
+            "shortLabel": "DGA eCLIP"
         },
         "longLabel":  "{target} {assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{target} {assay_title} of {biosample_term_name} {accession}",
         "sortOrder": [ "Biosample", "Targets", "Replicates", "Views" ],
         "Views":  {
             "tag": "view",
-            "group_order": [ "Signal", "Peaks" ],
+            "group_order": [ "Plus signal of unique reads", "Minus signal of unique reads", "Signal", "Peaks" ],
             "groups": {
                 "Signal": {
                     "tag": "aSIG",
                     "visibility": "full",
                     "type": "bigWig",
-                    "viewLimits": "0:1",
+		    "viewLimits": "-1:0",
                     "autoScale": "off",
                     "maxHeightPixels": "32:16:8",
                     "windowingFunction": "mean+whiskers",
@@ -30,6 +30,27 @@
                     "minGrayLevel": 4,
                     "scoreFilter": "100",
                     "output_type": [ "peaks" ]
+                },
+                "Minus signal of unique reads": {
+                    "tag": "SIGLR",
+                    "visibility": "full",
+                    "type": "bigWig",
+                    "viewLimits": "0:1",
+                    "autoScale": "off",
+                    "negateValues": "on",
+                    "maxHeightPixels": "64:18:8",
+                    "windowingFunction": "mean+whiskers",
+                    "output_type": [ "minus strand signal of unique reads" ]
+                },
+                "Plus signal of unique reads": {
+                    "tag": "SIGLF",
+                    "visibility": "full",
+                    "type": "bigWig",
+                    "viewLimits": "0:1",
+                    "autoScale": "off",
+                    "maxHeightPixels": "64:18:8",
+                    "windowingFunction": "mean+whiskers",
+                    "output_type": [ "plus strand signal of unique reads" ]
                 }
             }
         },

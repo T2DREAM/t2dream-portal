@@ -2,16 +2,26 @@
     "DNASE": {
         "rule": "'{assay_term_name}' == 'DNase-seq'",
         "assay_composite": {
-            "longLabel":  "Collection of Diabetes Epigenome Atlas DNase-HS experiments",
-            "shortLabel": "Diabetes Epigenome Atlas DNase-HS"
+            "longLabel":  "Collection of DGA DNase-HS experiments",
+            "shortLabel": "DGA DNase-HS"
         },
         "longLabel":  "{assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{assay_title} of {biosample_term_name} {accession}",
         "sortOrder": [ "Biosample", "Targets", "Replicates", "Views" ],
         "Views":  {
             "tag": "view",
-            "group_order": [ "Signal", "Peaks", "Hotspots", "AutoScale Signal" ],
+            "group_order": [ "Normalized Signal", "Signal", "Peaks", "Hotspots", "AutoScale Signal" ],
             "groups": {
+                "Normalized Signal": {
+                    "tag": "aNSIG",
+                    "visibility": "full",
+                    "type": "bigWig",
+                    "viewLimits": "0:1",
+                    "autoScale": "off",
+                    "maxHeightPixels": "32:16:8",
+                    "windowingFunction": "mean+whiskers",
+                    "output_type": [ "read-depth normalized signal" ]
+                },
                 "Signal": {
                     "tag": "aSIG",
                     "visibility": "full",
@@ -27,7 +37,7 @@
                     "visibility": "hide",
                     "type": "bigBed",
                     "spectrum": "on",
-                    "scoreFilter": "100",
+                    "signalFilter": "0",
                     "output_type": [ "peaks" ]
                 },
                 "Hotspots": {

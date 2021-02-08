@@ -4,7 +4,7 @@ Run sanity checks on files.
 Example.
 
     %(prog)s --username ACCESS_KEY_ID --password SECRET_ACCESS_KEY \\
-        --output check_files.log https://www.t2depigenome.org
+        --output check_files.log https://www.diabetesepigenome.org
 """
 import datetime
 import os.path
@@ -172,11 +172,11 @@ def check_format(encValData, job, path):
         ('CEL', None): None,
         ('txt', None): None,
         ('xls', None): None,
+        ('bedgraph', None): None,
         ('sam', None): None,
         ('wig', None): None,
         ('hdf5', None): None,
         ('hic', None): None,
-        ('bedgraph', None): None,
         ('ibed', None): None,
         ('gff', None): None,
         ('vcf', None): None,

@@ -46,94 +46,20 @@ class Experiment(Dataset,
     embedded = Dataset.embedded + [
         'files.platform',
         'files.analysis_step_version.analysis_step',
-        'files.analysis_step_version.analysis_step.documents',
-        'files.analysis_step_version.analysis_step.documents.award',
-        'files.analysis_step_version.analysis_step.documents.lab',
-        'files.analysis_step_version.analysis_step.documents.submitted_by',
         'files.analysis_step_version.analysis_step.pipelines',
-        'files.analysis_step_version.analysis_step.pipelines.documents',
-        'files.analysis_step_version.analysis_step.pipelines.documents.award',
-        'files.analysis_step_version.analysis_step.pipelines.documents.lab',
-        'files.analysis_step_version.analysis_step.pipelines.documents.submitted_by',
         'related_series',
         'replicates.antibody',
         'replicates.library',
-        'replicates.library.documents.lab',
-        'replicates.library.documents.submitted_by',
-        'replicates.library.documents.award',
         'replicates.library.biosample.submitted_by',
         'replicates.library.biosample.source',
-        'replicates.library.biosample.characterizations',
-        'replicates.library.biosample.characterizations.award',
-        'replicates.library.biosample.characterizations.lab',
-        'replicates.library.biosample.characterizations.submitted_by',
-        'replicates.library.biosample.constructs.documents',
-        'replicates.library.biosample.constructs.documents.award',
-        'replicates.library.biosample.constructs.documents.lab',
-        'replicates.library.biosample.constructs.documents.submitted_by',
-        'replicates.library.biosample.documents',
-        'replicates.library.biosample.documents.award',
-        'replicates.library.biosample.documents.lab',
-        'replicates.library.biosample.documents.submitted_by',
-        'replicates.library.biosample.talens.documents',
-        'replicates.library.biosample.talens.documents.award',
-        'replicates.library.biosample.talens.documents.lab',
-        'replicates.library.biosample.talens.documents.submitted_by',
+        'replicates.library.biosample.applied_modifications',
         'replicates.library.biosample.organism',
-        'replicates.library.biosample.rnais.documents',
-        'replicates.library.biosample.rnais.documents.award',
-        'replicates.library.biosample.rnais.documents.lab',
-        'replicates.library.biosample.rnais.documents.submitted_by',
         'replicates.library.biosample.donor',
-        'replicates.library.biosample.donor.documents',
-        'replicates.library.biosample.donor.documents.award',
-        'replicates.library.biosample.donor.documents.lab',
-        'replicates.library.biosample.donor.documents.submitted_by',
-        'replicates.library.biosample.donor.characterizations',
-        'replicates.library.biosample.donor.characterizations.award',
-        'replicates.library.biosample.donor.characterizations.lab',
-        'replicates.library.biosample.donor.characterizations.submitted_by',
         'replicates.library.biosample.donor.organism',
-        'replicates.library.biosample.genetic_modifications',
-        'replicates.library.biosample.genetic_modifications.target',
-        'replicates.library.biosample.genetic_modifications.modification_techniques',
-        'replicates.library.biosample.genetic_modifications.treatments',
-        'replicates.library.biosample.part_of.characterizations',
-        'replicates.library.biosample.part_of.characterizations.award',
-        'replicates.library.biosample.part_of.characterizations.lab',
-        'replicates.library.biosample.part_of.characterizations.submitted_by',
-        'replicates.library.biosample.part_of.constructs.documents',
-        'replicates.library.biosample.part_of.constructs.documents.award',
-        'replicates.library.biosample.part_of.constructs.documents.lab',
-        'replicates.library.biosample.part_of.constructs.documents.submitted_by',
-        'replicates.library.biosample.part_of.documents',
-        'replicates.library.biosample.part_of.documents.award',
-        'replicates.library.biosample.part_of.documents.lab',
-        'replicates.library.biosample.part_of.documents.submitted_by',
-        'replicates.library.biosample.part_of.talens.documents',
-        'replicates.library.biosample.part_of.talens.documents.award',
-        'replicates.library.biosample.part_of.talens.documents.lab',
-        'replicates.library.biosample.part_of.talens.documents.submitted_by',
-        'replicates.library.biosample.part_of.rnais.documents',
-        'replicates.library.biosample.part_of.rnais.documents.award',
-        'replicates.library.biosample.part_of.rnais.documents.lab',
-        'replicates.library.biosample.part_of.rnais.documents.submitted_by',
-        'replicates.library.biosample.part_of.donor.documents',
-        'replicates.library.biosample.part_of.donor.documents.award',
-        'replicates.library.biosample.part_of.donor.documents.lab',
-        'replicates.library.biosample.part_of.donor.documents.submitted_by',
-        'replicates.library.biosample.part_of.donor.characterizations',
-        'replicates.library.biosample.part_of.donor.characterizations.award',
-        'replicates.library.biosample.part_of.donor.characterizations.lab',
-        'replicates.library.biosample.part_of.donor.characterizations.submitted_by',
-        'replicates.library.biosample.part_of.treatments.documents',
-        'replicates.library.biosample.part_of.treatments.documents.award',
-        'replicates.library.biosample.part_of.treatments.documents.lab',
-        'replicates.library.biosample.part_of.treatments.documents.submitted_by',
-        'replicates.library.biosample.treatments.documents',
-        'replicates.library.biosample.treatments.documents.award',
-        'replicates.library.biosample.treatments.documents.lab',
-        'replicates.library.biosample.treatments.documents.submitted_by',
+        'replicates.library.biosample.part_of',
+        'replicates.library.biosample.part_of.donor',
+        'replicates.library.biosample.part_of.treatments',
+        'replicates.library.biosample.treatments',
         'replicates.library.treatments',
         'possible_controls',
         'target.organism',
@@ -161,7 +87,7 @@ class Experiment(Dataset,
         'replicates.library.biosample.donor.organism',
         'replicates.library.biosample.donor',
         'replicates.library.biosample.treatments',
-        'replicates.library.biosample.derived_from',
+        'replicates.library.biosample.originated_from',
         'replicates.library.biosample.part_of',
         'replicates.library.biosample.pooled_from',
         'replicates.library.spikeins_used',
@@ -213,8 +139,8 @@ class Experiment(Dataset,
                             biosample_accessions.add(biosampleObject['accession'])
 
                             if biosampleObject.get('biosample_type') in [
-                               'stem cell',
-                               'in vitro differentiated cells']:
+                                    'stem cell',
+                                    'in vitro differentiated cells']:
                                 drop_age_sex_flag = True
 
                             organismObject = None
@@ -236,74 +162,34 @@ class Experiment(Dataset,
                             if 'part_of' in biosampleObject:
                                 part_of_object = request.embed(biosampleObject['part_of'],
                                                                '@@object')
-                            derived_from_object = None
-                            if 'derived_from' in biosampleObject:
-                                derived_from_object = request.embed(biosampleObject['derived_from'],
-                                                                    '@@object')
+                            originated_from_object = None
+                            if 'originated_from' in biosampleObject:
+                                originated_from_object = request.embed(biosampleObject['originated_from'],
+                                                                       '@@object')
 
                             modifications_list = None
-                            genetic_modifications = biosampleObject.get('genetic_modifications')
-                            if genetic_modifications is not None and len(genetic_modifications) > 0:
+                            genetic_modifications = biosampleObject.get('applied_modifications')
+                            if genetic_modifications:
                                 modifications_list = []
                                 for gm in genetic_modifications:
                                     gm_object = request.embed(gm, '@@object')
-                                    if 'modification_techniques' in gm_object and \
-                                       len(gm_object['modification_techniques']) > 0:
-                                        for gmt in gm_object['modification_techniques']:
-                                            modifications_list.append(
-                                                (gm_object['modification_type'],
-                                                 request.embed(gmt, '@@object')))
+                                    modification_dict = {'category': gm_object.get('category')}
+                                    if gm_object.get('modified_site_by_target_id'):
+                                        modification_dict['target'] = request.embed(
+                                            gm_object.get('modified_site_by_target_id'),
+                                                          '@@object')['label']
+                                    if gm_object.get('introduced_tags_array'):
+                                        modification_dict['tags'] = []
+                                        for tag in gm_object.get('introduced_tags_array'):
+                                            tag_dict = {'location': tag['location']}
+                                            if tag.get('promoter_used'):
+                                                tag_dict['promoter'] = request.embed(
+                                                    tag.get('promoter_used'),
+                                                            '@@object').get['label']
+                                            modification_dict['tags'].append(tag_dict)
 
-                            construct_objects_list = None
-                            constructs = biosampleObject.get('constructs')
-                            if constructs is not None and len(constructs) > 0:
-                                construct_objects_list = []
-                                for c in constructs:
-                                    construct_object = request.embed(c, '@@object')
-                                    target_name = construct_object['target']
-                                    if 'promoter_used' in construct_object and \
-                                       construct_object['promoter_used'] is not None:
-                                        promo = construct_object['promoter_used']
-                                        item_to_add = (construct_object,
-                                                       request.embed(target_name, '@@object'),
-                                                       request.embed(promo, '@@object'))
-                                    else:
-                                        item_to_add = (construct_object,
-                                                       request.embed(target_name, '@@object'),
-                                                       None)
-                                    construct_objects_list.append(item_to_add)
+                                    modifications_list.append((gm_object['method'], modification_dict))
 
-                            model_construct_objects_list = None
-                            model_organism_donor_constructs = biosampleObject.get(
-                                'model_organism_donor_constructs')
-                            if model_organism_donor_constructs is not None and \
-                               len(model_organism_donor_constructs) > 0:
-                                model_construct_objects_list = []
-                                for c in model_organism_donor_constructs:
-                                    construct_object = request.embed(c, '@@object')
-                                    target_name = construct_object['target']
-                                    if 'promoter_used' in construct_object and \
-                                       construct_object['promoter_used'] is not None:
-                                        promo = construct_object['promoter_used']
-                                        item_to_add = (construct_object,
-                                                       request.embed(target_name, '@@object'),
-                                                       request.embed(promo, '@@object'))
-                                    else:
-                                        item_to_add = (construct_object,
-                                                       request.embed(target_name, '@@object'),
-                                                       None)
-                                    model_construct_objects_list.append(item_to_add)
-
-                            rnai_objects = None
-                            rnais = biosampleObject.get('rnais')
-                            if rnais is not None and len(rnais) > 0:
-                                rnai_objects = []
-                                for r in rnais:
-                                    rnai_object = request.embed(r, '@@object')
-                                    target_object = request.embed(rnai_object['target'], '@@object')
-                                    rnai_info = {'rnai_type': rnai_object['rnai_type'],
-                                                 'target': target_object['label']}
-                                    rnai_objects.append(rnai_info)
 
                             dictionary_to_add = generate_summary_dictionary(
                                 organismObject,
@@ -324,14 +210,10 @@ class Experiment(Dataset,
                                 biosampleObject.get('post_synchronization_time_units'),
                                 biosampleObject.get('post_treatment_time'),
                                 biosampleObject.get('post_treatment_time_units'),
-                                biosampleObject.get('transfection_type'),
                                 treatment_objects_list,
                                 part_of_object,
-                                derived_from_object,
+                                originated_from_object,
                                 modifications_list,
-                                construct_objects_list,
-                                model_construct_objects_list,
-                                rnai_objects,
                                 True)
 
                             dictionaries_of_phrases.append(dictionary_to_add)
@@ -344,13 +226,9 @@ class Experiment(Dataset,
                 'fractionated',
                 'synchronization',
                 'modifications_list',
-                'derived_from',
-                'transfection_type',
-                'rnais',
+                'originated_from',
                 'treatments_phrase',
-                'depleted_in',
-                'constructs',
-                'model_organism_constructs'
+                'depleted_in'
             ]
         else:
             sentence_parts = [
@@ -361,13 +239,9 @@ class Experiment(Dataset,
                 'sex_stage_age',
                 'synchronization',
                 'modifications_list',
-                'derived_from',
-                'transfection_type',
-                'rnais',
+                'originated_from',
                 'treatments_phrase',
-                'depleted_in',
-                'constructs',
-                'model_organism_constructs'
+                'depleted_in'
             ]
         if len(dictionaries_of_phrases) > 0:
             return construct_biosample_summary(dictionaries_of_phrases, sentence_parts)
@@ -414,7 +288,7 @@ class Experiment(Dataset,
                             break
                         elif 'nucleic_acid_term_name' in libraryObject and \
                              libraryObject['nucleic_acid_term_name'] == 'polyadenylated mRNA':
-                            preferred_name = 'polyA mRNA RNA-seq'
+                            preferred_name = 'polyA RNA-seq'
                             break
             return preferred_name or assay_term_name
         return assay_term_name
@@ -465,6 +339,7 @@ class Experiment(Dataset,
             "type": ['string', 'object'],
             "linkFrom": "Series.related_datasets",
         },
+        "notSubmittable": True,
     })
     def related_series(self, request, related_series):
         return paths_filtered_by_status(request, related_series)
@@ -476,6 +351,7 @@ class Experiment(Dataset,
             "type": ['string', 'object'],
             "linkFrom": "Experiment.supersedes",
         },
+        "notSubmittable": True,
     })
     def superseded_by(self, request, superseded_by):
         return paths_filtered_by_status(request, superseded_by)
@@ -523,7 +399,7 @@ class Experiment(Dataset,
         if (len(set(biosample_number_list)) < 2):
             return 'unreplicated'
 
-        if biosample_type == 'immortalized cell line':
+        if biosample_type == 'cell line':
             return 'isogenic'
 
         # Since we are not looking for model organisms here, we likely need audits
@@ -551,7 +427,9 @@ class Experiment(Dataset,
                 'organ_slims',
                 'award.project',
                 'assembly',
-                'internal_status'
+                'internal_status',
+                'audit_category', # Added for auditmatrix
+                'lab.title'
             ],
             'group_by': ['biosample_type', 'biosample_term_name'],
             'label': 'Biosample',

@@ -8,7 +8,6 @@ from .base import (
     Item,
     paths_filtered_by_status,
 )
-from pyramid.security import effective_principals
 
 from urllib.parse import quote_plus
 from urllib.parse import urljoin
@@ -35,20 +34,8 @@ def item_is_revoked(request, path):
 
 def calculate_assembly(request, files_list, status):
     assembly = set()
-    viewable_file_formats = ['bigWig',
-                             'bigBed',
-                             'hic',
-                             'bedgraph',
-                             'ibed',
-                             'long range chromatin interactions',
-                             'narrowPeak',
-                             'broadPeak',
-                             'bedRnaElements',
-                             'bedMethyl',
-                             'bedLogR']
-    viewable_file_status = ['released']
-    if status not in ['released']:
-        viewable_file_status.extend(['in progress'])
+    viewable_file_formats = ['bigWig', 'bigBed', 'hic', 'bedgraph','ibed', 'long range chromatin interactions']
+    viewable_file_status = ['released','in progress']
 
     for path in files_list:
         properties = request.embed(path, '@@object')
@@ -85,9 +72,6 @@ class Dataset(Item):
         'submitted_by',
         'lab',
         'award.pi.lab',
-        'documents.lab',
-        'documents.award',
-        'documents.submitted_by',
         'references'
     ]
     audit_inherit = [
@@ -111,6 +95,7 @@ class Dataset(Item):
             "type": ['string', 'object'],
             "linkFrom": "File.dataset",
         },
+        "notSubmittable": True,
     })
     def original_files(self, request, original_files):
         return paths_filtered_by_status(request, original_files)
@@ -192,7 +177,6 @@ class Dataset(Item):
     })
     def hub(self, request):
         return request.resource_path(self, '@@hub', 'hub.txt')
-
 
     @calculated_property(condition='date_released', schema={
         "title": "Month released",
@@ -286,7 +270,7 @@ class FileSet(Dataset):
     unique_key='accession',
     properties={
         'title': "Annotation file set",
-        'description': 'A set of annotation files produced by T2D consortium.',
+        'description': 'A set of annotation files produced by DGA.',
     })
 class Annotation(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, CalculatedVisualize):
     item_type = 'annotation'
@@ -298,15 +282,7 @@ class Annotation(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms,
         'targets',
         'files.dataset',
         'files.analysis_step_version.analysis_step',
-        'files.analysis_step_version.analysis_step.documents',
-        'files.analysis_step_version.analysis_step.documents.award',
-        'files.analysis_step_version.analysis_step.documents.lab',
-        'files.analysis_step_version.analysis_step.documents.submitted_by',
         'files.analysis_step_version.analysis_step.pipelines',
-        'files.analysis_step_version.analysis_step.pipelines.documents',
-        'files.analysis_step_version.analysis_step.pipelines.documents.award',
-        'files.analysis_step_version.analysis_step.pipelines.documents.lab',
-        'files.analysis_step_version.analysis_step.pipelines.documents.submitted_by',
         'files.analysis_step_version.analysis_step.versions',
         'files.analysis_step_version.analysis_step.versions.software_versions',
         'files.analysis_step_version.analysis_step.versions.software_versions.software',
@@ -354,6 +330,7 @@ class Annotation(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms,
             "type": ['string', 'object'],
             "linkFrom": "Annotation.supersedes",
         },
+        "notSubmittable": True,
     })
     def superseded_by(self, request, superseded_by):
         return paths_filtered_by_status(request, superseded_by)
@@ -386,7 +363,7 @@ class PublicationData(FileSet, CalculatedFileSetBiosample, CalculatedFileSetAssa
     unique_key='accession',
     properties={
         'title': "Reference file set",
-        'description': 'A set of reference files used by T2D consortium.',
+        'description': 'A set of reference files used by DGA.',
     })
 class Reference(FileSet):
     item_type = 'reference'
@@ -483,15 +460,10 @@ class Series(Dataset, CalculatedSeriesAssay, CalculatedSeriesBiosample, Calculat
         'related_datasets.replicates.antibody',
         'related_datasets.replicates.antibody.targets',
         'related_datasets.replicates.library',
-        'related_datasets.replicates.library.documents.lab',
-        'related_datasets.replicates.library.documents.submitted_by',
-        'related_datasets.replicates.library.documents.award',
         'related_datasets.replicates.library.biosample.submitted_by',
         'related_datasets.replicates.library.biosample.source',
         'related_datasets.replicates.library.biosample.organism',
-        'related_datasets.replicates.library.biosample.rnais',
         'related_datasets.replicates.library.biosample.donor.organism',
-        'related_datasets.replicates.library.biosample.donor.mutated_gene',
         'related_datasets.replicates.library.biosample.treatments',
         'related_datasets.replicates.library.spikeins_used',
         'related_datasets.replicates.library.treatments',
@@ -529,6 +501,24 @@ class Series(Dataset, CalculatedSeriesAssay, CalculatedSeriesBiosample, Calculat
             path for path in related_datasets
             if item_is_revoked(request, path)
         ]
+
+    @calculated_property(define=True, schema={
+        "title": "Assembly",
+        "type": "array",
+        "items": {
+            "type": "string",
+        },
+    })
+    def assembly(self, request, original_files, related_datasets, status):
+        combined_assembly = set()
+        for assembly_from_original_files in calculate_assembly(request, original_files, status):
+            combined_assembly.add(assembly_from_original_files)
+        for dataset in related_datasets:
+            properties = request.embed(dataset, '@@object')
+            if properties['status'] not in ('deleted', 'replaced'):
+                for assembly_from_related_dataset in properties['assembly']:
+                    combined_assembly.add(assembly_from_related_dataset)
+        return list(combined_assembly)
 
 
 @collection(

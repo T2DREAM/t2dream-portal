@@ -19,7 +19,7 @@
    ],
     "properties": {
         "schema_version": {
-            "default": "6"
+            "default": "7"
         },
         "CpG pairs": {
             "title": "CpG pairs",
@@ -37,6 +37,14 @@
             "minimum": -1,
             "maximum": 1,
             "description": "Pearson's correlation of CpG pairs with at least 10 reads each"
+        }
+    },
+    "facets": {
+        "assay_term_name": {
+            "title": "Assay name"
+        },
+        "status": {
+            "title": "Status"
         }
     },
     "changelog": "/profiles/changelogs/cpg_correlation_quality_metric.md"

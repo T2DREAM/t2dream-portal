@@ -51,7 +51,6 @@ class Award(Item):
     }
 
 
-
 @collection(
     name='organisms',
     unique_key='organism:name',
@@ -70,7 +69,7 @@ class Organism(Item):
     unique_key='source:name',
     properties={
         'title': 'Sources',
-        'description': 'Listing of sources and vendors for T2D consortium material',
+        'description': 'Listing of sources and vendors for DGA material',
     })
 class Source(Item):
     item_type = 'source'
@@ -87,69 +86,9 @@ class Source(Item):
 class Treatment(Item):
     item_type = 'treatment'
     schema = load_schema('encoded:schemas/treatment.json')
-    # XXX 'treatment_name' as key?
-
-
-@collection(
-    name='constructs',
-    properties={
-        'title': 'Constructs',
-        'description': 'Listing of Biosample Constructs',
-    })
-class Construct(Item):
-    item_type = 'construct'
-    schema = load_schema('encoded:schemas/construct.json')
-    # XXX 'vector_name' as key?
-    rev = {
-        'characterizations': ('ConstructCharacterization', 'characterizes'),
-    }
-    embedded = ['target']
-
-    @calculated_property(schema={
-        "title": "Characterizations",
-        "type": "array",
-        "items": {
-            "type": "string",
-            "linkTo": "ConstructCharacterization",
-        },
-    })
-    def characterizations(self, request, characterizations):
-        return paths_filtered_by_status(request, characterizations)
-
-
-@collection(
-    name='talens',
-    unique_key='talen:name',
-    properties={
-        'title': 'TALENs',
-        'description': 'Listing of TALEN Constructs',
-    })
-class TALEN(Item):
-    item_type = 'talen'
-    schema = load_schema('encoded:schemas/talen.json')
-    name_key = 'name'
-    rev = {
-        'characterizations': ('ConstructCharacterization', 'characterizes'),
-    }
     embedded = [
         'lab',
-        'submitted_by',
-        'documents',
-        'documents.award',
-        'documents.lab',
-        'documents.submitted_by'
     ]
-
-    @calculated_property(schema={
-        "title": "Characterizations",
-        "type": "array",
-        "items": {
-            "type": "string",
-            "linkTo": "ConstructCharacterization",
-        },
-    })
-    def characterizations(self, request, characterizations):
-        return paths_filtered_by_status(request, characterizations)
 
 
 @collection(
@@ -235,32 +174,6 @@ class Library(Item):
             else:
                 term_id.append('Term ID unknown')
         return term_id
-
-
-@collection(
-    name='rnais',
-    properties={
-        'title': 'RNAi',
-        'description': 'Listing of RNAi',
-    })
-class RNAi(Item):
-    item_type = 'rnai'
-    schema = load_schema('encoded:schemas/rnai.json')
-    embedded = ['source', 'documents', 'target']
-    rev = {
-        'characterizations': ('RNAiCharacterization', 'characterizes'),
-    }
-
-    @calculated_property(schema={
-        "title": "Characterizations",
-        "type": "array",
-        "items": {
-            "type": "string",
-            "linkTo": "RNAiCharacterization",
-        },
-    })
-    def characterizations(self, request, characterizations):
-        return paths_filtered_by_status(request, characterizations)
 
 
 @collection(

@@ -1,21 +1,14 @@
-'use strict';
-var React = require('react');
+import React from 'react';
 import PropTypes from 'prop-types';
-import createReactClass from 'create-react-class';
 
-var Footer = createReactClass({
-    contextTypes: {
-        session: PropTypes.object
-    },
 
-    propTypes: {
-        version: PropTypes.string // App version number
-    },
-
-    render: function() {
-        var session = this.context.session;
-        var disabled = !session;
-        var userActionRender;
+/* eslint "jsx-a11y/href-no-hash": 0 */
+// Reworking the data triggers to use buttons doesn't seem worth it to avoid an eslint warning.
+export default class Footer extends React.Component {
+    render() {
+        const session = this.context.session;
+        const disabled = !session;
+        let userActionRender;
 
         if (!(session && session['auth.userid'])) {
             userActionRender = <a href="#" data-trigger="login" disabled={disabled}>User sign-in</a>;
@@ -38,8 +31,8 @@ var Footer = createReactClass({
 
                             <div className="col-sm-6 col-sm-pull-6">
                                 <ul className="footer-logos">
-                                <li><a href="/"><img src="/static/img/logo_final.png" alt="Diabetes Epigenome Atlas" id="t2dream-logo" height="55px" width="130px" /></a></li>
-                                <li><a href="http://www.ucsd.edu"><img src="/static/img/UCSanDiegoLogo-BlueGold.png" alt="UC San Diego" id="ucsd-logo" width="130px" height="40px" /></a></li>
+                                    <li><a href="/"><img src="/static/img/logo_final.png" alt="Diabetes Epigenome Atlas" id="t2dream-logo" height="55px" width="130px" /></a></li>
+                                    <li><a href="http://www.ucsd.edu"><img src="/static/img/UCSanDiegoLogo-BlueGold.png" alt="UC San Diego" id="ucsd-logo" width="130px" height="40px" /></a></li>
                                 </ul>
                             </div>
                         </div>
@@ -48,6 +41,16 @@ var Footer = createReactClass({
             </footer>
         );
     }
-});
+}
 
-module.exports = Footer;
+Footer.contextTypes = {
+    session: PropTypes.object,
+};
+
+Footer.propTypes = {
+    version: PropTypes.string, // App version number
+};
+
+Footer.defaultProps = {
+    version: '',
+};

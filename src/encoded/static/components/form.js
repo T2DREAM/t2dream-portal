@@ -1,15 +1,16 @@
 /* eslint-disable jsx-a11y/label-has-for */
 
-const React = require('react');
+import React from 'react';
 import PropTypes from 'prop-types';
-import createReactClass from 'create-react-class';
-const parseAndLogError = require('./globals').parseAndLogError;
-const offset = require('../libs/offset');
-const fetched = require('./fetched');
-const inputs = require('./inputs');
-const layout = require('./layout');
-const jsonschema = require('jsonschema');
-const _ = require('underscore');
+import jsonschema from 'jsonschema';
+import _ from 'underscore';
+import offset from '../libs/offset';
+import { FetchedData, Param } from './fetched';
+import { parseAndLogError, listingTitles } from './globals';
+import { FileInput, ItemPreview, ObjectPicker } from './inputs';
+import Layout from './layout';
+import DropdownButton from '../libs/bootstrap/button';
+import { DropdownMenu } from '../libs/bootstrap/dropdown-menu';
 
 const validator = new jsonschema.Validator();
 
@@ -28,7 +29,7 @@ validator.attributes.pattern = function validatePattern(instance, schema) {
 // Parse object and property from `linkFrom`.
 // Backrefs have a linkFrom property in the form
 // (object type).(property name)
-const parseLinkFrom = function (linkFrom) {
+const parseLinkFrom = function parseLinkFrom(linkFrom) {
     const parts = linkFrom.split('.');
     return {
         type: parts[0],
@@ -41,39 +42,56 @@ validator.attributes.linkFrom = function validateLinkFrom(instance, schema, opti
     let result;
     if (instance !== undefined && instance instanceof Object) {
         const linkFrom = parseLinkFrom(schema.linkFrom);
-        const subschema = options.schemas[linkFrom.type];
+        const types = instance['@type'];
+        if (!_.contains(types, linkFrom.type)) {
+            result = `expected object of type ${linkFrom.type}`;
+        }
+        const subschema = options.schemas[types[0]];
         result = this.attributes.properties.call(this, instance, subschema, options, ctx);
     }
     return result;
 };
 
-// Recursively filter an object to remove `schema_version`.
+// Recursively filter an object to remove calculated properties
+// (`schema_version`).
 // This is used before sending the value to the server.
-const filterValue = function (value) {
+const filterValue = function filterValue(value) {
+    let result;
     if (Array.isArray(value)) {
-        value.map(filterValue);
+        result = value.map(filterValue);
     } else if (typeof value === 'object') {
+        result = {};
         _.each(value, (v, k) => {
-            if (k === 'schema_version') {
-                delete value[k];
-            } else {
-                filterValue(v);
+            if (k === '@type') {
+                // We're not allowed to change an existing item's @type
+                // but the server needs to know it for new items.
+                if (!value['@id']) {
+                    result['@type'] = v;
+                }
+            } else if (k === 'layout') {
+                // Avoid filtering out @type from layout blocks
+                result[k] = v;
+            } else if (k !== 'schema_version') {
+                result[k] = filterValue(v);
             }
         });
+    } else {
+        result = value;
     }
+    return result;
 };
 
 // Given a schema, construct a default object.
 // The default object includes the `default` value
 // for any property that defines one,
-// with the exception of read-only and calculated properties.
-const defaultValue = function (schema) {
+// with the exception of read-only and non-submittable properties.
+const defaultValue = function defaultValue(schema) {
     if (schema.default !== undefined) {
-        return schema.default || undefined;
+        return schema.default !== undefined ? schema.default : undefined;
     } else if (schema.properties !== undefined) {
         const value = {};
         _.each(schema.properties, (property, name) => {
-            if (property.calculatedProperty) return;
+            if (property.notSubmittable) return;
             if (!property.readonly) {
                 const propertyDefault = defaultValue(property);
                 if (propertyDefault !== undefined) {
@@ -86,53 +104,51 @@ const defaultValue = function (schema) {
     return schema.default || undefined;
 };
 
-const updateChild = function (name, subvalue) {
-    // This is the workhorse for passing for field updates
-    // up the hierarchy of form fields.
-    // It constructs a new value for the current element
-    // by replacing the value of one of its children,
-    // then propagates the new value to its parent.
 
-    const schema = this.props.schema;
-    let oldValue = this.props.value;
-    let newValue;
-    if (schema.type === 'object') {
-        // Clone the old value so we don't mutate it
-        newValue = Object.assign({}, oldValue);
-        // Set the new value unless it is undefined
-        if (subvalue !== undefined) {
-            newValue[name] = subvalue;
-        } else if (newValue[name] !== undefined) {
-            delete newValue[name];
+const UpdateChildMixin = superclass => class extends superclass {
+    updateChild(name, subvalue) {
+        // This is the workhorse for passing for field updates
+        // up the hierarchy of form fields.
+        // It constructs a new value for the current element
+        // by replacing the value of one of its children,
+        // then propagates the new value to its parent.
+
+        const schema = this.props.schema;
+        let oldValue = this.props.value;
+        let newValue;
+        if (schema.type === 'object') {
+            // Clone the old value so we don't mutate it
+            newValue = Object.assign({}, oldValue);
+            // Set the new value unless it is undefined
+            if (subvalue !== undefined) {
+                newValue[name] = subvalue;
+            } else if (newValue[name] !== undefined) {
+                delete newValue[name];
+            }
+        } else if (schema.type === 'array') {
+            // Construct the old value using slices of the old
+            // so we don't mutate it
+            oldValue = oldValue || [];
+            newValue = oldValue.slice(0, name).concat(subvalue).concat(oldValue.slice(name + 1));
         }
-    } else if (schema.type === 'array') {
-        // Construct the old value using slices of the old
-        // so we don't mutate it
-        oldValue = oldValue || [];
-        newValue = oldValue.slice(0, name).concat(subvalue).concat(oldValue.slice(name + 1));
+        // Pass the new value to the parent
+        this.props.updateChild(this.props.name, newValue);
     }
-    // Pass the new value to the parent
-    this.props.updateChild(this.props.name, newValue);
 };
 
-const RepeatingItem = createReactClass({
+
+class RepeatingItem extends React.Component {
     // A form field for editing one item in an array
     // (part of a RepeatingFieldset).
     // It delegates rendering the field to an actual Field component,
     // but also shows a button to remove the item.
+    constructor() {
+        super();
 
-    propTypes: {
-        name: PropTypes.number,
-        path: PropTypes.string,
-        schema: PropTypes.object,
-        onRemove: PropTypes.func,
-        value: PropTypes.any,
-        updateChild: PropTypes.func,
-    },
-
-    contextTypes: {
-        readonly: PropTypes.bool,
-    },
+        // Bind `this` to non-React methods.
+        this.handleRemove = this.handleRemove.bind(this);
+        this.updateChild = this.updateChild.bind(this);
+    }
 
     handleRemove(e) {
         // Called when the remove button is clicked.
@@ -145,13 +161,13 @@ const RepeatingItem = createReactClass({
         if (this.props.onRemove) {
             this.props.onRemove(this.props.name);
         }
-    },
+    }
 
     updateChild(name, value) {
         // When the contained field value is updated,
         // tell our parent RepeatingFieldset to update the correct index.
         this.props.updateChild(this.props.name, value);
-    },
+    }
 
     render() {
         const { path, schema, value } = this.props;
@@ -171,37 +187,51 @@ const RepeatingItem = createReactClass({
             : ''}
           </div>
         );
-    },
+    }
 
-});
+}
 
-const RepeatingFieldset = createReactClass({
+RepeatingItem.propTypes = {
+    name: PropTypes.number,
+    path: PropTypes.string,
+    schema: PropTypes.object,
+    onRemove: PropTypes.func,
+    value: PropTypes.any,
+    updateChild: PropTypes.func.isRequired,
+};
+
+RepeatingItem.defaultProps = {
+    name: '',
+    path: '',
+    schema: {},
+    onRemove: null,
+    value: null,
+};
+
+RepeatingItem.contextTypes = {
+    readonly: PropTypes.bool,
+};
+
+
+class RepeatingFieldset extends UpdateChildMixin(React.Component) {
     // A form field for editing an array.
     // Each item in the array is rendered via RepeatingItem.
     // Also shows a button to add a new item.
+    constructor() {
+        super();
 
-    propTypes: {
-        schema: PropTypes.object,
-        name: PropTypes.string,
-        path: PropTypes.string,
-        value: PropTypes.any,
-        updateChild: PropTypes.func,
-    },
-
-    contextTypes: {
-        schemas: PropTypes.object,
-        readonly: PropTypes.bool,
-        id: PropTypes.string,
-    },
-
-    getInitialState: function () {
         // Counter which is incremented every time an item is removed.
         // This is used as part of the React key for contained RepeatingItems
         // to make sure that we re-render all items after one is removed.
         // After a removal the same array index may point to a different
         // item, so it's not safe to use the array index alone as the key.
-        return { generation: 0 };
-    },
+        this.state = { generation: 0 };
+
+        // Bind `this` to non-React methods.
+        this.onRemove = this.onRemove.bind(this);
+        this.handleAdd = this.handleAdd.bind(this);
+        this.updateChild = this.updateChild.bind(this);
+    }
 
     onRemove(index) {
         // Called when a contained RepeatingItem is removed.
@@ -218,25 +248,29 @@ const RepeatingFieldset = createReactClass({
 
         // Pass the new value for the entire array to parent
         this.props.updateChild(this.props.name, value);
-    },
+    }
 
-    handleAdd() {
+    handleAdd(e) {
         // Called when the add button is clicked.
-
-        // Construct a new subitem from schema defaults.
-        let subschema = this.props.schema.items;
+        e.preventDefault();
+        const schema = this.props.schema;
+        const subtype = e.target.getAttribute('data-subtype');
         let newValue;
-        if (subschema.linkFrom !== undefined) {
-            // This is an array of backreferences from separate objects of a different type.
-            // We need to construct the default value for that type,
-            // and also add a reference to the object being edited.
-            const linkFrom = parseLinkFrom(subschema.linkFrom);
-            subschema = this.context.schemas[linkFrom.type];
+        if (subtype) {
+            // Construct a child object.
+            // It needs a reference back to the parent object.
+            const subschema = this.context.schemas[subtype];
             newValue = defaultValue(subschema);
-            newValue[linkFrom.prop] = this.context.id;
+            newValue['@type'] = [subtype];
+            const linkFrom = parseLinkFrom(schema.items.linkFrom);
+            if (subschema.properties[linkFrom.prop].type === 'array') {
+                newValue[linkFrom.prop] = [this.context.id];
+            } else {
+                newValue[linkFrom.prop] = this.context.id;
+            }
         } else {
-            // Simple subitem; construct default value from schema.
-            newValue = defaultValue(subschema);
+            // Simple subitem; construct default value from schema;
+            newValue = defaultValue(schema.items);
         }
 
         // Add the new subitem to the end of the array.
@@ -244,13 +278,39 @@ const RepeatingFieldset = createReactClass({
 
         // Pass the new value for the entire array to parent
         this.props.updateChild(this.props.name, value);
-    },
-
-    // Propagate edits to subitems upward
-    updateChild,
+    }
 
     render() {
         const { path, value, schema } = this.props;
+        const schemas = this.context.schemas;
+        const linkFrom = schema.items.linkFrom;
+        const subtypes = linkFrom ? schemas._subtypes[parseLinkFrom(linkFrom).type] : [];
+        let button = null;
+        if (!this.context.readonly) {
+            if (subtypes.length > 1) {
+                button = (
+                    <DropdownButton title="Add" buttonClasses="rf-RepeatingFieldset__add">
+                        <DropdownMenu>
+                            {subtypes.map(subtype =>
+                                <a
+                                    href="#" key={subtype}
+                                    data-subtype={subtype}
+                                    onClick={this.handleAdd}
+                                >{schemas[subtype].title}</a>)}
+                        </DropdownMenu>
+                    </DropdownButton>
+                );
+            } else {
+                button = (
+                    <button
+                        type="button"
+                        onClick={this.handleAdd}
+                        data-subtype={subtypes.length === 1 ? subtypes[0] : null}
+                        className="rf-RepeatingFieldset__add"
+                    >Add</button>
+                );
+            }
+        }
         return (
             <div>
                 <div className="rf-RepeatingFieldset__items">
@@ -267,79 +327,82 @@ const RepeatingFieldset = createReactClass({
                         return <RepeatingItem {...props} />;
                     }) : ''}
                 </div>
-                {!this.context.readonly &&
-                    <button
-                        type="button"
-                        onClick={this.handleAdd}
-                        className="rf-RepeatingFieldset__add"
-                    >Add</button>
-                }
+                {button}
             </div>
         );
-    },
+    }
 
-});
+}
 
-const FetchedFieldset = createReactClass({
+RepeatingFieldset.propTypes = {
+    schema: PropTypes.object,
+    name: PropTypes.string,
+    path: PropTypes.string,
+    value: PropTypes.any,
+    updateChild: PropTypes.func,
+};
+
+RepeatingFieldset.contextTypes = {
+    schemas: PropTypes.object,
+    readonly: PropTypes.bool,
+    id: PropTypes.string,
+};
+
+
+class ObjectField extends React.Component {
+    // Wrapper to determine which schema to use for an object,
+    // then render a Field with that schema. Used after ChildObject
+    // fetches a child object from the server.
+
+    render() {
+        const type = this.props.value['@type'][0];
+        const schema = this.context.schemas[type];
+        return <Field {...this.props} schema={schema} />;
+    }
+}
+
+ObjectField.propTypes = {
+    value: PropTypes.any,
+};
+
+ObjectField.defaultProps = {
+    value: null,
+};
+
+ObjectField.contextTypes = {
+    schemas: PropTypes.object,
+};
+
+
+class ChildObject extends React.Component {
     // A form field for editing a child object
     // (a subitem of an array property using linkFrom).
     // Initially the value is a URI and we render a preview of the object.
-    // If the user expands the item we fetch its edit frame and render form fields.
+    // If the user expands the item we fetch its form frame and render form fields.
     // If the user updates any fields the new value is the updated object
     // rather than just the URI.
-
-    propTypes: {
-        schema: PropTypes.object,
-        name: PropTypes.any,
-        path: PropTypes.string,
-        value: PropTypes.any,
-        updateChild: PropTypes.func,
-    },
-
-    contextTypes: {
-        schemas: PropTypes.object,
-        errors: PropTypes.object,
-    },
-
-    childContextTypes: {
-        id: PropTypes.string,
-    },
-
-    getInitialState() {
-        const schema = this.props.schema;
-
-        // We need to construct a modified schema for the child type,
-        // to avoid showing the field that links back to the main object being edited.
-
-        const linkFrom = parseLinkFrom(schema.linkFrom);
-        let subschema = this.context.schemas[linkFrom.type];
-        // FIXME Handle linkFrom abstract type.
-        if (subschema !== undefined) {
-            // The linkProp is the one that refers to the parent object.
-            // This should not be shown when accessed from the parent's form.
-            // Let's immutably clone the schema and delete it:
-            subschema = Object.assign({}, subschema, {
-                properties: Object.assign({}, subschema.properties),
-            });
-            delete subschema.properties[linkFrom.prop];
-        }
+    constructor(props, context) {
+        super(props);
 
         const value = this.props.value;
-        const error = this.context.errors[this.props.path];
+        const error = context.errors[this.props.path];
         const url = typeof value === 'string' ? value : null;
-        return {
-            schema: subschema,
-            url: url,
+        this.state = {
+            url,
             // Start collapsed for existing children,
             // expanded when adding a new one or if there are errors
             collapsed: url && !error,
         };
-    },
+
+        // Bind `this` to non-React methods.
+        this.toggleCollapsed = this.toggleCollapsed.bind(this);
+        this.updateChild = this.updateChild.bind(this);
+    }
 
     toggleCollapsed() {
         // Toggle collapsed state when collapsible trigger is clicked.
         this.setState({ collapsed: !this.state.collapsed });
-    },
+    }
 
     updateChild(name, value) {
         // Pass new value up to our parent.
@@ -347,10 +410,9 @@ const FetchedFieldset = createReactClass({
             value['@id'] = this.state.url;
         }
         this.props.updateChild(this.props.name, value);
-    },
+    }
 
     render() {
-        const schema = this.state.schema;
         const { path, value } = this.props;
         let preview;
         let fieldset;
@@ -360,25 +422,26 @@ const FetchedFieldset = createReactClass({
             const previewUrl = this.state.url;
             // When collapsed, fetch the object and render it using ItemPreview.
             preview = (
-                <fetched.FetchedData>
-                    <fetched.Param name="data" url={previewUrl} />
-                    <inputs.ItemPreview />
-                </fetched.FetchedData>
+                <FetchedData>
+                    <Param name="data" url={previewUrl} />
+                    <ItemPreview />
+                </FetchedData>
             );
-            // When expanded, fetch the edit frame and render form fields.
+            // When expanded, fetch the form frame and render form fields.
             if (typeof value === 'string') {
                 fieldset = (
-                    <fetched.FetchedData>
-                        <fetched.Param name="value" url={`${this.state.url}?frame=edit`} />
-                        <Field path={path} schema={schema} updateChild={this.updateChild} />
-                    </fetched.FetchedData>
+                    <FetchedData>
+                        <Param name="value" url={`${this.state.url}?frame=form`} />
+                        <ObjectField path={path} updateChild={this.updateChild} />
+                    </FetchedData>
                 );
             } else {
-                fieldset = <Field path={path} schema={schema} value={value} updateChild={this.updateChild} />;
+                fieldset = <ObjectField path={path} value={value} updateChild={this.updateChild} />;
             }
         } else {
             // We don't have a URI yet (it's a new object).
             // When collapsed, render a placeholder.
+            const schema = this.context.schemas[value['@type'][0]];
             preview = (
                 <ul className="nav result-table">
                   <li>
@@ -386,10 +449,9 @@ const FetchedFieldset = createReactClass({
                   </li>
                 </ul>
             );
-            // When expanded, render form fields (but there's no edit frame to fetch)
-            fieldset = (<Field
-                path={path} value={value} schema={schema}
-                updateChild={this.updateChild}
+            // When expanded, render form fields (but there's no form frame to fetch)
+            fieldset = (<ObjectField
+                path={path} value={value} updateChild={this.updateChild}
             />);
         }
 
@@ -402,11 +464,34 @@ const FetchedFieldset = createReactClass({
                 {this.state.collapsed ? preview : fieldset}
             </div>
         );
-    },
+    }
 
-});
+}
 
-const Field = module.exports.Field = createReactClass({
+ChildObject.propTypes = {
+    name: PropTypes.any,
+    path: PropTypes.string,
+    value: PropTypes.any,
+    updateChild: PropTypes.func.isRequired,
+};
+
+ChildObject.defaultProps = {
+    name: null,
+    path: '',
+    value: null,
+};
+
+ChildObject.contextTypes = {
+    schemas: PropTypes.object,
+    errors: PropTypes.object,
+};
+
+ChildObject.childContextTypes = {
+    id: PropTypes.string,
+};
+
+
+export class Field extends UpdateChildMixin(React.Component) {
     // Build form input components based on a JSON schema
     // (or a portion thereof).
 
@@ -425,7 +510,7 @@ const Field = module.exports.Field = createReactClass({
     // - `type: 'integer' or 'number'`: Renders an HTML number `input` elemtn.
     // - schema with `enum`: Renders an HTML `select` element.
     // - schema with `linkTo`: Renders an `ObjectPicker` for searching and selecting other objects.
-    // - schema with `linkFrom`: Renders using `FetchedFieldset`.
+    // - schema with `linkFrom`: Renders using `ChildObject`.
     // - schema with `formInput: 'file'`: Renders a `FileInput` to handle file uploads.
     // - schema with `formInput: 'textarea`: Renders an HTML `textarea` element.
     // - schema with `formInput: 'layout'`: Renders a `Layout` for drag-and-drop placement of content blocks.
@@ -435,44 +520,21 @@ const Field = module.exports.Field = createReactClass({
     // If the schema (or the schema for any parent field) has `readonly: true`,
     // the input is disabled and the field value cannot be edited.
 
-    propTypes: {
-        name: PropTypes.any,
-        path: PropTypes.string,
-        schema: PropTypes.object,
-        value: PropTypes.any,
-        className: PropTypes.string,
-        updateChild: PropTypes.func,
-        hideLabel: PropTypes.bool,
-    },
+    constructor() {
+        super();
 
-    contextTypes: {
-        submitted: PropTypes.bool,
-        errors: PropTypes.object,
-        showReadOnly: PropTypes.bool,
-        readonly: PropTypes.bool,
-        id: PropTypes.string,
-    },
+        // Set intial React state.
+        this.state = { isDirty: false };
 
-    childContextTypes: {
-        readonly: PropTypes.bool,
-    },
-
-    getDefaultProps() {
-        return {
-            path: 'instance',
-            hideLabel: false,
-            className: '',
-        };
-    },
-
-    getInitialState() {
-        return { isDirty: false };
-    },
+        // Bind `this` to non-React methods.
+        this.handleChange = this.handleChange.bind(this);
+        this.updateChild = this.updateChild.bind(this);
+    }
 
     getChildContext() {
         // Allow contained fields to tell whether they are inside a readonly field.
         return { readonly: !!(this.context.readonly || this.props.schema.readonly) };
-    },
+    }
 
     // Don't update when state is changed.
     // (Without this, the update to isDirty from handleChange causes
@@ -482,10 +544,7 @@ const Field = module.exports.Field = createReactClass({
     // This should be safe as long as Field's state only contains isDirty.
     shouldComponentUpdate(nextProps) {
         return nextProps !== this.props;
-    },
-
-    // Propagate updates from children to parent
-    updateChild,
+    }
 
     handleChange(e) {
         // Handles change events on (leaf) input elements.
@@ -517,7 +576,7 @@ const Field = module.exports.Field = createReactClass({
         this.setState({ isDirty: true });
         // Pass the new value to the parent.
         this.props.updateChild(this.props.name, value);
-    },
+    }
 
     render() {
         const { name, path, schema, value } = this.props;
@@ -545,18 +604,18 @@ const Field = module.exports.Field = createReactClass({
         let input = schema.formInput;
         if (input) {
             if (input === 'file') {
-                input = <inputs.FileInput {...inputProps} />;
+                input = <FileInput {...inputProps} />;
             } else if (input === 'textarea') {
                 input = <textarea rows="4" {...inputProps} />;
             } else if (input === 'layout') {
-                input = <layout.Layout {...inputProps} editable={!readonly} />;
+                input = <Layout {...inputProps} editable={!readonly} />;
             } else {
                 // We were passed an arbitrary custom input,
                 // which we need to clone to specify the correct props.
                 input = React.cloneElement(input, inputProps);
             }
         } else if (schema.linkFrom) {
-            input = (<FetchedFieldset
+            input = (<ChildObject
                 name={this.props.name} path={path} schema={schema}
                 value={value} updateChild={this.props.updateChild}
             />);
@@ -565,7 +624,7 @@ const Field = module.exports.Field = createReactClass({
             Object.keys(schema.properties).forEach((key) => {
                 if (key === 'uuid' || key === 'schema_version') return;
                 const subschema = schema.properties[key];
-                if (subschema.calculatedProperty) return;
+                if (subschema.notSubmittable || subschema.hideFromForms) return;
                 // Readonly fields are omitted when showReadOnly is false
                 // (i.e. when adding a new object).
                 if (!this.context.showReadOnly && subschema.readonly) return;
@@ -597,7 +656,7 @@ const Field = module.exports.Field = createReactClass({
             // Restrict ObjectPicker to finding the specified type
             // FIXME this should handle an array of types too
             const restrictions = { type: [schema.linkTo] };
-            input = (<inputs.ObjectPicker
+            input = (<ObjectPicker
                 {...inputProps}
                 searchBase={`?mode=picker&type=${schema.linkTo}`}
                 restrictions={restrictions}
@@ -627,11 +686,43 @@ const Field = module.exports.Field = createReactClass({
                 {input}
             </div>
         );
-    },
+    }
 
-});
+}
 
-const Form = module.exports.Form = createReactClass({
+Field.propTypes = {
+    name: PropTypes.any,
+    path: PropTypes.string,
+    schema: PropTypes.object,
+    value: PropTypes.any,
+    className: PropTypes.string,
+    updateChild: PropTypes.func.isRequired,
+    hideLabel: PropTypes.bool,
+};
+
+Field.defaultProps = {
+    name: '',
+    path: 'instance',
+    schema: null,
+    value: '',
+    hideLabel: false,
+    className: '',
+};
+
+Field.contextTypes = {
+    submitted: PropTypes.bool,
+    errors: PropTypes.object,
+    showReadOnly: PropTypes.bool,
+    readonly: PropTypes.bool,
+    id: PropTypes.string,
+};
+
+Field.childContextTypes = {
+    readonly: PropTypes.bool,
+};
+
+
+export class Form extends React.Component {
     // The Form component renders a form based on a JSON schema.
 
     // It renders an actual HTML `form` element which contains
@@ -660,51 +751,27 @@ const Form = module.exports.Form = createReactClass({
     // and scrolls to the first one.
 
     // Clicking the Cancel button returns to the homepage.
+    constructor(props) {
+        super(props);
 
-    propTypes: {
-        defaultValue: PropTypes.any,
-        schemas: PropTypes.object,
-        schema: PropTypes.object,
-        showReadOnly: PropTypes.bool,
-        id: PropTypes.string,
-        method: PropTypes.string,
-        action: PropTypes.string,
-        etag: PropTypes.string,
-        onFinish: PropTypes.func,
-        submitLabel: PropTypes.string,
-    },
-
-    contextTypes: {
-        adviseUnsavedChanges: PropTypes.func,
-        fetch: PropTypes.func,
-    },
-
-    childContextTypes: {
-        schemas: PropTypes.object,
-        canSave: PropTypes.func,
-        onTriggerSave: PropTypes.func,
-        errors: PropTypes.object,
-        showReadOnly: PropTypes.bool,
-        id: PropTypes.string,
-        submitted: PropTypes.bool,
-    },
-
-    getDefaultProps() {
-        return {
-            showReadOnly: true,
-            submitLabel: 'Save',
-        };
-    },
-
-    getInitialState() {
-        return {
+        // Set initial React state.
+        this.state = {
             isDirty: false,
             isValid: true,
             value: this.props.defaultValue,
             errors: {},
             submitted: false,
         };
-    },
+
+        // Bind `this` to non-React methods.
+        this.validate = this.validate.bind(this);
+        this.update = this.update.bind(this);
+        this.canSave = this.canSave.bind(this);
+        this.save = this.save.bind(this);
+        this.receive = this.receive.bind(this);
+        this.showErrors = this.showErrors.bind(this);
+        this.finish = this.finish.bind(this);
+    }
 
     getChildContext() {
         // Provide various props to contained fields via React's
@@ -719,18 +786,19 @@ const Form = module.exports.Form = createReactClass({
             id: this.props.id,
             submitted: this.state.submitted,
         };
-    },
+    }
 
     componentDidUpdate(prevProps, prevState) {
         // If form error state changed, scroll to first error message
         // to make sure the user notices it.
-        if (!_.isEqual(prevState.errors, this.state.errors)) {
-            const error = document.querySelector('.rf-Message');
-            if (error) {
-                window.scrollTo(0, offset(error).top - document.getElementById('navbar').clientHeight);
+        if (!_.isEqual(prevState.errors, this.state.errors) ||
+            (this.state.message && (this.state.message !== prevState.message))) {
+            const message = document.querySelector('.rf-Message,.alert');
+            if (message) {
+                window.scrollTo(0, offset(message).top - document.getElementById('navbar').clientHeight);
             }
         }
-    },
+    }
 
     validate(value) {
         // Get validation errors from jsonschema validator.
@@ -747,7 +815,8 @@ const Form = module.exports.Form = createReactClass({
         // but we use paths like
         //   `instance.aliases.0`
         // so we have to convert them here.
-        const errorsByPath = validation.errorsByPath = {};
+        validation.errorsByPath = {};
+        const errorsByPath = validation.errorsByPath;
         validation.errors.forEach((error) => {
             let path = error.property.replace(/\[/g, '.').replace(/]/g, '');
             // Missing values for required properties are reported
@@ -761,7 +830,7 @@ const Form = module.exports.Form = createReactClass({
             errorsByPath[path] = error.message;
         });
         return validation;
-    },
+    }
 
     update(name, value) {
         // Called whenever the form value was changed.
@@ -787,14 +856,14 @@ const Form = module.exports.Form = createReactClass({
             nextState.unsavedToken = this.context.adviseUnsavedChanges();
         }
         this.setState(nextState);
-    },
+    }
 
     canSave() {
         // Called to determine whether to enable the Save button or not.
         // It is enabled if the form has been edited, the value is valid
         // according to the schema, and the form submission is not in progress.
         return this.state.isDirty && this.state.isValid && !this.state.editor_error && !this.communicating;
-    },
+    }
 
     save(e) {
         // Send the form value to the server.
@@ -803,14 +872,15 @@ const Form = module.exports.Form = createReactClass({
         e.preventDefault();
         e.stopPropagation();
 
+        const button = e.target.getAttribute('data-button');
+
         // Filter out `schema_version` property
-        const value = this.state.value;
-        filterValue(value);
+        const value = filterValue(this.state.value);
 
         // Make the request
         const { method, action, etag } = this.props;
         const request = this.context.fetch(action, {
-            method: method,
+            method,
             headers: {
                 'If-Match': etag || '*',
                 Accept: 'application/json',
@@ -825,15 +895,17 @@ const Form = module.exports.Form = createReactClass({
             return response.json();
         })
         .catch(parseAndLogError.bind(undefined, 'putRequest'))
-        .then(this.receive);
+        .then(this.receive.bind(this, button));
         // Set `communicating` to true so the Save button becomes disabled.
         this.setState({
+            message: null,
+            error: null,
             communicating: true,
             putRequest: request,
         });
-    },
+    }
 
-    receive(data) {
+    receive(button, data) {
         // Handle a response that is not an HTTP error status.
 
         // Handle server-side validation errors using `this.showErrors`.
@@ -842,8 +914,8 @@ const Form = module.exports.Form = createReactClass({
             return this.showErrors(data);
         }
         // Handle a successful form submission using `this.finish`.
-        return this.finish(data);
-    },
+        return this.finish(button, data);
+    }
 
     showErrors(data) {
         // Translate server-side validation errors.
@@ -885,9 +957,9 @@ const Form = module.exports.Form = createReactClass({
             submitted: true,
             communicating: false,
         });
-    },
+    }
 
-    finish(data) {
+    finish(button, data) {
         // Handle a successful form submission.
 
         // Let the app know navigation is now allowed again
@@ -898,11 +970,20 @@ const Form = module.exports.Form = createReactClass({
             this.setState({ unsavedToken: null });
         }
 
-        // Call the `onFinish` prop, if specified.
-        if (this.props.onFinish) {
+        if (button === 'saveAndAdd') {
+            const context = data['@graph'][0];
+            const title = listingTitles.lookup(context)({ context });
+            let message = `Created ${title}`;
+            if (context.accession && context.accession !== title) {
+                message += ` with accession ${context.accession}`;
+            }
+            message += '.';
+            this.setState({ message });
+        } else if (this.props.onFinish) {
+            // Default action: defer to the `onFinish` prop.
             this.props.onFinish(data);
         }
-    },
+    }
 
     render() {
         return (
@@ -910,6 +991,7 @@ const Form = module.exports.Form = createReactClass({
                 className="rf-Form"
                 onSubmit={this.save}
             >
+                {this.state.message ? <div className="alert alert-success">{this.state.message}</div> : ''}
                 <Field
                     schema={this.props.schema}
                     value={this.state.value}
@@ -923,15 +1005,64 @@ const Form = module.exports.Form = createReactClass({
                         onClick={this.save}
                         disabled={!this.canSave()}
                     >{this.props.submitLabel}</button>
+                    {' '}
+                    {this.props.showSaveAndAdd ?
+                        <button
+                            data-button="saveAndAdd"
+                            className="btn btn-success"
+                            onClick={this.save}
+                            disabled={!this.canSave()}
+                        >Save & Add Another</button>
+                    : ''}
                 </div>
-                {this.state.error ? <div className="rf-Message">{this.state.error}</div> : ''}
+                {this.state.error ? <div className="alert alert-danger">{this.state.error}</div> : ''}
             </form>
         );
-    },
+    }
 
-});
+}
 
-module.exports.JSONSchemaForm = createReactClass({
+Form.propTypes = {
+    defaultValue: PropTypes.any,
+    schemas: PropTypes.object,
+    schema: PropTypes.object.isRequired,
+    showReadOnly: PropTypes.bool,
+    showSaveAndAdd: PropTypes.bool,
+    id: PropTypes.string,
+    method: PropTypes.string.isRequired,
+    action: PropTypes.string.isRequired,
+    etag: PropTypes.string,
+    onFinish: PropTypes.func.isRequired,
+    submitLabel: PropTypes.string,
+};
+
+Form.defaultProps = {
+    defaultValue: null,
+    schemas: null,
+    id: '',
+    etag: '',
+    showReadOnly: true,
+    showSaveAndAdd: false,
+    submitLabel: 'Save',
+};
+
+Form.contextTypes = {
+    adviseUnsavedChanges: PropTypes.func,
+    fetch: PropTypes.func,
+};
+
+Form.childContextTypes = {
+    schemas: PropTypes.object,
+    canSave: PropTypes.func,
+    onTriggerSave: PropTypes.func,
+    errors: PropTypes.object,
+    showReadOnly: PropTypes.bool,
+    id: PropTypes.string,
+    submitted: PropTypes.bool,
+};
+
+
+export class JSONSchemaForm extends React.Component {
     // JSONSchemaForm is a wrapper of Form
     // that is used from the ItemEdit component after
     // it fetches the `schemas` and the `context`
@@ -944,37 +1075,46 @@ module.exports.JSONSchemaForm = createReactClass({
 
     // Other properties are passed through to the Form.
 
-    propTypes: {
-        type: PropTypes.string,
-        schemas: PropTypes.object,
-        context: PropTypes.any,
-        action: PropTypes.string,
-        method: PropTypes.string,
-        etag: PropTypes.string,
-        showReadOnly: PropTypes.bool,
-        id: PropTypes.string,
-        onFinish: PropTypes.func,
-    },
+    constructor(props) {
+        super(props);
 
-    getDefaultProps() {
-        return { showReadOnly: true };
-    },
-
-    getInitialState() {
         const { type, schemas } = this.props;
-        return {
+        this.state = {
             schema: schemas[type],
             value: this.props.context || defaultValue(schemas[type]),
         };
-    },
+    }
 
     render() {
         return (<Form
             action={this.props.action} method={this.props.method} etag={this.props.etag}
             schemas={this.props.schemas} schema={this.state.schema}
             defaultValue={this.state.value} showReadOnly={this.props.showReadOnly}
+            showSaveAndAdd={this.props.showSaveAndAdd}
             id={this.props.id} onFinish={this.props.onFinish}
         />);
-    },
+    }
 
-});
+}
+
+JSONSchemaForm.propTypes = {
+    type: PropTypes.string.isRequired,
+    schemas: PropTypes.object,
+    context: PropTypes.any,
+    action: PropTypes.string.isRequired,
+    method: PropTypes.string.isRequired,
+    etag: PropTypes.string,
+    showReadOnly: PropTypes.bool,
+    showSaveAndAdd: PropTypes.bool,
+    id: PropTypes.string,
+    onFinish: PropTypes.func.isRequired,
+};
+
+JSONSchemaForm.defaultProps = {
+    schemas: null,
+    context: null,
+    id: null,
+    etag: '',
+    showReadOnly: true,
+    showSaveAndAdd: false,
+};

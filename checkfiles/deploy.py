@@ -77,7 +77,7 @@ def run(image_id, instance_type,
     )
 
     instance = reservation[0]  # Instance:i-34edd56f
-    print('%s.%s.t2depigenome.org' % (instance.instance_id, domain))
+    print('%s.%s.diabetesepigenome.org' % (instance.instance_id, domain))
     instance.wait_until_exists()
     instance.create_tags(Tags=[
         {'Key': 'Name', 'Value': name},
@@ -85,7 +85,7 @@ def run(image_id, instance_type,
         {'Key': 'commit', 'Value': commit},
         {'Key': 'started_by', 'Value': username},
     ])
-    print('ssh %s.%s.t2depigenome.org' % (name, domain))
+    print('ssh %s.%s.diabetesepigenome.org' % (name, domain))
     print('pending...')
     instance.wait_until_running()
     print(instance.state['Name'])

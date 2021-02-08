@@ -2,9 +2,8 @@ biosampleType_ontologyPrefix = {
     'tissue': ['UBERON'],
     'whole organisms': ['UBERON'],
     'primary cell': ['CL'],
-    'cell line': ['CL', 'BTO'],
     'stem cell': ['EFO', 'CL'],
-    'immortalized cell line': ['EFO'],
+    'cell line': ['EFO', 'CL', 'BTO'],
     'in vitro differentiated cells': ['CL', 'EFO'],
     'induced pluripotent stem cell line': ['EFO']
 }

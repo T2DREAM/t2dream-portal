@@ -7,6 +7,7 @@ README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
 requires = [
+    'alembic',
     'snovault',
     'Pillow',
     'PyBrowserID',
@@ -59,7 +60,7 @@ tests_require = [
 
 setup(
     name='encoded',
-    version='0.1',
+    version='66.0',
     description='Metadata database for ENCODE',
     long_description=README + '\n\n' + CHANGES,
     packages=find_packages('src'),
@@ -97,13 +98,15 @@ setup(
         index-annotations = encoded.commands.index_annotations:main
         migrate-attachments-aws = encoded.commands.migrate_attachments_aws:main
         migrate-dataset-type = encoded.commands.migrate_dataset_type:main
+        alembic = encoded.commands.alembic:main
 
         [paste.app_factory]
         main = encoded:main
-        
+
         [paste.composite_factory]
         indexer = snovault.elasticsearch.es_index_listener:composite
-        secondaryindexer = snovault.elasticsearch.es_index_listener:composite
+        visindexer = snovault.elasticsearch.es_index_listener:composite
+        regionindexer = snovault.elasticsearch.es_index_listener:composite
 
         [paste.filter_app_factory]
         memlimit = encoded.memlimit:filter_app

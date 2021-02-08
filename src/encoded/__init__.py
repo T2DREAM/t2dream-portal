@@ -177,12 +177,16 @@ def app_version(config):
     import hashlib
     import os
     import subprocess
-    version = subprocess.check_output(
-        ['git', '-C', os.path.dirname(__file__), 'describe']).decode('utf-8').strip()
-    diff = subprocess.check_output(
-        ['git', '-C', os.path.dirname(__file__), 'diff', '--no-ext-diff'])
-    if diff:
-        version += '-patch' + hashlib.sha1(diff).hexdigest()[:7]
+    try:
+        version = subprocess.check_output(
+            ['git', '-C', os.path.dirname(__file__), 'describe']).decode('utf-8').strip()
+        diff = subprocess.check_output(
+            ['git', '-C', os.path.dirname(__file__), 'diff', '--no-ext-diff'])
+        if diff:
+            version += '-patch' + hashlib.sha1(diff).hexdigest()[:7]
+    except:
+        # Travis can't run git describe without crashing
+        version = 'version_test'
     config.registry.settings['snovault.app_version'] = version
 
 
@@ -193,7 +197,7 @@ def main(global_config, **local_config):
     settings.update(local_config)
 
     settings['snovault.jsonld.namespaces'] = json_asset('encoded:schemas/namespaces.json')
-    settings['snovault.jsonld.terms_namespace'] = 'https://ucsd.edu/about/terms-of-use.html'
+    settings['snovault.jsonld.terms_namespace'] = 'https://www.diabetesepigenome.org/policy/'
     settings['snovault.jsonld.terms_prefix'] = 'encode'
     settings['snovault.elasticsearch.index'] = 'snovault'
 
@@ -221,13 +225,12 @@ def main(global_config, **local_config):
     config.include('.root')
     config.include('.batch_download')
     config.include('.rest_api')
-    config.include('.rest_api_old')
     config.include('.visualization')
 
     if 'elasticsearch.server' in config.registry.settings:
         config.include('snovault.elasticsearch')
         config.include('.search')
-        config.include('.secondary_indexer')
+        config.include('.vis_indexer')
 
     if 'snp_search.server' in config.registry.settings:
         addresses = aslist(config.registry.settings['snp_search.server'])
@@ -241,7 +244,7 @@ def main(global_config, **local_config):
         )
         config.include('.region_search')
         config.include('.variant_search')
-        config.include('.peak_indexer')
+        config.include('.region_indexer')
     config.include(static_resources)
     config.include(changelogs)
     config.registry['ontology'] = json_from_path(settings.get('ontology_path'), {})

@@ -7,7 +7,7 @@ cookie.set('X-Stats', '', {path: '/', expires: new Date(0)});
 
 // Use a separate tracker for dev / test
 var ga = require('google-analytics');
-var trackers = {'www.t2depigenome.org': 'UA-100045013-1'};
+var trackers = {'www.diabetesepigenome.org': 'UA-100045013-1'};
 var tracker = trackers[document.location.hostname] || 'UA-100045013-1';
 ga('create', tracker, {'cookieDomain': 'none', 'siteSpeedSampleRate': 100});
 ga('send', 'pageview');

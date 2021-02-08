@@ -54,13 +54,17 @@ def dataset_2_3(value, system):
     if 'aliases' in value:
         for alias in value['aliases']:
             if re.match('ucsc_encode_db:hg19-', alias):
-                new_dbxref = alias.replace('ucsc_encode_db:hg19-', 'UCSC-GB-hg19:')
+                new_dbxref = alias.replace(
+                    'ucsc_encode_db:hg19-', 'UCSC-GB-hg19:')
             elif re.match('ucsc_encode_db:mm9-', alias):
-                new_dbxref = alias.replace('ucsc_encode_db:mm9-', 'UCSC-GB-mm9:')
+                new_dbxref = alias.replace(
+                    'ucsc_encode_db:mm9-', 'UCSC-GB-mm9:')
             elif re.match('.*wgEncodeEH.*', alias):
-                new_dbxref = alias.replace('ucsc_encode_db:', 'UCSC-ENCODE-hg19:')
+                new_dbxref = alias.replace(
+                    'ucsc_encode_db:', 'UCSC-ENCODE-hg19:')
             elif re.match('.*wgEncodeEM.*', alias):
-                new_dbxref = alias.replace('ucsc_encode_db:', 'UCSC-ENCODE-mm9:')
+                new_dbxref = alias.replace(
+                    'ucsc_encode_db:', 'UCSC-ENCODE-mm9:')
             else:
                 continue
             value['dbxrefs'].append(new_dbxref)
@@ -258,3 +262,80 @@ def dataset_9_10(value, system):
     # http://redmine.encodedcc.org/issues/2491
     if 'assay_term_id' in value:
         del value['assay_term_id']
+
+
+@upgrade_step('experiment', '11', '12')
+@upgrade_step('annotation', '11', '12')
+@upgrade_step('matched_set', '11', '12')
+@upgrade_step('project', '11', '12')
+@upgrade_step('publication_data', '11', '12')
+@upgrade_step('reference', '11', '12')
+@upgrade_step('reference_epigenome', '11', '12')
+@upgrade_step('organism_development_series', '11', '12')
+@upgrade_step('replication_timing_series', '11', '12')
+@upgrade_step('treatment_time_series', '11', '12')
+@upgrade_step('treatment_concentration_series', '11', '12')
+@upgrade_step('ucsc_browser_composite', '11', '12')
+def dataset_11_12(value, system):
+    # http://redmine.encodedcc.org/issues/5049
+    return
+
+
+@upgrade_step('annotation', '12', '13')
+def dataset_12_13(value, system):
+    # http://redmine.encodedcc.org/issues/5178
+    annotation_type = value.get('annotation_type')
+    if annotation_type and annotation_type == 'candidate regulatory regions':
+        value['annotation_type'] = 'candidate regulatory elements'
+
+
+@upgrade_step('annotation', '13', '14')
+@upgrade_step('experiment', '12', '13')
+def dataset_13_14(value, system):
+    # http://redmine.encodedcc.org/issues/4925
+    # http://redmine.encodedcc.org/issues/4900
+    return
+
+
+@upgrade_step('experiment', '13', '14')
+@upgrade_step('annotation', '14', '15')
+@upgrade_step('reference', '12', '13')
+@upgrade_step('project', '12', '13')
+@upgrade_step('matched_set', '12', '13')
+@upgrade_step('publication_data', '12', '13')
+@upgrade_step('ucsc_browser_composite', '12', '13')
+@upgrade_step('organism_development_series', '12', '13')
+@upgrade_step('reference_epigenome', '12', '13')
+@upgrade_step('replication_timing_series', '12', '13')
+@upgrade_step('treatment_time_series', '12', '13')
+@upgrade_step('treatment_concentration_series', '12', '13')
+def dataset_14_15(value, system):
+    if value['status'] == "proposed":
+        value['status'] = "started"
+
+
+@upgrade_step('annotation', '15', '16')
+def annotation_15_16(value, system):
+    if 'annotation_type' in value:
+        if value['annotation_type'] in ['enhancer-like regions', 'promoter-like regions']:
+            value['annotation_type'] = 'candidate regulatory elements'
+        if value['annotation_type'] == 'DNase master peaks':
+            value['annotation_type'] = 'representative DNase hypersensitivity sites'
+
+
+@upgrade_step('experiment', '14', '15')
+def experiment_14_15(value, system):
+    # https://encodedcc.atlassian.net/browse/ENCD-3721
+    if value['biosample_type'] == 'in vitro sample':
+        value['biosample_type'] = 'cell-free sample'
+        value['biosample_term_id'] = 'NTR:0000471'
+        value['biosample_term_name'] = 'none'
+
+
+@upgrade_step('experiment', '15', '16')
+@upgrade_step('annotation', '16', '17')
+def dataset_15_16(value, system):
+    # https://encodedcc.atlassian.net/browse/ENCD-3848
+    if value.get('biosample_type') == 'immortalized cell line':
+        value['biosample_type'] = "cell line"
+

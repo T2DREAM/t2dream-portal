@@ -6,12 +6,12 @@ import _ from 'underscore';
 import url from 'url';
 import jsonScriptEscape from '../libs/jsonScriptEscape';
 import origin from '../libs/origin';
-import globals from './globals';
+import * as globals from './globals';
 import DataColors from './datacolors';
 import Navigation from './navigation';
 import Footer from './footer';
 import Home from './home';
-import { newsHead } from './page';
+import newsHead from './page';
 
 const portal = {
     portal_title: 'Diabetes Epigenome Atlas',
@@ -25,27 +25,25 @@ const portal = {
                 { id: 'news', title: 'News', url: '/search/?type=Page&news=true&status=released' },
                 { id: 'acknowledgements', title: 'Acknowledgements', url: '/acknowledgements/' },
                 { id: 'contact', title: 'Contact', url: '/help/contacts/' },
-
             ],
         },
         {
             id: 'data',
             title: 'Data',
             children: [
-	        { id: 'experiment', title: 'Experiments', url: '/matrix/?type=Experiment'},
-                { id: 'annotations', title: 'Annotations', url: '/matrix/?type=Annotation'},
+                { id: 'experiment', title: 'Experiments', url: '/matrix/?type=Experiment' },
+                { id: 'annotations', title: 'Annotations', url: '/matrix/?type=Annotation' },
 		{ id: 'sep-mm-1' },
-		{ id: 'publications', title: 'Publications', url: '/search/?type=Publication'},
+                { id: 'publications', title: 'Publications', url: '/search/?type=Publication' },
             ],
         },
         {
             id: 'tools',
             title: 'Tools',
             children: [
-                {id: 'variant', title: 'Variant Search', url: '/variant-search/'},
+                { id: 'variant', title: 'Variant Search', url: '/variant-search/' },
             ],
         },
-       
         {
             id: 'help',
             title: 'Help',
@@ -65,16 +63,17 @@ const portal = {
 const projectList = [
     'ENCODE',
     'Roadmap',
+    'modENCODE',
+    'modERN',
     'GGR',
     'AMP',
 ];
 const biosampleTypeList = [
-    'immortalized cell line',
+    'cell line',
     'tissue',
     'primary cell',
     'whole organisms',
     'stem cell',
-    'cell line',
     'in vitro differentiated cells',
     'induced pluripotent stem cell line',
 ];
@@ -125,7 +124,7 @@ function recordServerStats(serverStats, timingVar) {
         if (name.indexOf('_time') !== -1) {
             ga('send', 'timing', {
                 timingCategory: name,
-                timingVar: timingVar,
+                timingVar,
                 timingValue: Math.round(serverStats[name] / 1000),
             });
         }
@@ -138,7 +137,7 @@ function recordBrowserStats(browserStats, timingVar) {
         if (name.indexOf('_time') !== -1) {
             ga('send', 'timing', {
                 timingCategory: name,
-                timingVar: timingVar,
+                timingVar,
                 timingValue: browserStats[name],
             });
         }
@@ -236,9 +235,9 @@ class App extends React.Component {
             listActionsFor: this.listActionsFor,
             currentResource: this.currentResource,
             location_href: this.state.href,
-            portal: portal,
-            projectColors: projectColors,
-            biosampleTypeColors: biosampleTypeColors,
+            portal,
+            projectColors,
+            biosampleTypeColors,
             fetch: this.fetch,
             navigate: this.navigate,
             adviseUnsavedChanges: this.adviseUnsavedChanges,
@@ -259,7 +258,7 @@ class App extends React.Component {
         this.setState({
             href: window.location.href,
             session_cookie: sessionCookie,
-            session: session,
+            session,
         });
 
         // Make a URL for the logo.
@@ -277,7 +276,6 @@ class App extends React.Component {
             auth: {
                 redirect: false,
             },
-	    //TBD replace with Diabetes Epigenome Atlas logo
             theme: {
                 logo: logoUrl,
             },
@@ -285,7 +283,7 @@ class App extends React.Component {
             languageDictionary: {
                 title: 'Log in',
             },
-            allowedConnections: ['github', 'google-oauth2', 'facebook', 'linkedin', 'twitter'],
+            allowedConnections: ['google-oauth2', 'facebook', 'github', 'linkedin'],
         });
         this.lock.on('authenticated', this.handleAuth0Login);
 
@@ -450,7 +448,7 @@ class App extends React.Component {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ accessToken: accessToken }),
+            body: JSON.stringify({ accessToken }),
         }).then((response) => {
             this.lock.hide();
             if (!response.ok) {
@@ -684,7 +682,7 @@ class App extends React.Component {
                 this.requestCurrent = false;
             }
             this.setState({
-                href: href,  // href should be consistent with context
+                href,  // href should be consistent with context
                 context: event.state,
             });
         }
@@ -710,6 +708,7 @@ class App extends React.Component {
         if (this.state.unsavedChanges.length) {
             return 'You have unsaved changes.';
         }
+        return undefined;
     }
 
     navigate(href, options) {
@@ -909,12 +908,12 @@ class App extends React.Component {
                 context = context.default_page;
             }
             if (context) {
-                const ContentView = globals.content_views.lookup(context, currentAction);
+                const ContentView = globals.contentViews.lookup(context, currentAction);
                 content = <ContentView context={context} />;
                 containerClass = 'container';
             }
         }
-        const errors = this.state.errors.map(() => <div className="alert alert-error" />);
+        const errors = this.state.errors.map(i => <div key={i} className="alert alert-error" />);
 
         let appClass = 'done';
         if (this.state.slow) {
@@ -939,8 +938,8 @@ class App extends React.Component {
 
         // Google does not update the content of 301 redirected pages
         let base;
-        if (({ 'http://www.t2dream.org/': 1, 'http://t2dream.org/': 1 })[canonical]) {
-            base = 'https://www.t2dream.org/';
+        if (({ 'http://www.diabetesepigenome.org/': 1, 'http://diabetesepigenome.org/': 1 })[canonical]) {
+            base = 'https://www.diabetesepigenome.org/';
             canonical = base;
             this.constructor.historyEnabled = false;
         }
@@ -1022,7 +1021,7 @@ module.exports = App;
 
 
 // Only used for Jest tests.
-module.exports.getRenderedProps = function (document) {
+module.exports.getRenderedProps = function getRenderedProps(document) {
     const props = {};
 
     // Ensure the initial render is exactly the same

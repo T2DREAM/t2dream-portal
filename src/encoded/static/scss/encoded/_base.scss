@@ -1,5 +1,5 @@
 /* Variables */
-$mainThemeColor: 			   #FFFFFF; /* i.e. the background color ..for now */
+$mainThemeColor: 			   #e8ecef; /* i.e. the background color ..for now */
 
 $nav-color-bg:                 #0a253d; // Navigation background color
 
@@ -111,4 +111,18 @@ blockquote {
 .browser-error {
     margin: 10px;
     text-align: center;
+}
+
+
+.checkbox--right {
+	pointer: normal;
+
+	label {
+		cursor: default;
+	}
+
+	input[type="checkbox"] {
+		float: none;
+		margin-left: 10px;
+	}
 }

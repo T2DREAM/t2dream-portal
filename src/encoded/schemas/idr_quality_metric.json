@@ -19,7 +19,7 @@
    ],
     "properties": {
         "schema_version": {
-            "default": "5"
+            "default": "6"
         },
         "Fp": {
             "title": "FRiP score from pooled pseudoreplicate peaks",
@@ -34,7 +34,7 @@
         "F1": {
             "title": "FRiP score from rep1 self-pseudoreplicate peaks",
             "type": "number",
-            "description": "Fraction reads in peaks (FRiP) from replicate 1 self-pseudoreplicates or the number of stable peaks that pass the internal psuedoreplication IDR threhold, when self-pseudoreplication is done on unreplicated experiments."
+            "description": "Fraction reads in peaks (FRiP) from replicate 1 self-pseudoreplicates or the number of stable peaks that pass the internal pseudoreplication IDR threshold, when self-pseudoreplication is done on unreplicated experiments."
         },
         "F2": {
             "title": "FRiP score from rep2 self-pseudoreplicate peaks",
@@ -54,7 +54,7 @@
         "N1": {
             "title": "# rep1 self-pseudoreplicate peaks",
             "type": "number",
-            "description": "Number of peaks from replicate 1 self-pseudoreplicates or the number of stable peaks that pass the internal psuedoreplication IDR threhold, when self-pseudoreplication is done on unreplicated experiments."
+            "description": "Number of peaks from replicate 1 self-pseudoreplicates or the number of stable peaks that pass the internal pseudoreplication IDR threshold, when self-pseudoreplication is done on unreplicated experiments."
         },
         "N2": {
             "title": "# rep2 self-pseudoreplicate peaks",
@@ -81,9 +81,9 @@
             "type": "string",
             "description": "IDR reproducibility test result for this experiment",
             "enum": [
-                "pass",
                 "borderline",
-                "fail"
+                "fail",
+                "pass"
             ]
         },
         "N_optimal": {
@@ -399,6 +399,14 @@
                     "title": "MD5sum"
                 }
             }
+        }
+    },
+    "facets": {
+        "assay_term_name": {
+            "title": "Assay name"
+        },
+        "status": {
+            "title": "Status"
         }
     },
     "changelog": "/profiles/changelogs/idr_quality_metric.md"

@@ -34,17 +34,6 @@ class StarQualityMetric(QualityMetric, CalculatedAssayTermID):
 
 
 @collection(
-    name='fastqc-quality-metrics',
-    properties={
-        'title': "FastQC mapping quality metrics",
-        'description': 'A set of QC metrics from FastQC',
-    })
-class FastqcQualityMetric(QualityMetric, CalculatedAssayTermID):
-    item_type = 'fastqc_quality_metric'
-    schema = load_schema('encoded:schemas/fastqc_quality_metric.json')
-
-
-@collection(
     name='bismark-quality-metrics',
     properties={
         'title': "Bismark (WGBS) mapping quality metrics",
@@ -208,6 +197,17 @@ class SamtoolsStatsQualityMetric(QualityMetric, CalculatedAssayTermID):
 class IDRQualityMetric(QualityMetric, CalculatedAssayTermID):
     item_type = 'idr_quality_metric'
     schema = load_schema('encoded:schemas/idr_quality_metric.json')
+
+
+@collection(
+    name='histone-chipseq-quality-metrics',
+    properties={
+        'title': "Histone ChIP-seq Quality Metrics",
+        'description': "Quality metrics from histone ChIP-seq peak overlap analysis",
+    })
+class HistoneChipSeqQualityMetric(QualityMetric, CalculatedAssayTermID):
+    item_type = 'histone_chipseq_quality_metric'
+    schema = load_schema('encoded:schemas/histone_chipseq_quality_metric.json')
 
 
 @collection(

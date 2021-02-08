@@ -16,7 +16,7 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "3"
+            "default": "4"
         },
         "analysis_step_version": {
             "title": "Analysis Step Version",
@@ -69,10 +69,10 @@
                         "type": "string",
                         "default": "waiting",
                         "enum" : [
-                            "waiting",
-                            "running",
+                            "error",
                             "finished",
-                            "error"
+                            "running",
+                            "waiting"
                         ]
                     }
                 }
@@ -82,12 +82,18 @@
             "title": "Status",
             "type": "string",
             "enum" : [
-                "waiting",
-                "running",
-                "finished",
-                "error",
-                "virtual"
+                "in progress",
+                "released",
+                "virtual",
+                "deleted"
             ]
         }
-    }
+    },
+    "facets": {
+        "status": {
+            "title": "Status"
+        }
+    },
+    "changelog": "/profiles/changelogs/analysis_step_run.md"
+
 }

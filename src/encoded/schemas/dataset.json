@@ -27,6 +27,22 @@
         "accession": {
             "accessionType": "SR"
         },
+        "alternate_accessions": {
+            "title": "Alternate accessions",
+            "description": "Accessions previously assigned to objects that have been merged with this object.",
+            "comment": "Do not submit. Only admins are allowed to set or update this value.",
+            "type": "array",
+            "default": [],
+            "permission": "import_items",
+            "items": {
+                "title": "Alternate Accession",
+                "description": "An accession previously assigned to an object that has been merged with this object.",
+                "comment": "Only accessions of objects that have status equal replaced will work here.",
+                "type": "string",
+                "format": "accession",
+                "pattern": "^(ENCSR\\d{3}[A-Z]{3})$|^(TSTSR\\d{6})$"
+            }
+        },
         "description": {
             "title": "Description",
             "description": "A plain text description of the dataset.",
@@ -48,16 +64,16 @@
             "@type": "@id",
             "rdfs:subPropertyOf": "rdfs:seeAlso",
             "title": "External identifiers",
-            "description": "Unique identifiers from external resources.",
+            "description": "Identifiers from external resources that may have 1-to-1 or 1-to-many relationships with ENCODE objects.",
             "type": "array",
             "default": [],
             "uniqueItems": true,
             "items": {
                 "title": "External identifier",
-                "description": "A unique identifier from external resource.",
+                "description": "Identifier from an external resource that may have 1-to-1 or 1-to-many relationships with ENCODE objects.",
                 "type":  "string",
-                "pattern": "^((UCSC-GB-mm9|UCSC-GB-hg19):\\S+|http://\\S+|https://\\S+|GEO:(GSM|GSE)\\d+|SRA:(SRX)\\d+|ENCODE:(ENCSR)\\S+|DNS\\S+||His\\S+||Oth\\S+||HPAP:HPAP-\\d+|UCSC-ENCODE-mm9:wgEncodeEM\\d+|UCSC-ENCODE-hg19:wgEncodeEH\\d+|IHEC:IHECRE\\d{8}\\.\\d|EBI:(E-)\\S+)$"
-            }   
+                "pattern": "^((UCSC-GB-mm9|UCSC-GB-hg19):\\S+|http://\\S+|https://\\S+|GEO:(GSM|SRX|GSE)\\d+|SRA:(SRX)\\d+|ENCODE:(ENCSR)\\S+|DNS\\S+||His\\S+||Oth\\S+||HPAP:HPAP-\\d+|UCSC-ENCODE-mm9:wgEncodeEM\\d+|UCSC-ENCODE-hg19:wgEncodeEH\\d+|dbGaP:phs\\S+|IHEC:IHECRE\\d{8}\\.\\d|EBI:(E-)\\S+)$"
+            }
         },
         "date_released": {
             "title": "Date released",
@@ -79,33 +95,35 @@
             "items": {
                 "type": "string",
                 "enum": [
-		    "Diabetes Epigenome Atlas",
-                    "T2DREAM",
-                    "ENCORE",
-                    "ENTEx",
-                    "SESCC",
+                    "cre_inputv10",
+                    "cre_inputv11",
                     "dbGaP",
+                    "DREAM",
                     "ENCYCLOPEDIAv3",
                     "ENCYCLOPEDIAv4",
-                    "cre_inputv10",
-                    "cre_inputv11"
+                    "ENCORE",
+		    "Diabetes Epigenome Atlas",
+		    "T2DREAM",
+		    "DGA",
+                    "ENTEx",
+                    "SESCC",
+                    "RegulomeDB"
                 ]
             }
         },
         "status": {
             "title": "Status",
             "type": "string",
-            "default": "proposed",
+            "default": "started",
             "enum" : [
-                "proposed",
                 "started",
                 "submitted",
                 "ready for review",
-                "deleted",
                 "released",
-                "revoked",
                 "archived",
-                "replaced"
+                "deleted",
+                "replaced",
+                "revoked"
             ]
         }
     },

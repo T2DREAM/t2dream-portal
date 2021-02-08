@@ -12,7 +12,6 @@ from pyramid.traversal import (
     traverse,
 )
 import snovault
-from ..schema_formats import is_accession
 
 
 @lru_cache()
@@ -20,8 +19,8 @@ def _award_viewing_group(award_uuid, root):
     award = root.get_by_uuid(award_uuid)
     return award.upgrade_properties().get('viewing_group')
 
-# Item acls
 
+# Item acls
 ONLY_ADMIN_VIEW = [
     (Allow, 'group.admin', ['view', 'edit']),
     (Allow, 'group.read-only-admin', ['view']),
@@ -128,17 +127,12 @@ class Item(snovault.Item):
         'exempt from standards': ALLOW_CURRENT,
 
         # antibody_lot
-        'eligible for new data': ALLOW_CURRENT,
-        'not eligible for new data': ALLOW_CURRENT,
         'not pursued': ALLOW_CURRENT,
 
         # dataset / experiment
         'release ready': ALLOW_VIEWING_GROUP_VIEW,
         'revoked': ALLOW_CURRENT,
         'in review': ALLOW_CURRENT_AND_SUBMITTER_EDIT,
-
-        # publication
-        'published': ALLOW_CURRENT,
 
         # pipeline
         'active': ALLOW_CURRENT,
@@ -184,7 +178,7 @@ class Item(snovault.Item):
 
 
 class SharedItem(Item):
-    ''' An Item visible to all authenticated users while "proposed" or "in progress".
+    ''' An Item visible to all authenticated users while "in progress".
     '''
     def __ac_local_roles__(self):
         roles = {}

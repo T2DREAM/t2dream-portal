@@ -14,15 +14,21 @@
         font-weight: 400;
 	&:focus,
         &:hover {
-            background-color: #DCDCDC;
+	    background-color: #DCDCDC;
         }
     }
 
-    .nav > li > a {
-        color: #696969;   
+    .nav > li > button {
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+        color: #fff;
+        background-color: transparent;
+        border: none;
+
         &:focus,
         &:hover {
-            background-color: #DCDCDC;
+            background-color: #2f4961;
         }
 
         /* Disabled sign-in link */
@@ -89,6 +95,8 @@
     color: #fff;
     vertical-align: top;
     cursor: pointer;
+    background: transparent;
+    border: none;
 
     &:hover {
         color: #fff;

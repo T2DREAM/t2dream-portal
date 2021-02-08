@@ -7,12 +7,14 @@ def file_exp(lab, award, testapp, experiment):
         'lab': lab['uuid'],
         'award': award['uuid'],
         'assay_term_name': 'RAMPAGE',
+        'biosample_type': 'tissue',
         'biosample_term_id': 'NTR:000012',
         'biosample_term_name': 'Some body part',
+        'biosample_type': 'tissue',
         'possible_controls': [experiment['uuid']],
         'status': 'released',
         'date_released': '2016-01-01'
-        }
+    }
     return testapp.post_json('/experiment', item, status=201).json['@graph'][0]
 
 
@@ -22,7 +24,7 @@ def file_rep(replicate, file_exp, testapp):
         'experiment': file_exp['uuid'],
         'biological_replicate_number': 1,
         'technical_replicate_number': 1
-        }
+    }
     return testapp.post_json('/replicate', item, status=201).json['@graph'][0]
 
 
@@ -33,10 +35,11 @@ def file_exp2(lab, award, testapp):
         'award': award['uuid'],
         'assay_term_name': 'RAMPAGE',
         'biosample_term_id': 'NTR:000013',
+        'biosample_type': 'tissue',
         'biosample_term_name': 'Some other body part',
         'status': 'released',
         'date_released': '2016-01-01'
-        }
+    }
     return testapp.post_json('/experiment', item, status=201).json['@graph'][0]
 
 
@@ -46,7 +49,7 @@ def file_rep2(replicate, file_exp2, testapp):
         'experiment': file_exp2['uuid'],
         'biological_replicate_number': 1,
         'technical_replicate_number': 1
-        }
+    }
     return testapp.post_json('/replicate', item, status=201).json['@graph'][0]
 
 
@@ -56,7 +59,7 @@ def file_rep1_2(replicate, file_exp, testapp):
         'experiment': file_exp['uuid'],
         'biological_replicate_number': 2,
         'technical_replicate_number': 1
-        }
+    }
     return testapp.post_json('/replicate', item, status=201).json['@graph'][0]
 
 
@@ -217,8 +220,9 @@ def chipseq_bam_quality_metric_2(testapp, analysis_step_run_bam, file7, lab, awa
 @pytest.fixture
 def analysis_step_bam(testapp):
     item = {
-        'name': 'bamqc',
-        'title': 'bamqc',
+        'step_label': 'bamqc-step',
+        'title': 'bamqc step',
+        'major_version': 1,
         'input_file_types': ['reads'],
         'analysis_step_types': ['QA calculation']
     }
@@ -237,13 +241,15 @@ def pipeline_short_rna(testapp, lab, award, analysis_step_bam):
 
 
 def test_audit_file_mismatched_paired_with(testapp, file1, file4):
-    testapp.patch_json(file1['@id'], {'run_type': 'paired-ended', 'paired_end': '2', 'paired_with': file4['uuid']})
+    testapp.patch_json(file1['@id'], {
+                       'run_type': 'paired-ended', 'paired_end': '2', 'paired_with': file4['uuid']})
     res = testapp.get(file1['@id'] + '@@index-data')
     errors = res.json['audit']
     errors_list = []
     for error_type in errors:
         errors_list.extend(errors[error_type])
-    assert any(error['category'] == 'inconsistent paired_with' for error in errors_list)
+    assert any(error['category'] ==
+               'inconsistent paired_with' for error in errors_list)
 
 
 def test_audit_file_missing_controlled_by(testapp, file3):
@@ -252,7 +258,8 @@ def test_audit_file_missing_controlled_by(testapp, file3):
     errors_list = []
     for error_type in errors:
         errors_list.extend(errors[error_type])
-    assert any(error['category'] == 'missing controlled_by' for error in errors_list)
+    assert any(error['category'] ==
+               'missing controlled_by' for error in errors_list)
 
 
 def test_audit_file_mismatched_controlled_by(testapp, file1):
@@ -261,7 +268,8 @@ def test_audit_file_mismatched_controlled_by(testapp, file1):
     errors_list = []
     for error_type in errors:
         errors_list.extend(errors[error_type])
-    assert any(error['category'] == 'inconsistent control' for error in errors_list)
+    assert any(error['category'] ==
+               'inconsistent control' for error in errors_list)
 
 
 def test_audit_file_read_length_controlled_by(testapp, file1_2,
@@ -272,7 +280,8 @@ def test_audit_file_read_length_controlled_by(testapp, file1_2,
     testapp.patch_json(file2['@id'], {'read_length': 150,
                                       'run_type': 'single-ended'})
     testapp.patch_json(file1_2['@id'], {'controlled_by': [file2['@id']]})
-    testapp.patch_json(file_exp['@id'], {'possible_controls': [file_exp2['@id']]})
+    testapp.patch_json(file_exp['@id'], {
+                       'possible_controls': [file_exp2['@id']]})
     testapp.patch_json(file_exp2['@id'], {'assay_term_name': 'RAMPAGE',
                                           'biosample_term_id': 'NTR:000012',
                                           'biosample_term_name': 'Some body part'})
@@ -281,7 +290,8 @@ def test_audit_file_read_length_controlled_by(testapp, file1_2,
     errors_list = []
     for error_type in errors:
         errors_list.extend(errors[error_type])
-    assert any(error['category'] == 'inconsistent control read length' for error in errors_list)
+    assert any(error['category'] ==
+               'inconsistent control read length' for error in errors_list)
 
 
 def test_audit_file_read_length_controlled_by_exclusion(testapp, file1_2,
@@ -292,7 +302,8 @@ def test_audit_file_read_length_controlled_by_exclusion(testapp, file1_2,
     testapp.patch_json(file2['@id'], {'read_length': 52,
                                       'run_type': 'single-ended'})
     testapp.patch_json(file1_2['@id'], {'controlled_by': [file2['@id']]})
-    testapp.patch_json(file_exp['@id'], {'possible_controls': [file_exp2['@id']]})
+    testapp.patch_json(file_exp['@id'], {
+                       'possible_controls': [file_exp2['@id']]})
     testapp.patch_json(file_exp2['@id'], {'assay_term_name': 'RAMPAGE',
                                           'biosample_term_id': 'NTR:000012',
                                           'biosample_term_name': 'Some body part'})
@@ -301,100 +312,31 @@ def test_audit_file_read_length_controlled_by_exclusion(testapp, file1_2,
     errors_list = []
     for error_type in errors:
         errors_list.extend(errors[error_type])
-    assert any(error['category'] != 'inconsistent control read length' for error in errors_list)
+    assert any(error['category'] !=
+               'inconsistent control read length' for error in errors_list)
 
 
-def test_audit_file_inconsistent_controlled_by(testapp, file1,
-                                               file2, file3,
-                                               file_rep1_2,
-                                               file_rep2):
-    testapp.patch_json(file1['@id'], {'replicate': file_rep2['@id']})
-    testapp.patch_json(file3['@id'], {'replicate': file_rep1_2['@id']})
-    testapp.patch_json(file1['@id'], {'controlled_by': [file2['@id'], file3['@id']]})
-
-    res = testapp.get(file1['@id'] + '@@index-data')
-    errors = res.json['audit']
-    errors_list = []
-    for error_type in errors:
-        errors_list.extend(errors[error_type])
-    assert any(error['category'] == 'inconsistent controlled_by replicates' for
-                                    error in errors_list)
-
-
-def test_audit_file_missing_paired_controlled_by(testapp, file1,
-                                                 file2, file3,
-                                                 file_rep2):
-    testapp.patch_json(file3['@id'], {'replicate': file_rep2['@id'],
-                                      'paired_with': file2['@id'],
-                                      'run_type': 'paired-ended',
-                                      'paired_end': '2'})
-    testapp.patch_json(file2['@id'], {'replicate': file_rep2['@id'],
-                                      'run_type': 'paired-ended',
-                                      'paired_end': '1'})
-    testapp.patch_json(file1['@id'], {'controlled_by': [file2['@id']]})
-
-    res = testapp.get(file1['@id'] + '@@index-data')
-    errors = res.json['audit']
-    errors_list = []
-    for error_type in errors:
-        errors_list.extend(errors[error_type])
-    assert any(error['category'] == 'missing paired_with in controlled_by' for
-                                    error in errors_list)
-
-
-def test_audit_file_replicate_match(testapp, file1, file_rep2):
+def test_audit_file_replicate_match_inconsistent(testapp, file1, file_rep2):
     testapp.patch_json(file1['@id'], {'replicate': file_rep2['uuid']})
     res = testapp.get(file1['@id'] + '@@index-data')
     errors = res.json['audit']
     errors_list = []
     for error_type in errors:
         errors_list.extend(errors[error_type])
-    assert any(error['category'] == 'inconsistent replicate' for error in errors_list)
+    assert any(error['category'] ==
+               'inconsistent replicate' for error in errors_list)
 
 
-def test_audit_file_insufficient_control_read_depth_chip_seq_paired_end(
-    testapp,
-    file_exp,
-    file_exp2,
-    file6,
-    file2,
-    file7,
-    file4,
-    chipseq_bam_quality_metric,
-    chipseq_bam_quality_metric_2,
-    analysis_step_run_bam,
-    analysis_step_version_bam,
-    analysis_step_bam,
-    target_H3K27ac,
-    target_control,
-        pipeline_bam):
-    testapp.patch_json(file_exp['@id'], {'target': target_H3K27ac['@id']})
-    testapp.patch_json(file_exp2['@id'], {'target': target_control['@id']})
-    testapp.patch_json(chipseq_bam_quality_metric['@id'], {'total': 1000})
-    testapp.patch_json(chipseq_bam_quality_metric_2['@id'], {'total': 1000})
-    testapp.patch_json(file2['@id'], {'dataset': file_exp2['@id']})
-    testapp.patch_json(file7['@id'], {'dataset': file_exp2['@id'],
-                                      'file_format': 'bam',
-                                      'output_type': 'alignments',
-                                      'assembly': 'hg19',
-                                      'derived_from': [file2['@id']]})
-
-    testapp.patch_json(file4['@id'], {'dataset': file_exp['@id'],
-                                      'controlled_by': [file2['@id']]})
-    testapp.patch_json(file6['@id'], {'dataset': file_exp['@id'],
-                                      'assembly': 'hg19',
-                                      'derived_from': [file4['@id']]})
-    testapp.patch_json(file4['@id'], {'run_type': 'paired-ended',
-                                      'paired_end': '1'})
-    testapp.patch_json(file2['@id'], {'run_type': 'paired-ended',
-                                      'paired_end': '1'})
-    testapp.patch_json(file7['@id'], {})
-    res = testapp.get(file6['@id'] + '@@index-data')
+def test_audit_file_replicate_match_consistent(testapp, file1, file_rep2):
+    #testapp.patch_json(file1['@id'], {'replicate': file_rep2['uuid']})
+    res = testapp.get(file1['@id'] + '@@index-data')
     errors = res.json['audit']
     errors_list = []
     for error_type in errors:
         errors_list.extend(errors[error_type])
-    assert any(error['category'] == 'control extremely low read depth' for error in errors_list)
+    assert all(error['category'] !=
+               'inconsistent replicate' for error in errors_list)
+
 
 '''
 def test_audit_modERN_missing_step_run(testapp, file_exp, file3, award):
@@ -450,37 +392,6 @@ def test_audit_modERN_unexpected_step_run(testapp, file_exp, file2, award, analy
     assert any(error['category'] == 'unexpected step_run' for error in errors_list)
 '''
 
-def test_audit_file_biological_replicate_number_match(testapp,
-                                                      file_exp,
-                                                      file_rep,
-                                                      file1,
-                                                      file_rep1_2,
-                                                      file1_2):
-    testapp.patch_json(file1['@id'], {'derived_from': [file1['@id']]})
-    res = testapp.get(file1['@id'] + '@@index-data')
-    errors = res.json['audit']
-    errors_list = []
-    for error_type in errors:
-        errors_list.extend(errors[error_type])
-    assert all(error['category'] != 'inconsistent replicate'
-               for error in errors_list)
-
-
-def test_audit_file_biological_replicate_number_mismatch(testapp,
-                                                         file_exp,
-                                                         file_rep,
-                                                         file1,
-                                                         file_rep1_2,
-                                                         file1_2):
-    testapp.patch_json(file1['@id'], {'derived_from': [file1_2['@id']]})
-    res = testapp.get(file1['@id'] + '@@index-data')
-    errors = res.json['audit']
-    errors_list = []
-    for error_type in errors:
-        errors_list.extend(errors[error_type])
-    assert any(error['category'] == 'inconsistent replicate'
-               for error in errors_list)
-
 
 def test_audit_file_assembly(testapp, file6, file7):
     testapp.patch_json(file6['@id'], {'assembly': 'GRCh38'})
@@ -510,7 +421,8 @@ def test_audit_file_bam_derived_from_no_fastq(testapp, file7, file6):
                                       'status': 'released',
                                       'file_format': 'bam',
                                       'assembly': 'hg19'})
-    testapp.patch_json(file7['@id'], {'file_format': 'tsv', 'assembly': 'hg19'})
+    testapp.patch_json(
+        file7['@id'], {'file_format': 'tsv', 'assembly': 'hg19'})
     res = testapp.get(file6['@id'] + '@@index-data')
     errors = res.json['audit']
     errors_list = []
@@ -520,12 +432,186 @@ def test_audit_file_bam_derived_from_no_fastq(testapp, file7, file6):
                for error in errors_list)
 
 
+def test_audit_file_bam_derived_from_fastq(testapp, file4, file6):
+    testapp.patch_json(file6['@id'], {'derived_from': [file4['@id']],
+                                      'status': 'released',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert all(error['category'] != 'missing derived_from'
+               for error in errors_list)
+
+
+def test_audit_file_bam_derived_from_csfasta(testapp, file4, file6):
+    testapp.patch_json(file6['@id'], {'derived_from': [file4['@id']],
+                                      'status': 'released',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+    testapp.patch_json(file4['@id'], {'file_format': 'csfasta'})
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert all(error['category'] != 'missing derived_from'
+               for error in errors_list)
+
+
+def test_audit_file_bam_derived_from_csqual(testapp, file4, file6):
+    testapp.patch_json(file6['@id'], {'derived_from': [file4['@id']],
+                                      'status': 'released',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+    testapp.patch_json(file4['@id'], {'file_format': 'csqual'})
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert all(error['category'] != 'missing derived_from'
+               for error in errors_list)
+
+
+def test_audit_file_released_bam_derived_from_revoked_fastq(testapp, file4, file6):
+    testapp.patch_json(file6['@id'], {'derived_from': [file4['@id']],
+                                      'status': 'released',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+
+    testapp.patch_json(file4['@id'], {'status': 'revoked'})
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert any(error['category'] == 'missing derived_from'
+               for error in errors_list)
+
+
+def test_audit_file_deleted_bam_derived_from_revoked_fastq(testapp, file4, file6):
+    testapp.patch_json(file6['@id'], {'derived_from': [file4['@id']],
+                                      'status': 'deleted',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+
+    testapp.patch_json(file4['@id'], {'status': 'revoked'})
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert all(error['category'] != 'missing derived_from'
+               for error in errors_list)
+
+
+def test_audit_file_released_bam_derived_from_deleted_fastq(testapp, file4, file6):
+    testapp.patch_json(file6['@id'], {'derived_from': [file4['@id']],
+                                      'status': 'released',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+
+    testapp.patch_json(file4['@id'], {'status': 'deleted'})
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert any(error['category'] == 'missing derived_from'
+               for error in errors_list)
+
+
+def test_audit_file_deleted_bam_derived_from_deleted_fastq(testapp, file4, file6):
+    testapp.patch_json(file6['@id'], {'derived_from': [file4['@id']],
+                                      'status': 'deleted',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+
+    testapp.patch_json(file4['@id'], {'status': 'deleted'})
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert all(error['category'] != 'missing derived_from'
+               for error in errors_list)
+
+
+def test_audit_file_deleted_bam_derived_from_released_fastq(testapp, file4, file6):
+    testapp.patch_json(file6['@id'], {'derived_from': [file4['@id']],
+                                      'status': 'deleted',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+
+    testapp.patch_json(file4['@id'], {'status': 'released'})
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert all(error['category'] != 'missing derived_from'
+               for error in errors_list)
+
+
+def test_audit_file_missing_derived_from_ignores_replaced_bams(testapp, file4, file6):
+    testapp.patch_json(file6['@id'], {'derived_from': [file4['@id']],
+                                      'status': 'replaced',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+    testapp.patch_json(file4['@id'], {'status': 'deleted'})
+    res = testapp.get('/{}/@@index-data'.format(file6['uuid']))
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert all(error['category'] != 'missing derived_from'
+               for error in errors_list)
+
+
 def test_audit_file_bam_derived_from_bam_no_fastq(testapp, file7, file6):
     testapp.patch_json(file6['@id'], {'derived_from': [file7['@id']],
                                       'status': 'released',
                                       'file_format': 'bam',
                                       'assembly': 'hg19'})
-    testapp.patch_json(file7['@id'], {'file_format': 'bam', 'assembly': 'hg19'})
+    testapp.patch_json(
+        file7['@id'], {'file_format': 'bam', 'assembly': 'hg19'})
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert all(error['category'] != 'missing derived_from'
+               for error in errors_list)
+
+
+def test_audit_file_bam_derived_from_revoked_bam_no_fastq(testapp, file7, file6):
+    testapp.patch_json(file6['@id'], {'derived_from': [file7['@id']],
+                                      'status': 'released',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+    testapp.patch_json(file7['@id'], {'file_format': 'bam',
+                                      'assembly': 'hg19',
+                                      'status': 'revoked'})
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert any(error['category'] == 'missing derived_from'
+               for error in errors_list)
+
+
+def test_audit_file_revoked_bam_derived_from_revoked_bam_no_fastq(testapp, file7, file6):
+    testapp.patch_json(file6['@id'], {'derived_from': [file7['@id']],
+                                      'status': 'revoked',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+    testapp.patch_json(file7['@id'], {'file_format': 'bam',
+                                      'assembly': 'hg19',
+                                      'status': 'revoked'})
     res = testapp.get(file6['@id'] + '@@index-data')
     errors = res.json['audit']
     errors_list = []
@@ -548,6 +634,7 @@ def test_audit_file_bam_derived_from_different_experiment(testapp, file6, file4,
     assert any(error['category'] == 'inconsistent derived_from'
                for error in errors_list)
 
+
 '''
 def test_audit_file_md5sum(testapp, file1):
     testapp.patch_json(file1['@id'], {'md5sum': 'some_random_text'})
@@ -559,3 +646,162 @@ def test_audit_file_md5sum(testapp, file1):
     assert any(error['category'] == 'inconsistent md5sum'
                for error in errors_list)
 '''
+
+
+def test_audit_experiment_insufficient_control_read_depth_chip_seq_paired_end(
+        testapp, file_exp,
+        file_exp2, file6, file2, file7, file4,
+        chipseq_bam_quality_metric,
+        chipseq_bam_quality_metric_2,
+        analysis_step_run_bam,
+        analysis_step_version_bam,
+        analysis_step_bam,
+        target_H3K27ac,
+        target_control,
+        pipeline_bam):
+    testapp.patch_json(file_exp['@id'], {'target': target_H3K27ac['@id'],
+                                         'assay_term_name': 'ChIP-seq'})
+    testapp.patch_json(file_exp2['@id'], {'target': target_control['@id'],
+                                          'assay_term_name': 'ChIP-seq'})
+    testapp.patch_json(chipseq_bam_quality_metric['@id'], {'total': 1000})
+    testapp.patch_json(chipseq_bam_quality_metric_2['@id'], {'total': 1000})
+    testapp.patch_json(file2['@id'], {'dataset': file_exp2['@id']})
+    testapp.patch_json(file7['@id'], {'dataset': file_exp2['@id'],
+                                      'file_format': 'bam',
+                                      'output_type': 'alignments',
+                                      'assembly': 'hg19',
+                                      'derived_from': [file2['@id']]})
+
+    testapp.patch_json(file4['@id'], {'dataset': file_exp['@id'],
+                                      'controlled_by': [file2['@id']]})
+    testapp.patch_json(file6['@id'], {'dataset': file_exp['@id'],
+                                      'assembly': 'hg19',
+                                      'derived_from': [file4['@id']]})
+    testapp.patch_json(file4['@id'], {'run_type': 'paired-ended',
+                                      'paired_end': '1'})
+    testapp.patch_json(file2['@id'], {'run_type': 'paired-ended',
+                                      'paired_end': '1'})
+    testapp.patch_json(file7['@id'], {})
+    res = testapp.get(file_exp['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+        #print (error_type)
+        # for e in errors[error_type]:
+        #    print (e)
+    assert any(error['category'] ==
+               'control extremely low read depth' for error in errors_list)
+
+
+def test_audit_file_missing_derived_from_audit_with_made_up_status(testapp, file4, file6):
+    # This tests that a status that's not in STATUS_LEVEL dict won't break missing derived_from
+    # audit.
+    testapp.patch_json(file6['@id'], {'derived_from': [file4['@id']],
+                                      'status': 'released',
+                                      'file_format': 'bam',
+                                      'assembly': 'hg19'})
+
+    testapp.patch_json(file4['@id'] + '?validate=false',
+                       {'status': 'new made up status'})
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = []
+    for error_type in errors:
+        errors_list.extend(errors[error_type])
+    assert all(error['category'] != 'missing derived_from'
+               for error in errors_list)
+
+
+def test_audit_file_duplicate_quality_metrics(testapp,
+                                              file_exp,
+                                              file2,
+                                              file6,
+                                              chipseq_bam_quality_metric,
+                                              chipseq_bam_quality_metric_2,
+                                              analysis_step_run_bam):
+    testapp.patch_json(
+        file_exp['@id'],
+        {
+            'assay_term_name': 'ChIP-seq'
+        }
+    )
+    testapp.patch_json(
+        chipseq_bam_quality_metric['@id'],
+        {
+            'quality_metric_of': [file6['@id']],
+            'processing_stage': 'filtered'
+        }
+    )
+    testapp.patch_json(
+        chipseq_bam_quality_metric_2['@id'],
+        {
+            'quality_metric_of': [file6['@id']],
+            'processing_stage': 'filtered'
+        }
+    )
+    testapp.patch_json(
+        file6['@id'],
+        {
+            'dataset': file_exp['@id'],
+            'file_format': 'bam',
+            'output_type': 'alignments',
+            'assembly': 'GRCh38',
+            'derived_from': [file2['@id']],
+            'step_run': analysis_step_run_bam['@id']
+        }
+    )
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = [error for v in errors.values() for error in v]
+    assert any(
+        error['category'] == 'duplicate quality metric'
+        for error in errors_list
+    )
+
+
+def test_audit_file_no_duplicate_quality_metrics(testapp,
+                                                 file_exp,
+                                                 file2,
+                                                 file6,
+                                                 chipseq_bam_quality_metric,
+                                                 chipseq_bam_quality_metric_2,
+                                                 analysis_step_run_bam):
+    testapp.patch_json(
+        file_exp['@id'],
+        {
+            'assay_term_name': 'ChIP-seq'
+        }
+    )
+    testapp.patch_json(
+        chipseq_bam_quality_metric['@id'],
+        {
+            'quality_metric_of': [file6['@id']],
+            'processing_stage': 'filtered'
+        }
+    )
+    testapp.patch_json(
+        chipseq_bam_quality_metric_2['@id'],
+        {
+            'quality_metric_of': [file6['@id']],
+            'processing_stage': 'unfiltered'
+        }
+    )
+    testapp.patch_json(
+        file6['@id'],
+        {
+            'dataset': file_exp['@id'],
+            'file_format': 'bam',
+            'output_type': 'alignments',
+            'assembly': 'GRCh38',
+            'derived_from': [file2['@id']],
+            'step_run': analysis_step_run_bam['@id']
+        }
+    )
+    res = testapp.get(file6['@id'] + '@@index-data')
+    errors = res.json['audit']
+    errors_list = [error for v in errors.values() for error in v]
+    assert all(
+        error['category'] != 'duplicate quality metric'
+        for error in errors_list
+    )

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import globals from './globals';
+import * as globals from './globals';
 import { Breadcrumbs } from './navigation';
 import { ExperimentTable } from './dataset';
-import { DbxrefList } from './dbxref';
+import { DbxrefList, dbxrefHref } from './dbxref';
 import { RelatedItems } from './item';
 
 
@@ -16,19 +16,17 @@ class Target extends React.Component {
         let geneRef;
         let baseName;
         let sep;
-        let base;
 
         if (context.organism.name === 'human') {
-            geneLink = globals.dbxref_prefix_map.HGNC + context.gene_name;
+            geneLink = dbxrefHref('HGNC', context.gene_name);
         } else if (context.organism.name === 'mouse') {
             const mgiRef = _(context.dbxref).find(ref => ref.substr(0, 4) === 'MGI:');
             if (mgiRef) {
-                base = globals.dbxref_prefix_map.MGI;
-                geneLink = base + mgiRef;
+                geneLink = dbxrefHref('MGI', mgiRef);
             }
         } else if (context.organism.name === 'dmelanogaster' || context.organism.name === 'celegans') {
             const organismPrefix = context.organism.name === 'dmelanogaster' ? 'FBgn' : 'WBGene';
-            const baseUrl = context.organism.name === 'dmelanogaster' ? globals.dbxref_prefix_map.FlyBase : globals.dbxref_prefix_map.WormBase;
+            const baseUrl = context.organism.name === 'dmelanogaster' ? globals.dbxrefPrefixMap.FlyBase : globals.dbxrefPrefixMap.WormBase;
             geneRef = _.find(context.dbxref, ref => ref.indexOf(organismPrefix) !== -1);
             if (geneRef) {
                 sep = geneRef.indexOf(':') + 1;
@@ -76,7 +74,7 @@ class Target extends React.Component {
                             <dt>External resources</dt>
                             <dd>
                                 {context.dbxref.length ?
-                                    <DbxrefList values={context.dbxref} target_gene={context.gene_name} target_ref />
+                                    <DbxrefList context={context} dbxrefs={context.dbxref} />
                                 : <em>None submitted</em> }
                             </dd>
                         </div>
@@ -102,4 +100,4 @@ Target.defaultProps = {
 };
 
 
-globals.content_views.register(Target, 'Target');
+globals.contentViews.register(Target, 'Target');
