@@ -1,6 +1,7 @@
 from pyramid.view import view_config
 from snovault import TYPES
 from snovault.elasticsearch.interfaces import ELASTIC_SEARCH
+from snovault.elasticsearch.indexer import MAX_CLAUSES_FOR_ES
 from pyramid.security import effective_principals
 from .search import (
     format_results,
@@ -10,11 +11,11 @@ from .search import (
     format_facets,
     search_result_actions
 )
-from .batch_download import get_region_metadata_links
+from .batch_download import get_peak_metadata_links
 from collections import OrderedDict
 import requests
 from urllib.parse import urlencode
-import pprint
+
 import logging
 import re
 
@@ -35,8 +36,13 @@ _REGION_FIELDS = [
 ]
 
 _FACETS = [
-    ('annotation_type', {'title': 'Annotation'}),
+    ('assay_term_name', {'title': 'Assay'}),
     ('biosample_term_name', {'title': 'Biosample term'}),
+    ('target.label', {'title': 'Target'}),
+    ('replicates.library.biosample.donor.organism.scientific_name', {
+        'title': 'Organism'
+    }),
+    ('organ_slims', {'title': 'Organ'}),
     ('assembly', {'title': 'Genome assembly'}),
     ('files.file_type', {'title': 'Available data'})
 ]
@@ -58,6 +64,7 @@ _GENOME_TO_ALIAS = {
 
 def includeme(config):
     config.add_route('region-search', '/region-search{slash:/?}')
+    config.add_route('suggest', '/suggest{slash:/?}')
     config.scan(__name__)
 
 
@@ -86,26 +93,25 @@ def get_bool_query(start, end):
 
 
 
-def get_peak_query(start, end, with_inner_hits=True, within_peaks=True):
+def get_peak_query(start, end, with_inner_hits=False, within_peaks=False):
     """
     return peak query
     """
     query = {
         'query': {
-            'filtered': {
+            'bool': {
                 'filter': {
                     'nested': {
                         'path': 'positions',
-                        'filter': {
+                        'query': {
                             'bool': {
                                 'should': []
                             }
                         }
                     }
-                },
-                '_cache': True,
-            }
-        },
+                }
+             }
+         },
         '_source': False,
     }
     search_ranges = {
@@ -127,9 +133,9 @@ def get_peak_query(start, end, with_inner_hits=True, within_peaks=True):
         }
     }
     for key, value in search_ranges.items():
-        query['query']['filtered']['filter']['nested']['filter']['bool']['should'].append(get_bool_query(value['start'], value['end']))
+        query['query']['bool']['filter']['nested']['query']['bool']['should'].append(get_bool_query(value['start'], value['end']))
     if with_inner_hits:
-        query['query']['filtered']['filter']['nested']['inner_hits'] = {'size': 99999}
+        query['query']['bool']['filter']['nested']['inner_hits'] = {'size': 99999}
     return query
 
 
@@ -258,11 +264,9 @@ def region_search(context, request):
     result = {
         '@id': '/region-search/' + ('?' + request.query_string.split('&referrer')[0] if request.query_string else ''),
         '@type': ['region-search'],
-        'title': 'Search by region',
+        'title': 'Search by Region',
         'facets': [],
         '@graph': [],
-        'regions': [],
-        'peaks': [],
         'columns': OrderedDict(),
         'notification': '',
         'filters': []
@@ -307,7 +311,6 @@ def region_search(context, request):
             chromosome, start, end = sanitize_coordinates(region)
     else:
         chromosome, start, end = ('', '', '')
-
     # Check if there are valid coordinates
     if not chromosome or not start or not end:
         result['notification'] = 'No annotations found'
@@ -321,7 +324,7 @@ def region_search(context, request):
     try:
         # including inner hits is very slow
         # figure out how to distinguish browser requests from .embed method requests
-        if 'region_metadata' in request.query_string:
+        if 'peak_metadata' in request.query_string:
             peak_query = get_peak_query(start, end, with_inner_hits=True, within_peaks=region_inside_peak_status)
         else:
             peak_query = get_peak_query(start, end, within_peaks=region_inside_peak_status)
@@ -341,46 +344,77 @@ def region_search(context, request):
 
 
     # if more than one peak found return the experiments with those peak files
-    if len(file_uuids):
-        query = get_filtered_query('', [], set(), principals, ['Annotation'])
+    uuid_count = len(file_uuids)
+    if uuid_count > MAX_CLAUSES_FOR_ES:
+        log.error("REGION_SEARCH WARNING: region with %d file_uuids is being restricted to %d" % \
+                                                            (uuid_count, MAX_CLAUSES_FOR_ES))
+        file_uuids = file_uuids[:MAX_CLAUSES_FOR_ES]
+        uuid_count = len(file_uuids)
+
+    if uuid_count:
+        query = get_filtered_query('', [], set(), principals, ['Experiment'])
         del query['query']
-        query['filter']['and']['filters'].append({
+        query['post_filter']['bool']['must'].append({
             'terms': {
                 'embedded.files.uuid': file_uuids
             }
         })
         used_filters = set_filters(request, query, result)
         used_filters['files.uuid'] = file_uuids
-        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Annotation'])
-        schemas = (types[item_type].schema for item_type in ['Annotation'])
+        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Experiment'])
+        schemas = (types[item_type].schema for item_type in ['Experiment'])
         es_results = es.search(
-            body=query, index='snovault', doc_type='annotation', size=size
+            body=query, index='experiment', doc_type='experiment', size=size, request_timeout=60
         )
         result['@graph'] = list(format_results(request, es_results['hits']['hits']))
         result['total'] = total = es_results['hits']['total']
         result['facets'] = format_facets(es_results, _FACETS, used_filters, schemas, total, principals)
         result['peaks'] = list(peak_results['hits']['hits'])
-        result['regions'] = rows = []
-        for row in result['peaks']:
-            if row['_id'] in file_uuids:
-                file_json = request.embed(row['_id'])
-                annotation_json = request.embed(file_json['dataset'])
-                for hit in row['inner_hits']['positions']['hits']['hits']:
-                    data_row = {}
-                    coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
-                    assembly = '{}'.format(row['_type'])
-                    state = '{}'.format(hit['_source']['state'])
-                    val = '{}'.format(hit['_source']['val'])
-                    file_accession = file_json['accession']
-                    annotation_accession = annotation_json['accession']
-                    description = annotation_json['description']
-                    annotation = annotation_json['annotation_type']
-                    biosample_term = annotation_json['biosample_term_name']
-                    data_row.update({'annotation_type':annotation, 'biosample_term_name':biosample_term, 'coordinates':coordinates, 'state':state, 'value':val, '@id':annotation_accession, 'description':description})
-                    rows.append(data_row)
-        result['download_elements'] = get_region_metadata_links(request)
+        result['download_elements'] = get_peak_metadata_links(request)
         if result['total'] > 0:
             result['notification'] = 'Success'
             position_for_browser = format_position(result['coordinates'], 200)
-            result.update(search_result_actions(request, ['Annotation'], es_results, position=position_for_browser))
+            result.update(search_result_actions(request, ['Experiment'], es_results, position=position_for_browser))
+
     return result
+
+
+@view_config(route_name='suggest', request_method='GET', permission='search')
+def suggest(context, request):
+    text = ''
+    requested_genome = ''
+    if 'q' in request.params:
+        text = request.params.get('q', '')
+        requested_genome = request.params.get('genome', '')
+        # print(requested_genome)
+
+    result = {
+        '@id': '/suggest/?' + urlencode({'genome': requested_genome, 'q': text}, ['q', 'genome']),
+        '@type': ['suggest'],
+        'title': 'Suggest',
+        '@graph': [],
+    }
+    es = request.registry[ELASTIC_SEARCH]
+    query = {
+        "suggest": {
+            "default-suggest": {
+                "text": text,
+                "completion": {
+                    "field": "suggest",
+                    "size": 100
+                }
+            }
+        }
+    }
+    try:
+        results = es.search(index='annotations', body=query)
+    except:
+        return result
+    else:
+        result['@id'] = '/suggest/?' + urlencode({'genome': requested_genome, 'q': text}, ['q','genome'])
+        result['@graph'] = []
+        for item in results['suggest']['default-suggest'][0]['options']:
+            if _GENOME_TO_SPECIES[requested_genome].replace('_', ' ') == item['_source']['payload']['species']:
+                result['@graph'].append(item)
+        result['@graph'] = result['@graph'][:10]
+        return result
