@@ -1024,7 +1024,7 @@
 			"RPKM counts matrix",
 			"TPM counts matrix",
 			"Raw count matrix",
-			"barcode info"			
+			"barcode info",			
                         "unfiltered alignments",
                         "variant calls"
                     ]
