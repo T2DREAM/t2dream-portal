@@ -22,7 +22,7 @@ currenttime = datetime.datetime.now()
 def includeme(config):
     config.add_route('batch_download', '/batch_download/{search_params}')
     config.add_route('metadata', '/metadata/{search_params}/{tsv}')
-    config.add_route('peak_metadata', '/peak_metadata/{search_params}/{tsv}')
+    config.add_route('peak_download', '/peak_download/{search_params}/{tsv}')
     config.add_route('report_download', '/report.tsv')
     config.scan(__name__)
 
@@ -169,13 +169,13 @@ def make_audit_cell(header_column, experiment_json, file_json):
     return ', '.join(list(set(data)))
 
 
-@view_config(route_name='peak_metadata', request_method='GET')
-def peak_metadata(context, request):
+@view_config(route_name='peak_download', request_method='GET')
+def peak_download(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
     param_list['field'] = []
     header = ['assay_term_name', 'coordinates', 'target.label', 'biosample.accession', 'file.accession', 'experiment.accession']
     param_list['limit'] = ['all']
-    path = '/variant-search/?{}&{}'.format(urlencode(param_list, True),'referrer=peak_metadata')
+    path = '/variant-search/?{}&{}'.format(urlencode(param_list, True),'referrer=peak_download')
     results = request.embed(path, as_user=True)
     uuids_in_results = get_file_uuids(results)
     rows = []

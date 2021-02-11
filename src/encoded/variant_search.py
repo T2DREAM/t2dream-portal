@@ -64,7 +64,6 @@ _GENOME_TO_ALIAS = {
 
 def includeme(config):
     config.add_route('variant-search', '/variant-search{slash:/?}')
-    config.add_route('suggest', '/suggest{slash:/?}')
     config.scan(__name__)
 
 
@@ -377,44 +376,3 @@ def variant_search(context, request):
             result.update(search_result_actions(request, ['Experiment'], es_results, position=position_for_browser))
 
     return result
-
-
-@view_config(route_name='suggest', request_method='GET', permission='search')
-def suggest(context, request):
-    text = ''
-    requested_genome = ''
-    if 'q' in request.params:
-        text = request.params.get('q', '')
-        requested_genome = request.params.get('genome', '')
-        # print(requested_genome)
-
-    result = {
-        '@id': '/suggest/?' + urlencode({'genome': requested_genome, 'q': text}, ['q', 'genome']),
-        '@type': ['suggest'],
-        'title': 'Suggest',
-        '@graph': [],
-    }
-    es = request.registry[ELASTIC_SEARCH]
-    query = {
-        "suggest": {
-            "default-suggest": {
-                "text": text,
-                "completion": {
-                    "field": "suggest",
-                    "size": 100
-                }
-            }
-        }
-    }
-    try:
-        results = es.search(index='annotations', body=query)
-    except:
-        return result
-    else:
-        result['@id'] = '/suggest/?' + urlencode({'genome': requested_genome, 'q': text}, ['q','genome'])
-        result['@graph'] = []
-        for item in results['suggest']['default-suggest'][0]['options']:
-            if _GENOME_TO_SPECIES[requested_genome].replace('_', ' ') == item['_source']['payload']['species']:
-                result['@graph'].append(item)
-        result['@graph'] = result['@graph'][:10]
-        return result
