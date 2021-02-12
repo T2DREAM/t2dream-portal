@@ -805,7 +805,8 @@
             "items": {
                 "title": "Read length for zipped files",
                 "description": "For high-throughput sequencing, the number of contiguous nucleotides determined by sequencing",
-                "type": "string"	    
+                "type": "string"
+	    }
         },	
         "run_type": {
             "title": "Run type for sequencing files",
