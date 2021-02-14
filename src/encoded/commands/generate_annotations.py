@@ -281,7 +281,7 @@ def main():
     annotations = human + mouse
 
     # Create annotations JSON file
-    with open('annotations_local.json', 'w') as outfile:
+    with open('annotations.json', 'w') as outfile:
         json.dump(annotations, outfile)
 
 

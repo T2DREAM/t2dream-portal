@@ -288,7 +288,7 @@ write_files:
 
 - path: /etc/elasticsearch/elasticsearch.yml
   content: |
-    http.port: 9201
+    http.port: 9200
     thread_pool:
         search:
             size: 100
