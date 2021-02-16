@@ -5,7 +5,7 @@ var url = require('url');
 import moment from 'moment';
 import { FetchedData, FetchedItems, Param } from './fetched';
 import { Panel, PanelBody } from '../libs/bootstrap/panel';
-
+const newsUri = '/search/?type=Page&news=true&status=released';
 // Convert the selected organisms and assays into an encoded query.
 function generateQuery(selectedOrganisms, selectedAssayCategory) {
     // Make the base query.
@@ -185,7 +185,6 @@ class AssayClicking extends React.Component {
                        <h4 className="search-header">Search Database: </h4>
                        <SearchEngine />
                        <h5 style={{'margin-left': '20px', 'margin-top': '0px', 'font-weight': 'normal', 'font-style': 'italic'}}>search experiment, annotation, biosample & <a href="help/getting-started">more</a></h5>		
-                       <AdvSearch />
 		       </div>
                     </div>
             </div>
