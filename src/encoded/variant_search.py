@@ -36,15 +36,11 @@ _REGION_FIELDS = [
 ]
 
 _FACETS = [
-    ('assay_term_name', {'title': 'Assay'}),
+    ('annotation_type', {'title': 'Annotation Type'}),
+    ('portal_tissue', {'title': 'Tissue'}),
     ('biosample_term_name', {'title': 'Biosample term'}),
-    ('target.label', {'title': 'Target'}),
-    ('replicates.library.biosample.donor.organism.scientific_name', {
-        'title': 'Organism'
-    }),
-    ('organ_slims', {'title': 'Organ'}),
-    ('assembly', {'title': 'Genome assembly'}),
-    ('files.file_type', {'title': 'Available data'})
+    ('annotation_source', {'title': 'Annotation Source'}),
+    ('annotation_type_category', {'title': 'Underlying Assay'})
 ]
 
 _GENOME_TO_SPECIES = {
@@ -114,21 +110,9 @@ def get_peak_query(start, end, with_inner_hits=False, within_peaks=False):
         '_source': False,
     }
     search_ranges = {
-        'peaks_inside_range': {
-            'start': start,
-            'end': end
-        },
-        'range_inside_peaks': {
-            'start': end,
-            'end': start
-        },
         'peaks_overlap_start_range': {
             'start': start,
             'end': start
-        },
-        'peaks_overlap_end_range': {
-            'start': end,
-            'end': end
         }
     }
     for key, value in search_ranges.items():
@@ -144,7 +128,11 @@ def sanitize_coordinates(term):
     if term.count(':') != 1 or term.count('-') > 1:
         return ('', '', '')
     terms = term.split(':')
-    chromosome = terms[0]
+    chromosome_prefix = terms[0]
+    if chromosome_prefix.startswith('chr'):
+        chromosome = chromosome_prefix
+    else:
+        chromosome = 'chr' + chromosome_prefix
     positions = terms[1].split('-')
     if len(positions) == 1:
         start = end = positions[0].replace(',', '')
@@ -193,7 +181,6 @@ def assembly_mapper(location, species, input_assembly, output_assembly):
         start = data['start']
         end = data['end']
         return(chromosome, start, end)
-
 
 def get_rsid_coordinates(id, assembly):
     species = _GENOME_TO_SPECIES[assembly]
@@ -266,9 +253,17 @@ def variant_search(context, request):
         'title': 'Search by Variant',
         'facets': [],
         '@graph': [],
+        'regions': [],
+        'peaks': [],
+        'viz': OrderedDict(),
         'columns': OrderedDict(),
         'notification': '',
-        'filters': []
+        'filters': [],
+        'query': '',
+        'genome':'',
+        'chromosome':'',
+        'start':'',
+        'end':''
     }
     principals = effective_principals(request)
     es = request.registry[ELASTIC_SEARCH]
@@ -278,14 +273,14 @@ def variant_search(context, request):
 
 
     # handling limit
-    size = request.params.get('limit', 25)
+    size = request.params.get('limit', 50)
     if size in ('all', ''):
         size = 99999
     else:
         try:
             size = int(size)
         except ValueError:
-            size = 25
+            size = 50
     if region == '':
         region = '*'
 
@@ -310,6 +305,8 @@ def variant_search(context, request):
             chromosome, start, end = sanitize_coordinates(region)
     else:
         chromosome, start, end = ('', '', '')
+    chromosome_index = chromosome, chromosome.replace('chr', '')
+    result['query'] = region
     # Check if there are valid coordinates
     if not chromosome or not start or not end:
         result['notification'] = 'No annotations found'
@@ -323,12 +320,10 @@ def variant_search(context, request):
     try:
         # including inner hits is very slow
         # figure out how to distinguish browser requests from .embed method requests
-        if 'peak_metadata' in request.query_string:
-            peak_query = get_peak_query(start, end, with_inner_hits=True, within_peaks=region_inside_peak_status)
-        else:
-            peak_query = get_peak_query(start, end, within_peaks=region_inside_peak_status)
+        #if 'peak_metadata' in request.query_string:
+        peak_query = get_peak_query(start, end, with_inner_hits=True, within_peaks=region_inside_peak_status)
         peak_results = snp_es.search(body=peak_query,
-                                     index=chromosome.lower(),
+                                     index=chromosome_index,
                                      doc_type=_GENOME_TO_ALIAS[assembly],
                                      size=99999)
     except Exception:
@@ -340,7 +335,9 @@ def variant_search(context, request):
             file_uuids.append(hit['_id'])
     file_uuids = list(set(file_uuids))
     result['notification'] = 'No results found'
-
+    result['chromosome'] = chromosome
+    result['start'] = start
+    result['end'] = end
 
     # if more than one peak found return the experiments with those peak files
     uuid_count = len(file_uuids)
@@ -351,7 +348,7 @@ def variant_search(context, request):
         uuid_count = len(file_uuids)
 
     if uuid_count:
-        query = get_filtered_query('', [], set(), principals, ['Experiment'])
+        query = get_filtered_query('', [], set(), principals, ['Annotation'])
         del query['query']
         query['post_filter']['bool']['must'].append({
             'terms': {
@@ -360,19 +357,20 @@ def variant_search(context, request):
         })
         used_filters = set_filters(request, query, result)
         used_filters['files.uuid'] = file_uuids
-        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Experiment'])
-        schemas = (types[item_type].schema for item_type in ['Experiment'])
+        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Annotation'])
+        schemas = (types[item_type].schema for item_type in ['Annotation'])
         es_results = es.search(
-            body=query, index='experiment', doc_type='experiment', size=size, request_timeout=60
+            body=query, index='annotation', doc_type='annotation', size=size, request_timeout=60
         )
         result['@graph'] = list(format_results(request, es_results['hits']['hits']))
         result['total'] = total = es_results['hits']['total']
         result['facets'] = format_facets(es_results, _FACETS, used_filters, schemas, total, principals)
         result['peaks'] = list(peak_results['hits']['hits'])
         result['download_elements'] = get_peak_metadata_links(request)
+        result['regions'] = rows = []
         if result['total'] > 0:
             result['notification'] = 'Success'
             position_for_browser = format_position(result['coordinates'], 200)
-            result.update(search_result_actions(request, ['Experiment'], es_results, position=position_for_browser))
+            result.update(search_result_actions(request, ['VariantSearch'], es_results, position=position_for_browser))
 
     return result

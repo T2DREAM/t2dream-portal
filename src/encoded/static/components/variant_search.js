@@ -11,9 +11,6 @@ import * as globals from './globals';
 
 const regionGenomes = [
     { value: 'GRCh37', display: 'hg19' },
-    { value: 'GRCh38', display: 'GRCh38' },
-    { value: 'GRCm37', display: 'mm9' },
-    { value: 'GRCm38', display: 'mm10' },
 ];
 
 
@@ -195,15 +192,9 @@ class AdvSearch extends React.Component {
                     <form id="panel1" className="adv-search-form" ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1">
                         <input type="hidden" name="annotation" value={this.state.terms.annotation} />
                         <div className="form-group">
-                            <label htmlFor="annotation" >Enter any one of human Gene name, Symbol, Synonyms, Gene ID, HGNC ID, coordinates, rsid, Ensemble ID</label>
+                            <label htmlFor="annotation" >Enter coordinates or rsid</label>
                             <div className="input-group input-group-region-input">
                                 <input id="annotation" ref={(input) => { this.annotation = input; }} defaultValue={region} name="region" type="text" className="form-control" onChange={this.handleChange} />
-                                {(this.state.showAutoSuggest && this.state.searchTerm) ?
-                                    <FetchedData loadingComplete>
-                                        <Param name="auto" url={`/suggest/?genome=${this.state.genome}&q=${this.state.searchTerm}`} type="json" />
-                                        <AutocompleteBox name="annotation" userTerm={this.state.searchTerm} handleClick={this.handleAutocompleteClick} />
-                                    </FetchedData>
-                                : null}
                                 <div className="input-group-addon input-group-select-addon">
                                     <select value={this.state.genome} name="genome" onChange={this.handleAssemblySelect}>
                                         {regionGenomes.map(genomeId =>
@@ -261,12 +252,26 @@ class VariantSearch extends React.Component {
         const context = this.props.context;
         const results = context['@graph'];
         const columns = context.columns;
+	const variants = context['regions'];
+	const coordinates = variants.coordinates;
+	const key = variants.coordinates && variants.state && variants.state;
         const notification = context.notification;
+	const assembly = ['hg19'];
+	const files = [];
+	const id = url.parse(this.context.location_href, true);
+	const region = context['region'] || '';
         const searchBase = url.parse(this.context.location_href).search || '';
         const trimmedSearchBase = searchBase.replace(/[?|&]limit=all/, '');
         const filters = context.filters;
         const facets = context.facets;
         const total = context.total;
+	var kp = context['query'];
+	var genome = context['genome'];
+	var chromosome = context['chromosome']
+	var start = context['start'] - 5000
+	var end = context['end'] + 5000
+	const domain = 'http://www.type2diabetesgenetics.org/variantInfo/variantInfo/';
+	const loggedIn = this.context.session && this.context.session['auth.userid'];
         const visualizeDisabled = total > visualizeLimit;
 
         // Get a sorted list of batch hubs keys with case-insensitive sort
@@ -343,7 +348,31 @@ class VariantSearch extends React.Component {
 
                                   <hr />
                                   <ul className="nav result-table" id="result-table">
-                                      {results.map(result => Listing({ context: result, columns, key: result['@id'] }))}
+                     {results.map(function (result) {
+                                          return (
+					      <li key={result['@id']}>
+						  <div className="clearfix">
+						  <div className="pull-right search-meta">
+						  <p className="type">Annotation accession</p>
+						  <p className="type">{result['accession']}</p>
+						  </div>
+						  <div class="accession">
+						  <a href={result['@id']}><h4><font color="#428bca">Annotation Dataset: {result.description}</font></h4></a>
+						  </div>
+						  <div class="data-row">
+						  <div><strong>Annotation type: </strong>{result.annotation_type}</div>
+						  <div><strong>Biosample: </strong>{result.biosample_term_name}</div>
+						  <div style={{'height': '100px', 'overflow-y':'scroll', 'display': 'block'}}><table className="table table-panel table-striped table-hover"><thead><tr><th>Overlapping Coordinate</th><th>State</th><th>Value</th></tr></thead><tbody>{variants.map(function (result_variant){ while (result['accession'] == result_variant['@id']) {return(<tr key={key}><td>{result_variant.coordinates}</td><td> {result_variant.state}</td><td> {result_variant.value}</td></tr>);																				       }})}
+					      </tbody>
+						  </table>
+					      </div>
+						  <br/>
+						  </div>
+						  </div>
+						  </li>
+						 
+					  );
+		     })}			 
                                   </ul>
                                 </div>
                             </div>

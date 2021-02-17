@@ -47,23 +47,31 @@ log = logging.getLogger(__name__)
 # - regulomeDb versions of ENCODED_ALLOWED_FILE_FORMATS, ENCODED_ALLOWED_STATUSES, add_encoded_to_regions_es()
 
 # Species and references being indexed
-SUPPORTED_ASSEMBLIES = ['hg19', 'mm10', 'mm9', 'GRCh38']
+SUPPORTED_ASSEMBLIES = ['hg19']
 
 ENCODED_ALLOWED_FILE_FORMATS = ['bed']
 ENCODED_ALLOWED_STATUSES = ['released']
 RESIDENT_REGIONSET_KEY = 'resident_regionsets'  # in regions_es, keeps track of what datsets are resident in one place
 
 ENCODED_REGION_REQUIREMENTS = {
-    'ChIP-seq': {
-        'output_type': ['optimal idr thresholded peaks'],
+    'chromatin state': {
+        'output_type': ['semi-automated genome annotation'],
         'file_format': ['bed']
     },
-    'DNase-seq': {
-        'file_type': ['bed narrowPeak'],
+    'accessible chromatin': {
+        'output_type': ['peaks'],
         'file_format': ['bed']
     },
-    'eCLIP': {
-        'file_type': ['bed narrowPeak'],
+    'candidate regulatory regions': {
+        'file_type': ['bed3+'],
+        'file_format': ['bed']
+    },
+    'histone modifications': {
+        'file_type': ['bed3+'],
+        'file_format': ['bed']
+    },
+    'binding sites': {
+        'file_type': ['bed3+'],
         'file_format': ['bed']
     }
 }
@@ -83,6 +91,7 @@ def includeme(config):
 
 def tsvreader(file):
     reader = csv.reader(file, delimiter='\t')
+    next(reader)
     for row in reader:
         yield row
 
@@ -110,7 +119,13 @@ def get_mapping(assembly_name='hg19'):
                         },
                         'end': {
                             'type': 'long'
-                        }
+                        },
+                        'state': {
+                            'type': 'string',
+                            },
+                        'val': {
+                            'type': 'string'
+                            }
                     }
                 }
             }
@@ -129,20 +144,20 @@ def index_settings():
 
 #def all_regionable_dataset_uuids(registry):
 #    # NOTE: this old method needs postgres.  Avoid using postgres
-#    return list(all_uuids(registry, types=["experiment"]))
+#    return list(all_uuids(registry, types=["annotation"]))
 
 
-def encoded_regionable_datasets(request, restrict_to_assays=[]):
+def encoded_regionable_datasets(request, restrict_to_annotations=[]):
     '''return list of all dataset uuids eligible for regions'''
 
     encoded_es = request.registry[ELASTIC_SEARCH]
     encoded_INDEX = request.registry.settings['snovault.elasticsearch.index']
 
-    # basics... only want uuids of experiments that are released
-    query = '/search/?type=Experiment&field=uuid&status=released&limit=all'
-    # Restrict to just these assays
-    for assay in restrict_to_assays:
-        query += '&assay_title=' + assay
+    # basics... only want uuids of annotations that are released
+    query = '/search/?type=Annotation&field=uuid&status=released&limit=all'
+    # Restrict to just these annotations
+    for annotation_type in restrict_to_annotations:
+        query += '&annotation_type=' + annotation
     results = request.embed(query)['@graph']
     return [ result['uuid'] for result in results ]
 
@@ -167,8 +182,8 @@ class RegionIndexerState(IndexerState):
 
     def all_indexable_uuids(self, request):
         '''returns list of uuids pertinant to this indexer.'''
-        assays = list(ENCODED_REGION_REQUIREMENTS.keys())
-        return encoded_regionable_datasets(request, assays)  # Uses elasticsearch query
+        annotations = list(ENCODED_REGION_REQUIREMENTS.keys())
+        return encoded_regionable_datasets(request, annotations)  # Uses elasticsearch query
 
     def priority_cycle(self, request):
         '''Initial startup, reindex, or interupted prior cycle can all lead to a priority cycle.
@@ -238,8 +253,8 @@ class RegionIndexerState(IndexerState):
         if len(uuids) > 500:  # some arbitrary cutoff.
             # There is an efficiency trade off examining many non-dataset uuids
             # # vs. the cost of eliminating those uuids from the list ahead of time.
-            assays = list(ENCODED_REGION_REQUIREMENTS.keys())
-            uuids = list(set(encoded_regionable_datasets(request, assays)).intersection(uuids))
+            annotations = list(ENCODED_REGION_REQUIREMENTS.keys())
+            uuids = list(set(encoded_regionable_datasets(request, annotations)).intersection(uuids))
             uuid_count = len(uuids)
 
         return (list(set(uuids)),False)  # Only unique uuids
@@ -398,8 +413,8 @@ class RegionIndexer(Indexer):
             return  # Note that if a dataset is no longer a candidate but it had files in regions es, they won't get removed.
         #log.debug("dataset is a candidate: %s", dataset['accession'])
 
-        assay_term_name = dataset.get('assay_term_name')
-        if assay_term_name is None:
+        annotation_type = dataset.get('annotation_type')
+        if annotation_type is None:
             return
 
         files = dataset.get('files',[])
@@ -409,7 +424,7 @@ class RegionIndexer(Indexer):
 
             file_uuid = afile['uuid']
 
-            if self.encoded_candidate_file(afile, assay_term_name):
+            if self.encoded_candidate_file(afile, annotation_type):
 
                 using = ""
                 if force:
@@ -421,7 +436,7 @@ class RegionIndexer(Indexer):
                     if self.in_regions_es(file_uuid):
                         continue
 
-                if self.add_encoded_file_to_regions_es(request, assay_term_name, afile):
+                if self.add_encoded_file_to_regions_es(request, annotation_type, afile):
                     log.info("added file: %s %s %s", dataset['accession'], afile['href'], using)
                     self.state.file_added(file_uuid)
 
@@ -433,7 +448,7 @@ class RegionIndexer(Indexer):
         # TODO: gather and return errors
 
 
-    def encoded_candidate_file(self, afile, assay_term_name):
+    def encoded_candidate_file(self, afile, annotation_type):
         '''returns True if an encoded file should be in regions es'''
         if afile.get('status', 'imagined') not in ENCODED_ALLOWED_STATUSES:
             return False
@@ -446,7 +461,7 @@ class RegionIndexer(Indexer):
         if assembly not in SUPPORTED_ASSEMBLIES:
             return False
 
-        required = ENCODED_REGION_REQUIREMENTS.get(assay_term_name,{})
+        required = ENCODED_REGION_REQUIREMENTS.get(annotation_type,{})
         if not required:
             return False
 
@@ -465,10 +480,10 @@ class RegionIndexer(Indexer):
 
     def encoded_candidate_dataset(self, dataset):
         '''returns True if an encoded dataset may have files that should be in regions es'''
-        if 'Experiment' not in dataset['@type']:  # Only experiments?
+        if 'Annotation' not in dataset['@type']:  # Only annotations?
             return False
 
-        if dataset.get('assay_term_name','unknown') not in list(ENCODED_REGION_REQUIREMENTS.keys()):
+        if dataset.get('annotation_type','unknown') not in list(ENCODED_REGION_REQUIREMENTS.keys()):
             return False
 
         if len(dataset.get('files',[])) == 0:
@@ -517,7 +532,7 @@ class RegionIndexer(Indexer):
         return True
 
 
-    def add_to_regions_es(self, id, assembly, assay_term_name, regions, source='encoded'):
+    def add_to_regions_es(self, id, assembly, annotation_type, regions, source='encoded'):
         '''Given regions from some source (most likely encoded file) loads the data into region search es'''
         #return True # DEBUG
         for key in regions:
@@ -538,7 +553,7 @@ class RegionIndexer(Indexer):
         doc = {
             'uuid': str(id),
             'source': source,
-            'assay_term_name': assay_term_name,
+            'annotation_type': annotation_type,
             'assembly': assembly,
             'chroms': list(regions.keys())
         }
@@ -553,7 +568,7 @@ class RegionIndexer(Indexer):
         self.regions_es.index(index=self.residents_index, doc_type='default', body=doc, id=str(id))
         return True
 
-    def add_encoded_file_to_regions_es(self, request, assay_term_name, afile):
+    def add_encoded_file_to_regions_es(self, request, annotation_type, afile):
         '''Given an encoded file object, reads the file to create regions data then loads that into region search es.'''
         #return True # DEBUG
 
@@ -568,7 +583,7 @@ class RegionIndexer(Indexer):
             #if request.host_url == 'http://localhost':
             # assume we are running in dev-servers
             #href = request.host_url + ':8000' + afile['submitted_file_name']
-            href = 'http://www.encodeproject.org' + afile['href']
+            href = 'http://www.diabetesepigenome.org' + afile['href']
         else:
             href = request.host_url + afile['href']
 
@@ -617,20 +632,22 @@ class RegionIndexer(Indexer):
             # NOTE: requests doesn't require gzip but http.request does.
             with gzip.open(file_in_mem, mode='rt') as file:  # localhost:8000 would not require localhost
                 for row in tsvreader(file):
-                    chrom, start, end = row[0].lower(), int(row[1]), int(row[2])
+                    chrom, start, end, state, val = row[0].lower(), int(row[1]), int(row[2]), row[3], row[4]
                     if isinstance(start, int) and isinstance(end, int):
                         if chrom in file_data:
                             file_data[chrom].append({
-                                'start': start + 1,
-                                'end': end + 1
+                                'start': start,
+                                'end': end,
+                                'state': state,
+                                'val': val
                             })
                         else:
-                            file_data[chrom] = [{'start': start + 1, 'end': end + 1}]
+                            file_data[chrom] = [{'start': start, 'end': end, 'state': state, 'val': val}]
                     else:
                         log.warn('positions are not integers, will not index file')
         #else:  Other file types?
 
         if file_data:
-            return self.add_to_regions_es(afile['uuid'], assembly, assay_term_name, file_data, 'encoded')
+            return self.add_to_regions_es(afile['uuid'], assembly, annotation_type, file_data, 'encoded')
 
         return False
