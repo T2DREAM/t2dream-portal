@@ -75,6 +75,7 @@ export default class Navigation extends React.Component {
         const portal = this.context.portal;
         return (
             <div id="navbar" className="navbar navbar-fixed-top navbar-inverse">
+                <AmpBanner />
                 <div className="container">
                     <Navbar brand="Home" brandlink="/" label="main" navClasses="navbar-main">
                         <GlobalSections />

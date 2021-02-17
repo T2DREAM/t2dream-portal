@@ -119,13 +119,7 @@ def get_mapping(assembly_name='hg19'):
                         },
                         'end': {
                             'type': 'long'
-                        },
-                        'state': {
-                            'type': 'string',
-                            },
-                        'val': {
-                            'type': 'string'
-                            }
+                        }
                     }
                 }
             }
@@ -157,7 +151,7 @@ def encoded_regionable_datasets(request, restrict_to_annotations=[]):
     query = '/search/?type=Annotation&field=uuid&status=released&limit=all'
     # Restrict to just these annotations
     for annotation_type in restrict_to_annotations:
-        query += '&annotation_type=' + annotation
+        query += '&annotation_type=' + annotation_type
     results = request.embed(query)['@graph']
     return [ result['uuid'] for result in results ]
 
@@ -632,17 +626,15 @@ class RegionIndexer(Indexer):
             # NOTE: requests doesn't require gzip but http.request does.
             with gzip.open(file_in_mem, mode='rt') as file:  # localhost:8000 would not require localhost
                 for row in tsvreader(file):
-                    chrom, start, end, state, val = row[0].lower(), int(row[1]), int(row[2]), row[3], row[4]
+                    chrom, start, end = row[0].lower(), int(row[1]), int(row[2])
                     if isinstance(start, int) and isinstance(end, int):
                         if chrom in file_data:
                             file_data[chrom].append({
                                 'start': start,
                                 'end': end,
-                                'state': state,
-                                'val': val
                             })
                         else:
-                            file_data[chrom] = [{'start': start, 'end': end, 'state': state, 'val': val}]
+                            file_data[chrom] = [{'start': start, 'end': end}]
                     else:
                         log.warn('positions are not integers, will not index file')
         #else:  Other file types?

@@ -254,7 +254,7 @@ class VariantSearch extends React.Component {
         const columns = context.columns;
 	const variants = context['regions'];
 	const coordinates = variants.coordinates;
-	const key = variants.coordinates && variants.state && variants.state;
+	const key = variants.coordinates;
         const notification = context.notification;
 	const assembly = ['hg19'];
 	const files = [];
@@ -362,7 +362,7 @@ class VariantSearch extends React.Component {
 						  <div class="data-row">
 						  <div><strong>Annotation type: </strong>{result.annotation_type}</div>
 						  <div><strong>Biosample: </strong>{result.biosample_term_name}</div>
-						  <div style={{'height': '100px', 'overflow-y':'scroll', 'display': 'block'}}><table className="table table-panel table-striped table-hover"><thead><tr><th>Overlapping Coordinate</th><th>State</th><th>Value</th></tr></thead><tbody>{variants.map(function (result_variant){ while (result['accession'] == result_variant['@id']) {return(<tr key={key}><td>{result_variant.coordinates}</td><td> {result_variant.state}</td><td> {result_variant.value}</td></tr>);																				       }})}
+						  <div style={{'height': '100px', 'overflow-y':'scroll', 'display': 'block'}}><table className="table table-panel table-striped table-hover"><thead><tr><th>Overlapping Coordinate</th><th>State</th><th>Value</th></tr></thead><tbody>{variants.map(function (result_variant){ while (result['accession'] == result_variant['@id']) {return(<tr key={key}><td>{result_variant.coordinates}</td></tr>);																				       }})}
 					      </tbody>
 						  </table>
 					      </div>

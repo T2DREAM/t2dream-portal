@@ -22,13 +22,13 @@
         position: relative;
         display: block;
         padding: 10px 15px;
-        color: #fff;
+        color: #696969;
         background-color: transparent;
         border: none;
 
         &:focus,
         &:hover {
-            background-color: #2f4961;
+            background-color: #DCDCDC;
         }
 
         /* Disabled sign-in link */
@@ -95,8 +95,6 @@
     color: #fff;
     vertical-align: top;
     cursor: pointer;
-    background: transparent;
-    border: none;
 
     &:hover {
         color: #fff;
