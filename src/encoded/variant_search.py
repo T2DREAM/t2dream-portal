@@ -305,7 +305,7 @@ def variant_search(context, request):
             chromosome, start, end = sanitize_coordinates(region)
     else:
         chromosome, start, end = ('', '', '')
-    chromosome_index = chromosome, chromosome.replace('chr', '')
+    #chromosome_index = chromosome, chromosome.replace('chr', '')
     result['query'] = region
     # Check if there are valid coordinates
     if not chromosome or not start or not end:
@@ -323,7 +323,7 @@ def variant_search(context, request):
         #if 'peak_metadata' in request.query_string:
         peak_query = get_peak_query(start, end, with_inner_hits=True, within_peaks=region_inside_peak_status)
         peak_results = snp_es.search(body=peak_query,
-                                     index=chromosome_index,
+                                     index=chromosome.lower(),
                                      doc_type=_GENOME_TO_ALIAS[assembly],
                                      size=99999)
     except Exception:

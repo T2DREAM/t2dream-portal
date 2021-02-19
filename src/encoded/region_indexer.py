@@ -119,6 +119,12 @@ def get_mapping(assembly_name='hg19'):
                         },
                         'end': {
                             'type': 'long'
+                        },
+                        'state_annotation': {
+                            'type': 'long'
+                        },
+                        'value_annotation': {
+                            'type': 'long'
                         }
                     }
                 }
@@ -626,15 +632,17 @@ class RegionIndexer(Indexer):
             # NOTE: requests doesn't require gzip but http.request does.
             with gzip.open(file_in_mem, mode='rt') as file:  # localhost:8000 would not require localhost
                 for row in tsvreader(file):
-                    chrom, start, end = row[0].lower(), int(row[1]), int(row[2])
+                    chrom, start, end, state_annotation, value_annotation = row[0].lower(), int(row[1]), int(row[2]), row[3], row[4]
                     if isinstance(start, int) and isinstance(end, int):
                         if chrom in file_data:
                             file_data[chrom].append({
                                 'start': start,
                                 'end': end,
+                                'state_annotation': state_annotation,
+                                'value_annotation': value_annotation,
                             })
                         else:
-                            file_data[chrom] = [{'start': start, 'end': end}]
+                            file_data[chrom] = [{'start': start, 'end': end, 'state_annotation': state_annotation, 'value_annotation': value_annotation}]
                     else:
                         log.warn('positions are not integers, will not index file')
         #else:  Other file types?
