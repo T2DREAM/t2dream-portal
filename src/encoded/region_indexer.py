@@ -121,10 +121,10 @@ def get_mapping(assembly_name='hg19'):
                             'type': 'long'
                         },
                         'state_annotation': {
-                            'type': 'long'
+                            'type': 'string'
                         },
                         'value_annotation': {
-                            'type': 'long'
+                            'type': 'string'
                         }
                     }
                 }
