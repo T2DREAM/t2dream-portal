@@ -54,8 +54,12 @@ ENCODED_ALLOWED_STATUSES = ['released']
 RESIDENT_REGIONSET_KEY = 'resident_regionsets'  # in regions_es, keeps track of what datsets are resident in one place
 
 ENCODED_REGION_REQUIREMENTS = {
-    'candidate regulatory regions': {
-        'file_type': ['bed3+'],
+    'chromatin state': {
+        'output_type': ['semi-automated genome annotation'],
+        'file_format': ['bed']
+    },
+    'histone modifications': {
+        'output_type': ['peaks'],
         'file_format': ['bed']
     }
 }
