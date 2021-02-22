@@ -97,7 +97,6 @@ setup(
         index-annotations = encoded.commands.index_annotations:main
         migrate-attachments-aws = encoded.commands.migrate_attachments_aws:main
         migrate-dataset-type = encoded.commands.migrate_dataset_type:main
-        alembic = encoded.commands.alembic:main
 
         [paste.app_factory]
         main = encoded:main
