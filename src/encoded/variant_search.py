@@ -368,6 +368,27 @@ def variant_search(context, request):
         result['peaks'] = list(peak_results['hits']['hits'])
         result['download_elements'] = get_peak_metadata_links(request)
         result['regions'] = rows = []
+        rows_accesions = []
+        for row in result['@graph']:
+            accessions = row['accession']
+            rows_accesions.append(accessions)
+        for row in result['peaks']:
+            if row['_id'] in file_uuids:
+                file_json = request.embed(row['_id'])
+                annotation_json = request.embed(file_json['dataset'])
+                for hit in row['inner_hits']['positions']['hits']['hits']:
+                    data_row = {}
+                    coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
+                    assembly = '{}'.format(row['_type'])
+                    state_annotation = '{}'.format(hit['_source']['state_annotation'])
+                    value_annotation = '{}'.format(hit['_source']['value_annotation'])
+                    file_accession = file_json['accession']
+                    annotation_accession = annotation_json['accession']
+                    description = annotation_json['description']
+                    annotation = annotation_json['annotation_type']
+                    biosample_term = annotation_json['biosample_term_name']
+                    data_row.update({'annotation_type':annotation, 'biosample_term_name':biosample_term, 'coordinates':coordinates, 'state_annotation':state_annotation, 'value_annotation':value_annotation, '@id':annotation_accession, 'description':description})
+                    rows.append(data_row)
         if result['total'] > 0:
             result['notification'] = 'Success'
             position_for_browser = format_position(result['coordinates'], 200)

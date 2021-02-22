@@ -54,23 +54,7 @@ ENCODED_ALLOWED_STATUSES = ['released']
 RESIDENT_REGIONSET_KEY = 'resident_regionsets'  # in regions_es, keeps track of what datsets are resident in one place
 
 ENCODED_REGION_REQUIREMENTS = {
-    'chromatin state': {
-        'output_type': ['semi-automated genome annotation'],
-        'file_format': ['bed']
-    },
-    'accessible chromatin': {
-        'output_type': ['peaks'],
-        'file_format': ['bed']
-    },
     'candidate regulatory regions': {
-        'file_type': ['bed3+'],
-        'file_format': ['bed']
-    },
-    'histone modifications': {
-        'file_type': ['bed3+'],
-        'file_format': ['bed']
-    },
-    'binding sites': {
         'file_type': ['bed3+'],
         'file_format': ['bed']
     }
@@ -381,7 +365,7 @@ def index_regions(request):
 
     state.send_notices()
     return result
-
+    log.warn(result)
 
 class RegionIndexer(Indexer):
     def __init__(self, registry):
