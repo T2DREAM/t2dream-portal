@@ -50,7 +50,7 @@ log = logging.getLogger(__name__)
 SUPPORTED_ASSEMBLIES = ['hg19']
 
 ENCODED_ALLOWED_FILE_FORMATS = ['bed']
-ENCODED_ALLOWED_STATUSES = ['uploading']
+ENCODED_ALLOWED_STATUSES = ['released']
 RESIDENT_REGIONSET_KEY = 'resident_regionsets'  # in regions_es, keeps track of what datsets are resident in one place
 
 ENCODED_REGION_REQUIREMENTS = {
@@ -365,7 +365,6 @@ def index_regions(request):
 
     state.send_notices()
     return result
-    log.warn(result)
 
 class RegionIndexer(Indexer):
     def __init__(self, registry):
@@ -616,10 +615,7 @@ class RegionIndexer(Indexer):
             # NOTE: requests doesn't require gzip but http.request does.
             with gzip.open(file_in_mem, mode='rt') as file:  # localhost:8000 would not require localhost
                 for row in tsvreader(file):
-                    try:
-                        chrom, start, end, state_annotation, value_annotation = row[0].lower(), int(row[1]), int(row[2]), row[3], row[4]
-                    except IndexError:
-                        pass
+                    chrom, start, end, state_annotation, value_annotation = row[0].lower(), int(row[1]), int(row[2]), row[3], row[4]
                     if isinstance(start, int) and isinstance(end, int):
                         if chrom in file_data:
                             file_data[chrom].append({
