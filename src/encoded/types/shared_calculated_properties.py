@@ -290,14 +290,14 @@ class CalculatedVisualize:
             if len(browsers) == 0:
                 continue
             browser_urls = {}
-            if 'ucsc' in browsers:
-                ucsc_url = vis_format_url("ucsc", hub_url, assembly_name)
-                if ucsc_url is not None:
-                    browser_urls['UCSC'] = ucsc_url
-            if 'ensembl' in browsers:
-                ensembl_url = vis_format_url("ensembl", hub_url, assembly_name)
-                if ensembl_url is not None:
-                    browser_urls['Ensembl'] = ensembl_url
+            # if 'ucsc' in browsers:
+            #    ucsc_url = vis_format_url("ucsc", hub_url, assembly_name)
+            #    if ucsc_url is not None:
+            #        browser_urls['UCSC'] = ucsc_url
+            # if 'ensembl' in browsers:
+            #    ensembl_url = vis_format_url("ensembl", hub_url, assembly_name)
+            #    if ensembl_url is not None:
+            #        browser_urls['Ensembl'] = ensembl_url
             if 'quickview' in browsers:
                 quickview_url = vis_format_url("quickview", request.path, assembly_name)
                 if quickview_url is not None:

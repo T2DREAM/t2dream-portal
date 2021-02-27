@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 
 const maxFilesBrowsed = 40; // Maximum number of files to browse
-const domainName = 'https://www.diabetesepigenome.org';
+const domainName = 'https://t2depigenome-test.org';
 const dummyFiles = [
     {
         file_format: 'bigWig',

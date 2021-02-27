@@ -50,16 +50,12 @@ log = logging.getLogger(__name__)
 SUPPORTED_ASSEMBLIES = ['hg19']
 
 ENCODED_ALLOWED_FILE_FORMATS = ['bed']
-ENCODED_ALLOWED_STATUSES = ['released']
+ENCODED_ALLOWED_STATUSES = ['uploading']
 RESIDENT_REGIONSET_KEY = 'resident_regionsets'  # in regions_es, keeps track of what datsets are resident in one place
 
 ENCODED_REGION_REQUIREMENTS = {
     'chromatin state': {
         'output_type': ['semi-automated genome annotation'],
-        'file_format': ['bed']
-    },
-    'histone modifications': {
-        'output_type': ['peaks'],
         'file_format': ['bed']
     }
 }
@@ -411,7 +407,7 @@ class RegionIndexer(Indexer):
                 continue  # Note: if file_format changed to not allowed but file already in regions es, it doesn't get removed.
 
             file_uuid = afile['uuid']
-
+            log.warn(file_uuid)
             if self.encoded_candidate_file(afile, annotation_type):
 
                 using = ""
@@ -620,7 +616,10 @@ class RegionIndexer(Indexer):
             # NOTE: requests doesn't require gzip but http.request does.
             with gzip.open(file_in_mem, mode='rt') as file:  # localhost:8000 would not require localhost
                 for row in tsvreader(file):
-                    chrom, start, end, state_annotation, value_annotation = row[0].lower(), int(row[1]), int(row[2]), row[3], row[4]
+                    try:
+                        chrom, start, end, state_annotation, value_annotation = row[0].lower(), int(row[1]), int(row[2]), row[3], row[4]
+                    except IndexError:
+                        pass
                     if isinstance(start, int) and isinstance(end, int):
                         if chrom in file_data:
                             file_data[chrom].append({
@@ -629,12 +628,13 @@ class RegionIndexer(Indexer):
                                 'state_annotation': state_annotation,
                                 'value_annotation': value_annotation,
                             })
+                            
                         else:
                             file_data[chrom] = [{'start': start, 'end': end, 'state_annotation': state_annotation, 'value_annotation': value_annotation}]
                     else:
                         log.warn('positions are not integers, will not index file')
         #else:  Other file types?
-
+        #log.warn(afile['uuid'])
         if file_data:
             return self.add_to_regions_es(afile['uuid'], assembly, annotation_type, file_data, 'encoded')
 

@@ -329,20 +329,6 @@ class VariantSearch extends React.Component {
                                                 </span>
                                             }
 
-                                            {visualizeKeys ?
-                                                <DropdownButton disabled={visualizeDisabled} title={visualizeDisabled ? `Filter to ${visualizeLimit} to visualize` : 'Visualize'} label="batchhubs" wrapperClasses="results-table-button">
-                                                    <DropdownMenu>
-                                                        {visualizeKeys.map(assembly =>
-                                                            Object.keys(context.visualize_batch[assembly]).sort().map(browser =>
-                                                                <a key={[assembly, '_', browser].join()} data-bypass="true" target="_blank" rel="noopener noreferrer" href={context.visualize_batch[assembly][browser]}>
-                                                                    {assembly} {browser}
-                                                                </a>
-                                                            )
-                                                        )}
-                                                    </DropdownMenu>
-                                                </DropdownButton>
-                                            : null}
-
                                         </div>
                                     </div>
 

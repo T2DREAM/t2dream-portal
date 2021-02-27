@@ -21,7 +21,7 @@ const portal = {
             title: 'About',
             children: [
                 { id: 'projectoverview', title: 'Project overview', url: '/about/contributors/' },
-                { id: 'policies', title: 'Policies', url: '/policy/' },
+                { id: 'policies', title: 'Policies', url: '/data-access-policies/' },
                 { id: 'news', title: 'News', url: '/search/?type=Page&news=true&status=released' },
                 { id: 'acknowledgements', title: 'Acknowledgements', url: '/acknowledgements/' },
                 { id: 'contact', title: 'Contact', url: '/help/contacts/' },
@@ -283,7 +283,7 @@ class App extends React.Component {
             languageDictionary: {
                 title: 'Log in',
             },
-            allowedConnections: ['google-oauth2', 'facebook', 'github', 'linkedin'],
+            allowedConnections: ['github', 'google-oauth2', 'facebook', 'linkedin', 'twitter'],
         });
         this.lock.on('authenticated', this.handleAuth0Login);
 
@@ -393,9 +393,11 @@ class App extends React.Component {
         if (!(httpMethod === 'GET' || httpMethod === 'HEAD')) {
             const headers = _.extend({}, extendedOptions.headers);
             extendedOptions.headers = headers;
-            const session = this.state.session;
+            const { session } = this.state;
+	    //console.log(session._csrft_);
             if (session && session._csrft_) {
                 headers['X-CSRF-Token'] = session._csrft_;
+		console.log(headers['X-CSRF-Token']);
             }
         }
         // Strip url fragment.
@@ -938,8 +940,8 @@ class App extends React.Component {
 
         // Google does not update the content of 301 redirected pages
         let base;
-        if (({ 'http://www.diabetesepigenome.org/': 1, 'http://diabetesepigenome.org/': 1 })[canonical]) {
-            base = 'https://www.diabetesepigenome.org/';
+        if (({ 'https://t2depigenome-test.org': 1, 'https://t2depigenome-test.org/': 1 })[canonical]) {
+            base = 'https://t2depigenome-test.org';
             canonical = base;
             this.constructor.historyEnabled = false;
         }

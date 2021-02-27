@@ -460,8 +460,8 @@ def download(context, request):
         conn = boto.connect_s3()
         location = conn.generate_url(
             36*60*60, request.method, external['bucket'], external['key'],
-            force_http=proxy or use_download_proxy, response_headers={
-                'response-content-disposition': "attachment; filename=" + filename,
+            force_http=False, response_headers={
+                'content-type':'binary/octet-stream','response-content-disposition': "attachment; filename=" + filename,
             })
     else:
         raise ValueError(external.get('service'))
@@ -474,13 +474,13 @@ def download(context, request):
             'expires': datetime.datetime.fromtimestamp(expires, pytz.utc).isoformat(),
         }
 
-    if proxy:
-        return Response(headers={'X-Accel-Redirect': '/_proxy/' + str(location)})
+    # if proxy:
+    #    return Response(headers={'X-Accel-Redirect': '/_proxy/' + str(location)})
 
     # We don't use X-Accel-Redirect here so that client behaviour is similar for
     # both aws and non-aws users.
-    if use_download_proxy:
-        location = request.registry.settings.get('download_proxy', '') + str(location)
+    # if use_download_proxy:
+    #    location = request.registry.settings.get('download_proxy', '') + str(location)
 
     # 307 redirect specifies to keep original method
     raise HTTPTemporaryRedirect(location=location)

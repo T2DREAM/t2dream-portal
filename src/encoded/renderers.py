@@ -55,7 +55,7 @@ def includeme(config):
         under=renderer_tween,
     )
 
-    config.add_tween('.renderers.security_tween_factory', under='pyramid_tm.tm_tween_factory')
+    #config.add_tween('.renderers.security_tween_factory', under='pyramid_tm.tm_tween_factory')
     config.scan(__name__)
 
 
@@ -76,9 +76,10 @@ def fix_request_method_tween_factory(handler, registry):
 
     return fix_request_method_tween
 
-
+"""
 def security_tween_factory(handler, registry):
-
+    log.warn(handler)
+    log.warn(registry)
     def security_tween(request):
         login = None
         expected_user = request.headers.get('X-If-Match-User')
@@ -119,7 +120,7 @@ def security_tween_factory(handler, registry):
         raise CSRFTokenError('Missing CSRF token')
 
     return security_tween
-
+"""
 
 def normalize_cookie_tween_factory(handler, registry):
     from webob.cookies import Cookie

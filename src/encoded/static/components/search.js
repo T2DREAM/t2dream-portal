@@ -1454,7 +1454,7 @@ ResultTable.contextTypes = {
 
 
 const BrowserTabQuickView = function BrowserTabQuickView() {
-    return <div>Quick View <span className="beta-badge">BETA</span></div>;
+    return <div>Genome Browser</div>;
 };
 
 
@@ -1499,7 +1499,7 @@ const ResultBrowser = (props) => {
             }
             visUrl += `accession=${accession}`;
         }
-        visUrl = `batch_hub/type=Experiment/${visUrl}/${props.assembly}/vis_blob.json`;
+        visUrl = `batch_hub/type=Experiment/${visUrl}/${props.assembly}/trackDb.json`;
     }
     if (datasetCount > 0) {
         return (

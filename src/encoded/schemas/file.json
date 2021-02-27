@@ -91,7 +91,7 @@
                                     "required": ["file_size", "status"],
                                     "properties": {
                                         "status": {
-                                            "enum": ["in progress",  "revoked", "archived", "released"]
+                                            "enum": ["in progress",  "revoked", "archived", "released", "uploading"]
                                         },
                                         "no_file_available": {
                                             "enum": [false]
@@ -102,7 +102,7 @@
                                     "required": ["status"],
                                     "properties": {
                                         "status": {
-                                            "enum": ["uploading", "upload failed", "deleted", "replaced", "content error"]
+                                            "enum": ["upload failed", "deleted", "replaced", "content error"]
                                         },
                                         "no_file_available": {
                                             "enum": [false]
@@ -495,7 +495,7 @@
                                         "required": ["no_file_available"],
                                         "properties": {
                                             "status": {
-                                                "enum": ["in progress",  "revoked", "archived", "released"]
+                                                "enum": ["in progress",  "revoked", "archived", "released", "uploading"]
                                             },
                                              "no_file_available": {
                                                 "enum": [true]

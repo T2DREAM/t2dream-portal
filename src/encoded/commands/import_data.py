@@ -21,7 +21,7 @@ To make updates from a single tsv file
 
 """
 from webtest import TestApp
-from urlparse import urlparse
+from urllib.parse import urlparse
 from .. import loadxl
 import logging
 import os.path

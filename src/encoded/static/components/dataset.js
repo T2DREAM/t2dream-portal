@@ -227,7 +227,7 @@ class AnnotationComponent extends React.Component {
                                         <dt>Collection Tags</dt>
                                         <dd>
                                             {context.collection_tags && context.collection_tags ?
-                                                <DbxrefList values={context.collection_tags} />
+                                                <DbxrefList context={context} dbxrefs={context.collection_tags} />
                                             : <em>None submitted</em> }
                                         </dd>
                                     </div>
