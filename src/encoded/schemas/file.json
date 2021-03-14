@@ -1336,6 +1336,8 @@
         "idat red channel": "raw data",
         "intensity values": "raw data",
         "reads": "raw data",
+	"Raw count matrix": "raw data",
+	"TPM counts matrix":"raw data",
         "sample index": "raw data",
         "rejected reads": "raw data",
         "raw data": "raw data",

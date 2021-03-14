@@ -76,7 +76,7 @@
                             ]
                         },
                         "biosample_term_id":{
-                            "pattern": "^(CL|NTR):[0-9]{2,8}$"
+                            "pattern": "^(CL|EFO|UBERON|CLO|NTR):[0-9]{2,8}$"
                         }
                     }
                 },
@@ -89,7 +89,7 @@
                             ]
                         },
                         "biosample_term_id":{
-                            "pattern": "^(EFO|NTR):[0-9]{2,8}$"
+                            "pattern": "^(EFO|NTR|CL|EFO|CLO|UBERON):[0-9]{2,8}$"
                         }
                     }
                 },
@@ -102,7 +102,7 @@
                             ]
                         },
                         "biosample_term_id":{
-                            "pattern": "^(CL|EFO|NTR):[0-9]{2,8}$"
+                            "pattern": "^(CL|EFO|NTR|EFO|CLO|UBERON):[0-9]{2,8}$"
                         }
                     }
                 },

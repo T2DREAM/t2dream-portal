@@ -28,18 +28,6 @@
         "accession": {
             "accessionType": "DO"
         },
-        "external_ids": {
-            "title": "Unique external identifiers",
-            "description": "External identifiers that uniquely identify the donor of the sample, e.g. for strains it might be a strain identifier at a repository or a de-identified donor ID for a person.",
-            "comment": "List of identifiers that are used by external resources that can be used to identify samples from that particular donor or strain.",
-            "type": "array",
-            "uniqueItems": true,
-            "items": {
-                "type": "string",
-                "description": "External identifier that uniquely identify the donor of the sample, e.g. for strains it might be a strain identifier at a repository or a de-identified donor ID for a person.",
-                "pattern": "^(BDSC:\\d+)$|^(NICHD:\\d+)$|^(CGC:[A-Z]{2,3}[0-9]+)$|^(PGP:hu[A-Z0-9]+)$|^(PromoCell:\\d+)$|^(BioChain:[A-Z0-9-]+)$|^(DSSC:[0-9.-]+)$|^(DGGR:\\d+)$|^(GEO:SAMN\\d+)$|^(MGI.D:[A-Za-z0-9]+)$|^(GTEx:[A-Z0-9-]+)$|^(FlyBase:FBst\\d+)$|^(JAX:\\d{6})$|^(NBRP:\\d+)$"
-            }
-        },
         "alternate_accessions": {
             "title": "Alternate accessions",
             "description": "Accessions previously assigned to objects that have been merged with this object.",
@@ -64,7 +52,6 @@
         }
     },
     "boost_values": {
-        "external_ids": 1.0,
         "aliases": 1.0,
         "accession": 1.0,
         "alternate_accessions": 1.0
