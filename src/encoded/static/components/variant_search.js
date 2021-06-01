@@ -270,7 +270,7 @@ class VariantSearch extends React.Component {
 	var chromosome = context['chromosome']
 	var start = context['start'] - 5000
 	var end = context['end'] + 5000
-	const domain = 'http://www.type2diabetesgenetics.org/variantInfo/variantInfo/';
+	const domain = 'https://hugeamp.org/variant.html?variant=';
 	const loggedIn = this.context.session && this.context.session['auth.userid'];
         const visualizeDisabled = total > visualizeLimit;
 
@@ -328,7 +328,18 @@ class VariantSearch extends React.Component {
                                                     : null}
                                                 </span>
                                             }
-
+		          {context['download_elements'] ?
+			        <DropdownButton title='Download Elements' label="downloadelements" wrapperClasses="results-table-button">
+			         <DropdownMenu>
+			         {context['download_elements'].map(link =>
+								   <a key={link} data-bypass="true" target="_blank" private-browsing="true" href={link}>
+								   {link.split('.').pop()}
+								   </a>
+								   )}
+			         </DropdownMenu>
+			         </DropdownButton>
+			         : null}
+		          <a className="btn btn-info btn-sm" target = "_blank" href = { `${domain}${kp}` }>Knowledge Portal</a>
                                         </div>
                                     </div>
 

@@ -560,7 +560,7 @@ def search_result_actions(request, doc_types, es_results, position=None):
     # batch download disabled for variant-search results
     if '/variant-search/' not in request.url:
         #if (doc_types == ['Experiment'] or doc_types == ['Annotation']) and any(
-        if (doc_types == ['Experiment']) and any(
+        if (doc_types == ['Experiment'] or doc_types == ['Annotation']) and any(
                 bucket['doc_count'] > 0
                 for bucket in aggregations['files-file_type']['files-file_type']['buckets']):
             actions['batch_download'] = request.route_url(

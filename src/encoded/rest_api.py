@@ -27,14 +27,10 @@ log = logging.getLogger(__name__)
 
 def includeme(config):
     config.add_route('peak_metadata', '/peak_metadata/{search_params}/{tsv}')
-    config.add_route('variant_graph_new', '/variant_graph_new/{search_params}/{json}')
-    config.add_route('variant_all_graph', '/variant_all_graph/{search_params}/{json}')
-    config.add_route('variant_table', '/variant_table/{search_params}/{json}')
     config.add_route('region_metadata', '/region_metadata/{search_params}/{tsv}')
     config.add_route('experiment_metadata', '/experiment_metadata/{search_params}/{json}')
     config.add_route('annotation_metadata', '/annotation_metadata/{search_params}/{tsv}')
-    config.add_route('target_gene_metadata', '/target_gene_metadata/{search_params}/{tsv}')
-    config.add_route('data_filters', '/data_filters/{search_params}/{tsv}')
+    config.add_route('annotation_registry_metadata', '/annotation_registry_metadata/{search_params}/{tsv}')
     config.scan(__name__)
 
 # includes concatenated properties
@@ -46,9 +42,14 @@ _tsv_mapping = OrderedDict([
     ('Annotation accession', ['accession']),
     ('Assay', ['assay_term_name']),
     ('Annotation', ['annotation_type']),
+    ('Annotation Category', ['annotation_category']),
     ('Assay Type', ['annotation_type_category']),
     ('Status', ['status']),
+    ('Version', ['schema_version']),
     ('Collection Tags',  ['collection_tags']),
+    ('Knowledge Portal Tissue Category', ['portal_tissue']),
+    ('KP usage', ['portal_usage']),
+    ('Tissue term id', ['tissue_term_id']),
     ('Biosample term id', ['biosample_term_id']),
     ('Biosample term name', ['biosample_term_name']),
     ('Biosample type', ['biosample_type']),
@@ -78,6 +79,7 @@ _tsv_mapping = OrderedDict([
     ('Library strand specific', ['replicates.library.strand_specificity']),
     ('Experiment date released', ['date_released']),
     ('Project', ['award.project']),
+    ('RFA', ['award.rfa']),
     ('RBNS protein concentration', ['files.replicate.rbns_protein_concentration', 'files.replicate.rbns_protein_concentration_units']),
     ('Library fragmentation method', ['files.replicate.library.fragmentation_method']),
     ('Library size range', ['files.replicate.library.size_range']),
@@ -91,6 +93,7 @@ _tsv_mapping = OrderedDict([
     ('Derived from', ['files.derived_from']),
     ('Size', ['files.file_size']),
     ('Lab', ['files.lab.title']),
+    ('Laboratory', ['lab.name']),
     ('md5sum', ['files.md5sum']),
     ('bed_file_state', ['files.bed_file_state']),
     ('bed_file_value', ['files.bed_file_value']),
@@ -102,6 +105,7 @@ _tsv_mapping = OrderedDict([
     ('Platform', ['files.platform.title']),
     ('Controlled by', ['files.controlled_by']),
     ('External Source', ['dbxrefs']),
+    ('Annotation Source', ['annotation_source']),
     ('Publications', ['references']),
     ('references_title',['references.title']),
     ('references_identifiers',['references.identifiers']), 
@@ -344,8 +348,8 @@ def peak_metadata(context, request):
                 assembly = '{}'.format(row['_type'])
                 start = int('{}'.format(hit['_source']['start']))
                 stop = int('{}'.format(hit['_source']['end']))
-                state = '{}'.format(hit['_source']['state'])
-                val = '{}'.format(hit['_source']['val'])
+                state = '{}'.format(hit['_source']['state_annotation'])
+                val = '{}'.format(hit['_source']['value_annotation'])
                 file_accession = file_json['accession']
                 annotation_accession = annotation_json['accession']
                 coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
@@ -387,289 +391,6 @@ def peak_metadata(context, request):
         body=fout.getvalue(),
         content_disposition='attachment;filename="%s"' % 'peak_download.tsv'
     )
-@view_config(route_name='variant_graph_new', request_method='GET')
-def variant_graph_new(context, request):
-    param_list = parse_qs(request.matchdict['search_params'])
-    param_list['field'] = []
-    param_list['limit'] = ['all']
-    path = '/variant-search/?{}&{}'.format(urlencode(param_list, True),'referrer=peak_metadata')
-    results = request.embed(path, as_user=True)
-    uuids_in_results = get_file_uuids(results)
-    rows = []
-    json_doc = {}
-    json_doc1 = {}
-    json_doc2 = {}
-    json_doc3 = {}
-    json_doc4 = {}
-    json_doc5 = {}
-    json_doc6 = {}
-    json_doc['nodes'] = []
-    json_doc1['nodes'] = []
-    json_doc2['nodes'] = []
-    json_doc['links'] = []
-    json_doc2['links'] = []
-    json_doc3['new_state'] = []
-    query = results['query']
-    biosample_check = []
-    biosamples_annotation_allelic = {}
-    biosamples_annotation_accessible = {}
-    biosamples_annotation_both = {}
-    biosample_annotation = {}
-    variant_coordinates = results['coordinates']
-    #variant node
-    json_doc['nodes'].append({'path':query,'id':query, 'color':'LightGrey', 'link':'region=' + query + '&genome=GRCh37','label':query, 'name': query, 'type':'rsid','biosample':'-', 'annotation_type':'-', 'accession_ids':'-', 'level': 1, 'state_len': 1.5, 'score': None, 'distance': None})
-    for row in results['peaks']:
-        if row['_id'] in uuids_in_results:
-            file_json = request.embed(row['_id'])
-            annotation_json = request.embed(file_json['dataset'])
-            biosample = annotation_json['biosample_term_name']
-            annotation = annotation_json['annotation_type']
-            if annotation in variant_allelic_effects:
-                if annotation in accessible_chromatin:
-                    if biosample not in biosamples_annotation_both:
-                        biosamples_annotation_both[biosample] = []
-                        biosamples_annotation_both[biosample].append(
-                            annotation
-                        )
-                    else:
-                        biosamples_annotation_both[biosample].append(
-                            annotation
-                        )
-            if annotation in variant_allelic_effects:
-                if biosample not in biosamples_annotation_allelic:
-                    biosamples_annotation_allelic[biosample] = []
-                    biosamples_annotation_allelic[biosample].append(
-                        annotation
-                    )
-                else:
-                    biosamples_annotation_allelic[biosample].append(
-                        annotation
-                    )
-            if annotation in accessible_chromatin:
-                if biosample not in biosamples_annotation_accessible:
-                    biosamples_annotation_accessible[biosample] = []
-                    biosamples_annotation_accessible[biosample].append(
-                        annotation
-                    )
-                else:
-                    biosamples_annotation_accessible[biosample].append(
-                        annotation
-                    )
-    #biosample node
-    for row in results['peaks']:
-        if row['_id'] in uuids_in_results:
-            file_json = request.embed(row['_id'])
-            annotation_json = request.embed(file_json['dataset'])
-            biosample = annotation_json['biosample_term_name']
-            annotation = annotation_json['annotation_type']
-            if annotation in target_gene_prediction_annotation:
-                if biosample in biosample_term_list:
-                    if biosample not in biosample_check:
-                        link_color = '#003399' if biosample in biosamples_annotation_allelic and biosamples_annotation_accessible else '#bfcce6' if biosample in biosamples_annotation_allelic else '#738fc7' if biosample in biosamples_annotation_accessible else '#BEBEBE'
-                        link = 'biosample_term_name=' + biosample
-                        label = 'allelic effect & accessible chromatin' if biosample in biosamples_annotation_allelic and biosamples_annotation_accessible else 'allelic effect' if biosample in biosamples_annotation_allelic else 'accessible chromatin' if biosample in biosamples_annotation_accessible else None
-                        width = 3 if biosample in biosamples_annotation_allelic and biosamples_annotation_accessible else 3 if biosample in biosamples_annotation_allelic else 3 if biosample in biosamples_annotation_accessible else 1
-                        json_doc['nodes'].append({'path': biosample, 'id': biosample, 'color': _biosample_color[biosample], 'link': 'biosample_term_name=' + biosample ,'label': biosample, 'name': biosample, 'type': 'biosample', 'biosample': biosample, 'annotation_type': '-', 'accession_ids': '-', "level": 2, 'state_len': 1, 'score': None, 'distance': None})
-                        json_doc['links'].append({'source': query, 'target': biosample, 'id': query + biosample, 'link_color': link_color, 'length': 30, 'linkout': link, 'label': label, 'width': width})
-                        biosample_check.append(biosample)
-            for hit in row['inner_hits']['positions']['hits']['hits']:
-                data_row = []
-                chrom = '{}'.format(row['_index'])
-                assembly = '{}'.format(row['_type'])
-                start = int('{}'.format(hit['_source']['start']))
-                stop = int('{}'.format(hit['_source']['end']))
-                state = '{}'.format(hit['_source']['state'])
-                new_state = state.split('_', 1)[-1].replace('.', '').upper()
-                val = '{}'.format(hit['_source']['val'])
-                file_accession = file_json['accession']
-                annotation_accession = annotation_json['accession']
-                coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
-                annotation = annotation_json['annotation_type']
-                biosample_type = annotation_json['biosample_type']
-                biosample_term = annotation_json['biosample_term_name']
-                annotation_list = []
-                state_list = []
-                new_state_annotation = new_state + '|' + annotation_accession
-                state_biosample = new_state + '|' +biosample_term
-                software = 'None' if annotation_json.get("software_used")== None else annotation_json["software_used"][0]["software"]["description"]
-                score = 'None' if annotation_json.get("val")==None  else val
-                #software_accession_score = software + annotation_accession + score 
-                if annotation in target_gene_prediction_annotation:
-                    if new_state not in json_doc1:
-                        json_doc1[new_state] = []
-                        json_doc1[new_state].append(
-                            annotation_accession
-                        )
-                    else:
-                        json_doc1[new_state].append(
-                            annotation_accession
-                        )
-                    if new_state not in json_doc3:
-                        json_doc3[new_state] = []
-                        json_doc3[new_state].append(
-                            new_state_annotation
-                        )
-                    else:
-                        json_doc3[new_state].append(
-                            new_state_annotation
-                        )
-                    if new_state not in json_doc4:
-                        json_doc4[new_state] = []
-                        json_doc4[new_state].append(
-                            annotation
-                        )
-                    else:
-                        json_doc4[new_state].append(
-                            annotation
-                        )
-                    if new_state not in json_doc5:
-                        json_doc5[new_state] = []
-                        json_doc5[new_state].append(
-                            val
-                        )
-                    else:
-                        json_doc5[new_state].append(
-                            val
-                        )
-            for hit in row['inner_hits']['positions']['hits']['hits']:
-                annotation = annotation_json['annotation_type']
-                if annotation in target_gene_prediction_annotation:
-                    data_row = []
-                    chrom = '{}'.format(row['_index'])
-                    assembly = '{}'.format(row['_type'])
-                    start = int('{}'.format(hit['_source']['start']))
-                    stop = int('{}'.format(hit['_source']['end']))
-                    state = '{}'.format(hit['_source']['state'])
-                    new_state = state.split('_', 1)[-1].replace('.', '').upper()
-                    val = '{}'.format(hit['_source']['val'])
-                    file_accession = file_json['accession']
-                    annotation_accession = annotation_json['accession']
-                    coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
-                    annotation = annotation_json['annotation_type']
-                    biosample_type = annotation_json['biosample_type']
-                    biosample_term = annotation_json['biosample_term_name']
-                    annotation_list = []
-                    state_list = []
-                    new_state_annotation = new_state + '|' + annotation_accession
-                    state_biosample = new_state + '|' +biosample_term
-                    target_gene_accession = list(set(json_doc1[new_state]))
-                    method = list(set(json_doc4[new_state]))
-                    #target gene predictions
-                    if new_state not in json_doc6:
-                        json_doc6[new_state] = []
-                        json_doc6[new_state].append(
-                            state.split(':', 1)[1]
-                            )
-                    else:
-                        json_doc6[new_state].append(
-                            state.split(':', 1)[1]
-                            )
-                    promoter = json_doc6[new_state]
-                    variant_gene_coordinates = variant_coordinates.split(':', 1)[1]
-                    variant_gene_first_coordinate = variant_gene_coordinates.split('-')[0]
-                    target_gene_first_coordinate = [i.split('-')[0] for i in promoter]
-                    distances = [str(abs(int(i) - int(variant_gene_first_coordinate))) for i in target_gene_first_coordinate]
-                    distance = ", ".join(distances)
-                    if biosample_term in biosample_term_list:
-                        state_count = (len(set(json_doc3[new_state])))
-                        #state_len = state_count + 0.7 if state_count <= 2 else 3.1 
-                        state_len = 2
-                        links = "&accession=".join(target_gene_accession)
-                        accession_ids = ", ".join(target_gene_accession)
-                        method = ", ".join(method)
-                        score = ", ".join(json_doc5[new_state])
-                        state_color = '#FFC0CB' if state_count == 1 else '#FF69B4' if state_count == 2 else '#DB7093' if state_count == 3 else '#C71585' 
-                        link_color = '#BEBEBE'
-                        json_doc['nodes'].append({'path': new_state, 'id': new_state, 'color': state_color, 'link': 'accession=' + links, 'label': new_state, 'name': 'accession: ' + accession_ids + '\n' + 'evidence: ' + method + '\n' + 'score: ' + score + '\n' +'distance: ' + distance,  'type':'annotation', 'biosample': biosample_term, 'annotation_type': annotation, 'accession_ids': accession_ids, 'level': 3, 'state_len': state_len, 'score': val, 'distance': distance}) 
-                        json_doc['links'].append({'source': biosample, 'link_color':link_color, 'target': new_state, 'id': biosample + new_state, 'length': 50, 'link':None, 'label': None, 'width': 1})
-                #unique by id (aka. unique by same state & same tissue/cell)
-                json_doc2['nodes'] = list({v['id']:v for v in json_doc['nodes']}.values())
-                #unique by source
-                json_doc2['links'] = list({v['id']:v for v in json_doc['links']}.values())
-    if 'variant_graph_new.json' in request.url:
-        return Response(
-            content_type='text/plain',
-            body=json.dumps(json_doc2,indent=2,sort_keys=True),
-        )
-
-@view_config(route_name='variant_all_graph', request_method='GET')
-def variant_all_graph(context, request):
-    param_list = parse_qs(request.matchdict['search_params'])
-    param_list['field'] = []
-    param_list['limit'] = ['all']
-    path = '/variant-search/?{}&{}'.format(urlencode(param_list, True),'referrer=peak_metadata')
-    results = request.embed(path, as_user=True)
-    uuids_in_results = get_file_uuids(results)
-    rows = []
-    json_doc = {}
-    json_doc1 = {}
-    json_doc2 = {}
-    json_doc3 = {}
-    json_doc['nodes'] = []
-    json_doc1['nodes'] = []
-    json_doc2['nodes'] = []
-    json_doc3['nodes'] = []
-    query = results['query']
-    biosample_check = []
-    for row in results['peaks']:
-        if row['_id'] in uuids_in_results:
-            file_json = request.embed(row['_id'])
-            annotation_json = request.embed(file_json['dataset'])
-            biosample = annotation_json['biosample_term_name']
-            for hit in row['inner_hits']['positions']['hits']['hits']:
-                data_row = []
-                chrom = '{}'.format(row['_index'])
-                assembly = '{}'.format(row['_type'])
-                start = int('{}'.format(hit['_source']['start']))
-                stop = int('{}'.format(hit['_source']['end']))
-                state = '{}'.format(hit['_source']['state'])
-                new_state = re.sub(r'\d+[_]','',state) if re.match(r'\d+[_]', state) else state
-                harmonized_state = _states_maps[new_state] if new_state in _states_maps else state
-                val = '{}'.format(hit['_source']['val'])
-                file_accession = file_json['accession']
-                annotation_accession = annotation_json['accession'] 
-                coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
-                annotation = annotation_json['annotation_type']
-                biosample_type = annotation_json['biosample_type']
-                biosample_term = annotation_json['biosample_term_name']
-                annotation_list = []
-                state_list = []
-                state_biosample = harmonized_state + '|' +biosample_term
-                #annotation_accession_score = annotation_accession + '(' + val + ')' 
-                if state_biosample not in json_doc1:
-                    json_doc1[state_biosample] = []
-                    json_doc1[state_biosample].append(
-                        annotation_accession
-                        )
-                else:
-                    json_doc1[state_biosample].append(
-                        annotation_accession
-                        )
-                if state_biosample not in json_doc3:
-                    json_doc3[state_biosample] = []
-                    json_doc3[state_biosample].append(
-                        val
-                        )
-                else:
-                    json_doc3[state_biosample].append(
-                        val
-                        )
-                accession_ids = ", ".join(json_doc1[state_biosample])
-                score = ",".join(json_doc3[state_biosample])
-                table_id = state + ',' + biosample_term + ',' + annotation +  ',' + accession_ids
-                if harmonized_state in _high_states or annotation == 'accessible chromatin' or annotation == 'variant allelic effects' or annotation == 'Coaccessible target genes' or annotation == 'Chromatin interaction target genes' or annotation == 'binding sites' or annotation == 'gene expression' or annotation == 'eQTL':
-                    if biosample_term in biosample_term_list:                    
-                        links = "&accession=".join(json_doc1[state_biosample])
-                        accession_ids = ", ".join(json_doc1[state_biosample])
-                        score = ",".join(json_doc3[state_biosample])
-                        json_doc['nodes'].append({'id':state_biosample, 'link': 'accession=' + links, 'label': state, 'biosample':biosample_term, 'annotation_type':annotation, 'accession_ids':accession_ids, 'table_id': table_id, 'score': score }) 
-                #unique by id (aka. unique by same state & same tissue/cell)
-                json_doc2['nodes'] = list({v['id']:v for v in json_doc['nodes']}.values())
-    if 'variant_all_graph.json' in request.url:
-        return Response(
-            content_type='text/plain',
-            body=json.dumps(json_doc2,indent=2,sort_keys=True),
-        )
 @view_config(route_name='region_metadata', request_method='GET')
 def region_metadata(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
@@ -691,8 +412,8 @@ def region_metadata(context, request):
                 assembly = '{}'.format(row['_type'])
                 start = int('{}'.format(hit['_source']['start']))
                 stop = int('{}'.format(hit['_source']['end']))
-                state = '{}'.format(hit['_source']['state'])
-                val = '{}'.format(hit['_source']['val'])
+                state = '{}'.format(hit['_source']['state_annotation'])
+                val = '{}'.format(hit['_source']['value_annotation'])
                 file_accession = file_json['accession']
                 annotation_accession = annotation_json['accession']
                 coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
@@ -819,25 +540,16 @@ def annotation_metadata(context, request):
     json_doc = {}
     for annotation_json in results['@graph']:
         files = {}
-        for f in annotation_json['files']:
+        for f in annotation_json.get('files', []):
             title = f['title']
-            #log.warn(title)
             md5sum = f['md5sum']
-            #log.warn(md5sum)
             date_created = f['date_created']
             lab = f['lab']['title']
             href = request.host_url + f['href']
             status = f['status']
             assembly = f['assembly']
-            state_key = 'bed_file_state'
-            value_key = 'bed_file_value'
-            if state_key and value_key in f:
-                state_descriptor = f['bed_file_state']
-                value_descriptor = f['bed_file_value']
-            else:
-                state_descriptor = 'none'
-                value_descriptor = 'none'
-            if f['file_format'] == 'bed' and f['status'] != 'archived' and f['assembly'] != 'GRCh38':
+            output_type = f['output_type']
+            if f['file_format'] == 'bed' or f['file_format'] == 'tsv' and f['status'] != 'archived':
                 if title not in files:
                     files[title] = []
                     files[title].append({
@@ -847,8 +559,7 @@ def annotation_metadata(context, request):
                         'files_status': status,
                         'files_lab': lab,
                         'files_assembly': assembly,
-                        'files_value_descriptor': value_descriptor,
-                        'files_state_descriptor': state_descriptor
+                        'output_type': output_type
                     })
                 else:
                     files[title].append({
@@ -858,8 +569,7 @@ def annotation_metadata(context, request):
                         'files_status': status,
                         'files_lab': lab,
                         'files_assembly': assembly,
-                        'files_value_descriptor': value_descriptor,
-                        'files_state_descriptor': state_descriptor
+                        'output_type': output_type
                     })
         references = []
         for r in annotation_json['references']:
@@ -870,7 +580,7 @@ def annotation_metadata(context, request):
                 identifiers = []
             references.extend(identifiers)
         documents = {}
-        for d in annotation_json['documents']:
+        for d in annotation_json.get('documents', []):
             href = request.host_url + d['attachment']['href']
             md5sum = d['attachment']['md5sum']
             description = d['description']
@@ -894,60 +604,66 @@ def annotation_metadata(context, request):
         annotation_id = annotation_json['accession']
         project = annotation_json['award']['project']
         annotation_type = annotation_json['annotation_type']
-        dataset_status = annotation_json['status']
+        status = annotation_json['status']
+        version = annotation_json['schema_version']
+        portal_tissue = None if annotation_json.get('portal_tissue')== None else annotation_json['portal_tissue']
+        assay_type = annotation_json.get("annotation_type_category", None)
         collection_tags = None if annotation_json.get('collection_tags')== None else annotation_json['collection_tags']
         software = None if annotation_json.get("software_used")== None else annotation_json["software_used"][0]["software"]["title"]
         biosample_term_name = annotation_json.get("biosample_term_name", None)
-        biosample_synonyms = annotation_json['biosample_synonyms'] if 'biosample_synonyms' in annotation_json else None
-        system_slims = annotation_json['system_slims'] if 'system_slims' in annotation_json else None
-        organ_slims = annotation_json['organ_slims'] if 'organ_slims' in annotation_json else None
         biosample_type = annotation_json.get("biosample_type", None)
-        #publication = None if annotation_json.get("references")== None else annotation_json['references']['identifiers']
+        portal_tissue_id = annotation_json['tissue_term_id'] if 'tissue_term_id' in annotation_json else None
         biosample_term_id = annotation_json['biosample_term_id'] if 'biosample_term_id' in annotation_json else None
         dbxrefs = annotation_json['dbxrefs']
-        harmonized_states = varshney_chromhmm_states if dbxrefs == ['dbGaP:phs001188.v1.p1'] and dbxrefs != ['ENCODE:ENCSR123'] else None  if annotation_type != 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else roadmap_chromhmm_states  
-        #harmonized_states = roadmap_chromhmm_states if annotation_type == 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else None  if annotation_type != 'chromatin state' and dbxrefs != ['ENCODE:ENCSR123'] else varshney_chromhmm_states  
+        annotation_source = None if annotation_json.get('annotation_source')== None else annotation_json['annotation_source']
+        annotation_category = annotation_json['annotation_category'] if 'annotation_category' in annotation_json else 'Others'
+        portal_usage = None if annotation_json.get('portal_usage')== None else annotation_json['portal_usage']
+        #publication = None if annotation_json.get("references")== None else annotation_json['references']['identifiers']
         if files:
-            if annotation_type not in json_doc:
-                json_doc[annotation_type] = []
-                json_doc[annotation_type].append({
+            if version not in json_doc:
+                json_doc[version] = []
+                json_doc[version].append({
                     'annotation_type': annotation_type,
                     'annotation_id': annotation_id,
                     'dbxrefs': dbxrefs,
                     'biosample_term_id': biosample_term_id,
                     'biosample_term_name': biosample_term_name,
-                    'biosample_synonyms': biosample_synonyms,
                     'biosample_type': biosample_type,
-                    'organ_slims': organ_slims,
                     'project': project,
-                    'system_slims': system_slims,
-                    'harmonized_states': harmonized_states,
                     'file_download': files,
                     'documents': documents,
                     'annotation_method': software,
-                    'dataset_status': dataset_status,
+                    'dataset_status': status,
                     'collection_tags': collection_tags,
-                    'publications': references
+                    'portal_tissue': portal_tissue,
+                    'portal_tissue_id': portal_tissue_id,
+                    'underlying_assay': assay_type,
+                    'publications': references,
+                    'annotation_source': annotation_source,
+                    'annotation_category': annotation_category,
+                    'portal_usage': portal_usage
                 })  
             else:
-                json_doc[annotation_type].append({
+                json_doc[version].append({
                     'annotation_type': annotation_type,
                     'annotation_id': annotation_id,
                     'dbxrefs': dbxrefs,
                     'project': project,
                     'biosample_term_id': biosample_term_id,
                     'biosample_term_name': biosample_term_name,
-                    'biosample_synonyms': biosample_synonyms,
                     'biosample_type': biosample_type,
-                    'organ_slims': organ_slims,
-                    'system_slims':system_slims,
-                    'harmonized_states': harmonized_states,
                     'file_download': files,
-                    'documnents': documents,
+                    'documents': documents,
                     'annotation_method': software,
                     'dataset_status': status,
+                    'portal_tissue': portal_tissue,
+                    'portal_tissue_id':portal_tissue_id,
+                    'underlying_assay':assay_type,
                     'collection_tags': collection_tags,
-                    'publications': references
+                    'publications': references,
+                    'annotation_source': annotation_source,
+                    'annotation_category': annotation_category,
+                    'portal_usage': portal_usage
                     })             
     if 'annotation_metadata.json' in request.url:
         return Response(
@@ -955,8 +671,8 @@ def annotation_metadata(context, request):
             body=json.dumps(json_doc,indent=2,sort_keys=True),
             content_disposition='attachment;filename="%s"' % 'annotation_metadata.json'
     )
-@view_config(route_name= 'target_gene_metadata', request_method='GET')
-def target_gene_metadata(context, request):
+@view_config(route_name= 'annotation_registry_metadata', request_method='GET')
+def annotation_registry_metadata(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
     if 'referrer' in param_list:
         search_path = '/{}/'.format(param_list.pop('referrer')[0])
@@ -973,31 +689,6 @@ def target_gene_metadata(context, request):
     results = request.embed(path, as_user=True)
     json_doc = {}
     for annotation_json in results['@graph']:
-        files = {}
-        for f in annotation_json['files']:
-            title = f['title']
-            md5sum = f['md5sum']
-            date_created = f['date_created']
-            lab = f['lab']['title']
-            href = request.host_url + f['href']
-            status = f['status']
-            assembly = f['assembly']
-            if f['file_format'] == 'bed' and f['status'] != 'archived' and f['assembly'] != 'GRCh38':
-                if title not in files:
-                    files[title] = []
-                    files[title].append({
-                        'files_href': href,
-                        'files_status': status,
-                        'files_lab': lab,
-                        'files_assembly': assembly,
-                    })
-                else:
-                    files[title].append({
-                        'files_href': href,
-                        'files_status': status,
-                        'files_lab': lab,
-                        'files_assembly': assembly,
-                    })
         references = []
         for r in annotation_json['references']:
             identifier = 'identifiers'
@@ -1007,64 +698,74 @@ def target_gene_metadata(context, request):
                 identifiers = []
             references.extend(identifiers)
         annotation_id = annotation_json['accession']
-        assay_type = annotation_json.get("annotation_type_category", None)
+        project = annotation_json['award']['project']
         annotation_type = annotation_json['annotation_type']
+        status = annotation_json['status']
+        lab = annotation_json['lab']['name']
+        version = annotation_json['schema_version']
+        portal_tissue = None if annotation_json.get('portal_tissue')== None else annotation_json['portal_tissue']
+        assay_type = annotation_json.get("annotation_type_category", None)
+        rfa = annotation_json['award']['rfa']
+        collection_tags = None if annotation_json.get('collection_tags')== None else annotation_json['collection_tags']
         software = None if annotation_json.get("software_used")== None else annotation_json["software_used"][0]["software"]["title"]
         biosample_term_name = annotation_json.get("biosample_term_name", None)
+        biosample_type = annotation_json.get("biosample_type", None)
+        portal_tissue_id = annotation_json['tissue_term_id'] if 'tissue_term_id' in annotation_json else None
         biosample_term_id = annotation_json['biosample_term_id'] if 'biosample_term_id' in annotation_json else None
         dbxrefs = annotation_json['dbxrefs']
-        if annotation_type == 'target gene predictions' or annotation_type == 'Coaccessible target genes':
-            if annotation_type not in json_doc:
-                json_doc[annotation_type] = []
-                json_doc[annotation_type].append({
+        annotation_source = None if annotation_json.get('annotation_source')== None else annotation_json['annotation_source']
+        annotation_category = annotation_json['annotation_category'] if 'annotation_category' in annotation_json else 'Others'
+        portal_usage = None if annotation_json.get('portal_usage')== None else annotation_json['portal_usage']
+        #publication = None if annotation_json.get("references")== None else annotation_json['references']['identifiers']
+        if rfa == 'AMP2' and status != 'deleted':
+            if version not in json_doc:
+                json_doc[version] = []
+                json_doc[version].append({
                     'annotation_type': annotation_type,
                     'annotation_id': annotation_id,
                     'dbxrefs': dbxrefs,
+                    'project': project,
+                    'lab': lab,
+                    'rfa': rfa,
+                    'biosample_term_id': biosample_term_id,
                     'biosample_term_name': biosample_term_name,
-                    'assay_type': assay_type,
+                    'biosample_type': biosample_type,
                     'annotation_method': software,
-                    'publications': references
+                    'dataset_status': status,
+                    'collection_tags': collection_tags,
+                    'portal_tissue': portal_tissue,
+                    'portal_tissue_id': portal_tissue_id,
+                    'underlying_assay': assay_type,
+                    'publications': references,
+                    'annotation_source': annotation_source,
+                    'annotation_category': annotation_category,
+                    'portal_usage': portal_usage
                 })  
             else:
-                json_doc[annotation_type].append({
+                json_doc[version].append({
                     'annotation_type': annotation_type,
                     'annotation_id': annotation_id,
                     'dbxrefs': dbxrefs,
+                    'project': project,
+                    'lab': lab,
+                    'rfa': rfa,
+                    'biosample_term_id': biosample_term_id,
                     'biosample_term_name': biosample_term_name,
-                    'assay_type': assay_type,
+                    'biosample_type': biosample_type,
                     'annotation_method': software,
-                    'publications': references
+                    'dataset_status': status,
+                    'portal_tissue': portal_tissue,
+                    'portal_tissue_id':portal_tissue_id,
+                    'underlying_assay':assay_type,
+                    'collection_tags': collection_tags,
+                    'publications': references,
+                    'annotation_source': annotation_source,
+                    'annotation_category': annotation_category,
+                    'portal_usage': portal_usage
                     })             
-    if 'target_gene_metadata.json' in request.url:
+    if 'annotation_registry_metadata.json' in request.url:
         return Response(
             content_type='text/plain',
             body=json.dumps(json_doc,indent=2,sort_keys=True),
+            content_disposition='attachment;filename="%s"' % 'annotation_registry_metadata.json'
     )
-
-@view_config(route_name='data_filters', request_method='GET')
-def data_filters(context, request):
-    param_list = parse_qs(request.matchdict['search_params'])
-    if 'referrer' in param_list:
-        search_path = '/{}/'.format(param_list.pop('referrer')[0])
-    else:
-        search_path = '/search/'
-    param_list['field'] = []
-    param_list['limit'] = ['all']
-    path = '{}?{}'.format(search_path, urlencode(param_list, True))
-    results = request.embed(path, as_user=True)
-    json_doc = {}
-    for dataFilter_json in results['facets']:
-        field = dataFilter_json['field']
-        for term in dataFilter_json['terms']:
-            if term['doc_count'] != 0:
-                if field not in json_doc:
-                    json_doc[field] = []
-                    json_doc[field].append({term['key']:term['doc_count']})
-                else:
-                    json_doc[field].append({term['key']:term['doc_count']})
-    if 'data_filters.json' in request.url:
-        return Response(
-            content_type='text/plain',
-            body=json.dumps(json_doc,indent=2,sort_keys=True),
-            content_disposition='attachment;filename="%s"' % 'data_filters.json'
-        )

@@ -15,7 +15,9 @@ import csv
 import io
 import json
 import datetime
-
+import logging
+import re
+log = logging.getLogger(__name__)
 currenttime = datetime.datetime.now()
 
 
@@ -33,7 +35,9 @@ _tsv_mapping = OrderedDict([
     ('File format', ['files.file_type']),
     ('Output type', ['files.output_type']),
     ('Experiment accession', ['accession']),
+    ('Annotation accession', ['accession']),
     ('Assay', ['assay_term_name']),
+    ('Annotation', ['annotation_type']),
     ('Biosample term id', ['biosample_term_id']),
     ('Biosample term name', ['biosample_term_name']),
     ('Biosample type', ['biosample_type']),
@@ -74,6 +78,7 @@ _tsv_mapping = OrderedDict([
     ('Lab', ['files.lab.title']),
     ('md5sum', ['files.md5sum']),
     ('dbxrefs', ['files.dbxrefs']),
+    ('file_format', ['files.file_format']),
     ('File download URL', ['files.href']),
     ('Assembly', ['files.assembly']),
     ('Platform', ['files.platform.title']),
@@ -173,7 +178,7 @@ def make_audit_cell(header_column, experiment_json, file_json):
 def peak_download(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
     param_list['field'] = []
-    header = ['assay_term_name', 'coordinates', 'target.label', 'biosample.accession', 'file.accession', 'experiment.accession']
+    header = ['annotation_type', 'coordinates', 'biosample.accession', 'file.accession', 'annotation.accession']
     param_list['limit'] = ['all']
     path = '/variant-search/?{}&{}'.format(urlencode(param_list, True),'referrer=peak_download')
     results = request.embed(path, as_user=True)
@@ -183,33 +188,18 @@ def peak_download(context, request):
     for row in results['peaks']:
         if row['_id'] in uuids_in_results:
             file_json = request.embed(row['_id'])
-            experiment_json = request.embed(file_json['dataset'])
+            annotation_json = request.embed(file_json['dataset'])
             for hit in row['inner_hits']['positions']['hits']['hits']:
                 data_row = []
+                chrom = '{}'.format(row['_index'])
+                assembly = '{}'.format(row['_type'])
                 coordinates = '{}:{}-{}'.format(row['_index'], hit['_source']['start'], hit['_source']['end'])
                 file_accession = file_json['accession']
-                experiment_accession = experiment_json['accession']
-                assay_name = experiment_json['assay_term_name']
-                target_name = experiment_json.get('target', {}).get('label') # not all experiments have targets
-                biosample_accession = get_biosample_accessions(file_json, experiment_json)
-                data_row.extend([assay_name, coordinates, target_name, biosample_accession, file_accession, experiment_accession])
+                annotation_accession = annotation_json['accession']
+                annotation = annotation_json['annotation_type']
+                biosample_term = annotation_json['biosample_term_name']
+                data_row.extend([annotation, biosample_term, coordinates, file_accession, annotation_accession])
                 rows.append(data_row)
-                if assay_name not in json_doc:
-                    json_doc[assay_name] = []
-                else:
-                    json_doc[assay_name].append({
-                        'coordinates': coordinates,
-                        'target.name': target_name,
-                        'biosample.accession': list(biosample_accession.split(', ')),
-                        'file.accession': file_accession,
-                        'experiment.accession': experiment_accession
-                    })
-    if 'peak_metadata.json' in request.url:
-        return Response(
-            content_type='text/plain',
-            body=json.dumps(json_doc),
-            content_disposition='attachment;filename="%s"' % 'peak_metadata.json'
-        )
     fout = io.StringIO()
     writer = csv.writer(fout, delimiter='\t')
     writer.writerow(header)
@@ -241,7 +231,8 @@ def metadata_tsv(context, request):
     results = request.embed(path, as_user=True)
     rows = []
     for experiment_json in results['@graph']:
-        if experiment_json['files']:
+        #log.warn(results['@graph'])
+        for f in experiment_json.get('files', []):
             exp_data_row = []
             for column in header:
                 if not _tsv_mapping[column][0].startswith('files'):

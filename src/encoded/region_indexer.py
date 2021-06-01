@@ -54,22 +54,22 @@ ENCODED_ALLOWED_STATUSES = ['released', 'uploading']
 RESIDENT_REGIONSET_KEY = 'resident_regionsets'  # in regions_es, keeps track of what datsets are resident in one place
 
 ENCODED_REGION_REQUIREMENTS = {
-    'chromatin state': {
-        'output_type': ['semi-automated genome annotation'],
-        'file_format': ['bed']
-    },
-    'accessible chromatin': {
-        'output_type': ['peaks'],
-        'file_format': ['bed']
-        },
-    'eQTL': {
-        'file_type': ['bed bed3+'],
-        'file_format': ['bed']
-        },
-    'target gene predictions': {
-        'file_type': ['bed bed3+'],
-        'file_format': ['bed']
-        }            
+    #'chromatin state': {
+    #    'output_type': ['semi-automated genome annotation'],
+    #    'file_format': ['bed']
+    #}
+    #'accessible chromatin': {
+    #    'output_type': ['peaks'],
+    #    'file_format': ['bed']
+    #    }
+    #'eQTL': {
+    #    'file_type': ['bed bed3+'],
+    #    'file_format': ['bed']
+    #    }
+    #'target gene predictions': {
+    #    'file_type': ['bed bed3+'],
+    #    'file_format': ['bed']
+    #    }            
 }
 
 # On local instance, these are the only files that can be downloaded and regionalizable.  Currently only one is!
@@ -623,7 +623,7 @@ class RegionIndexer(Indexer):
         r.release_conn()
 
         file_data = {}
-        if afile['file_format'] == 'bed':
+        if afile['file_format'] == 'bed' and afile['uuid'] != '45aac1a8-9fe5-4475-88f4-a49ad811eed3' and afile['uuid'] != '309cea9e-2f4f-4e65-91d7-27cbf5d880ad' and afile['uuid'] != '46200779-a9af-4ebc-9af8-6a3bd42f13d7' and afile['uuid'] != 'eb32e0b8-569c-4bcf-9da7-500c0152908a':
             # NOTE: requests doesn't require gzip but http.request does.
             with gzip.open(file_in_mem, mode='rt') as file:  # localhost:8000 would not require localhost
                 for row in tsvreader(file):
