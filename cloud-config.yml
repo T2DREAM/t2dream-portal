@@ -194,6 +194,9 @@ runcmd:
 - cd /srv/encoded
 - sudo -u encoded git clone --no-checkout https://github.com/T2DREAM/t2dream-portal.git .
 - sudo -u encoded git checkout %(COMMIT)s
+- sudo add-apt-repository ppa:fkrull/deadsnakes-python2.7
+- sudo apt-get update
+- sudo apt-get install python2.7
 - mkdir /opt/cloudwatchmon
 - chown build:build /opt/cloudwatchmon
 - sudo -u build virtualenv --python=python2.7 /opt/cloudwatchmon
