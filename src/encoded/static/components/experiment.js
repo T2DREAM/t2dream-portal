@@ -581,11 +581,12 @@ class ExperimentComponent extends React.Component {
                                     <ProjectBadge award={context.award} addClasses="badge-heading" />
                                 </div>
                                 <dl className="key-value">
+                                    {context.lab.length ?
                                     <div data-test="lab">
                                         <dt>Lab</dt>
-                                        <dd>{context.lab.title}</dd>
+                                        <dd><DbxrefList context={context} dbxrefs={context.lab.title} /></dd>
                                     </div>
-
+                                    : null}
                                     <AwardRef context={context} adminUser={adminUser} />
 
                                     <div data-test="project">

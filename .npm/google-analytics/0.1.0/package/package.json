@@ -1,0 +1,1 @@
+{"name":"google-analytics","version":"0.1.0","description":"","main":"index.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"","license":"MIT","readme":"ERROR: No README data found!","_id":"google-analytics@0.1.0","_shasum":"1e8c6dcf1bc1e58ea8ef10518f07a724252eb220","_from":"node_shims/google-analytics","_resolved":"file:node_shims/google-analytics"}

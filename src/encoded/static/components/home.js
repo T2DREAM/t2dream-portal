@@ -178,7 +178,7 @@ class AssayClicking extends React.Component {
 		        <p></p>
 		 </div>
                             <div className="site-banner-intro-content">
-				<p style={{'margin': '20px'}}>The Diabetes Epigenome Atlas project collects and provides data on the human genome and epigenome to facilitate genetic studies of type 2 diabetes and its complications.  This resource is a component of the AMP T2D consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of researchers.</p>
+				<p style={{'margin': '20px'}}>This resource provides data on the human genome and epigenome to facilitate genetic studies of common metabolic disease risk as part of the AMP CMD consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of academic and industry partners.</p>
                             </div>
                         </div>
 		       <div className="site-banner-search">	       

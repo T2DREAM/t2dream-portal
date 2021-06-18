@@ -69,7 +69,7 @@ ENCODED_REGION_REQUIREMENTS = {
     #'target gene predictions': {
     #    'file_type': ['bed bed3+'],
     #    'file_format': ['bed']
-    #    }            
+    #   }
 }
 
 # On local instance, these are the only files that can be downloaded and regionalizable.  Currently only one is!

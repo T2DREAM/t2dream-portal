@@ -409,11 +409,11 @@
         },
         "lab.title": {
             "title": "Lab",
-            "type": "string"
+            "type": "array"
         },
         "award.project": {
             "title": "Project",
-            "type": "string"
+            "type": "array"
         },
         "status": {
             "title": "Status",
