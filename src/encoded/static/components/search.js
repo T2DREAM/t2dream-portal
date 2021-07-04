@@ -21,6 +21,7 @@ const types = {
     annotation: { title: 'Annotation file set' },
     antibody_lot: { title: 'Antibodies' },
     biosample: { title: 'Biosamples' },
+    embedding: { title: 'Embeddings file set' },
     experiment: { title: 'Experiments' },
     target: { title: 'Targets' },
     dataset: { title: 'Datasets' },
@@ -42,7 +43,6 @@ const types = {
 };
 
 const datasetTypes = {
-    Annotation: types.annotation.title,
     Dataset: types.dataset.title,
     MatchedSet: types.matched_set.title,
     OrganismDevelopmentSeries: types.organism_development_series.title,

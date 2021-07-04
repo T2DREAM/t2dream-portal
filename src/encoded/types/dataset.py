@@ -334,8 +334,35 @@ class Annotation(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms,
     })
     def superseded_by(self, request, superseded_by):
         return paths_filtered_by_status(request, superseded_by)
-
-
+@collection(
+    name='embedding',
+    unique_key='accession',
+    properties={
+        'title': "Embeddings file set",
+        'description': 'A set of embeddings files produced by DGA.',
+    })
+class Embedding(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, CalculatedVisualize):
+    item_type = 'embedding'
+    schema = load_schema('encoded:schemas/embedding.json')
+    embedded = FileSet.embedded + [
+        'software_used',
+        'software_used.software',
+        'organism',
+        'targets',
+        'datasets',
+        'files.dataset',
+        'files.analysis_step_version.analysis_step',
+        'files.analysis_step_version.analysis_step.pipelines',
+        'files.analysis_step_version.analysis_step.versions',
+        'files.analysis_step_version.analysis_step.versions.software_versions',
+        'files.analysis_step_version.analysis_step.versions.software_versions.software',
+        'files.analysis_step_version.software_versions',
+        'files.analysis_step_version.software_versions.software',
+        'files.quality_metrics',
+        'files.quality_metrics.step_run',
+        'files.quality_metrics.step_run.analysis_step_version.analysis_step',
+        'files.replicate.library',
+    ]
 @collection(
     name='publication-data',
     unique_key='accession',

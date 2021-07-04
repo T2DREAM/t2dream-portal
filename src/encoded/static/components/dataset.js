@@ -42,6 +42,28 @@ export function annotationBiosampleSummary(annotation) {
     return null;
 }
 
+export function embeddingsBiosampleSummary(embedding) {
+    const organismName = (embedding.organism && embedding.organism.scientific_name) ? <i>{embedding.organism.scientific_name}</i> : null;
+    const lifeStageString = (embedding.relevant_life_stage && embedding.relevant_life_stage !== 'unknown') ? <span>{embedding.relevant_life_stage}</span> : null;
+    const timepointString = embedding.relevant_timepoint ? <span>{embedding.relevant_timepoint + (embedding.relevant_timepoint_units ? ` ${embedding.relevant_timepoint_units}` : '')}</span> : null;
+
+    // Build an array of strings we can join, not including empty strings
+    const summaryStrings = _.compact([organismName, lifeStageString, timepointString]);
+
+    if (summaryStrings.length) {
+        return (
+            <span className="biosample-summary">
+                {summaryStrings.map((summaryString, i) =>
+                    <span key={i}>
+                        {i > 0 ? <span>{', '}{summaryString}</span> : <span>{summaryString}</span>}
+                    </span>,
+                )}
+            </span>
+        );
+    }
+    return null;
+}
+
 
 // Break the given camel-cased name into space-separated words just before the interior capital letters.
 function breakSetName(name) {
@@ -273,7 +295,251 @@ AnnotationComponent.contextTypes = {
 const Annotation = auditDecor(AnnotationComponent);
 
 globals.contentViews.register(Annotation, 'Annotation');
+// Display Embeddings page, a subtype of Dataset.
+class EmbeddingComponent extends React.Component {
+    render() {
+        const context = this.props.context;
+        const itemClass = globals.itemClass(context, 'view-item');
+        const adminUser = !!(this.context.session_properties && this.context.session_properties.admin);
 
+        const statuses = [{ status: context.status, title: 'Status' }];
+
+        // Build up array of documents attached to this dataset
+        const datasetDocuments = (context.documents && context.documents.length) ? context.documents : [];
+
+        // Make a biosample summary string
+        const biosampleSummary = annotationBiosampleSummary(context);
+
+        // Determine this experiment's ENCODE version
+        const encodevers = globals.encodeVersion(context);
+
+        // Set up the breadcrumbs
+        const datasetType = context['@type'][1];
+        const filesetType = context['@type'][0];
+        const crumbs = [
+            { id: 'Datasets' },
+            { id: datasetType, uri: `/search/?type=${datasetType}`, wholeTip: `Search for ${datasetType}` },
+            { id: breakSetName(filesetType), uri: `/search/?type=${filesetType}`, wholeTip: `Search for ${filesetType}` },
+        ];
+
+        // Make array of superseded_by accessions
+        let supersededBys = [];
+        if (context.superseded_by && context.superseded_by.length) {
+            supersededBys = context.superseded_by.map(supersededBy => globals.atIdToAccession(supersededBy));
+        }
+
+        // Make array of supersedes accessions
+        let supersedes = [];
+        if (context.supersedes && context.supersedes.length) {
+            supersedes = context.supersedes.map(supersede => globals.atIdToAccession(supersede));
+        }
+
+        // Get a list of reference links, if any
+        const references = pubReferenceList(context.references);
+
+        // Render tags badges
+        let tagBadges;
+        if (context.internal_tags && context.internal_tags.length) {
+            tagBadges = context.internal_tags.map(tag => <img src={`/static/img/tag-${tag}.png`} alt={`${tag} tag`} />);
+        }
+
+        return (
+            <div className={itemClass}>
+                <header className="row">
+                    <div className="col-sm-12">
+                        <Breadcrumbs crumbs={crumbs} />
+                        <h2>Summary for embeddings file set {context.accession}</h2>
+                        <AlternateAccession altAcc={context.alternate_accessions} />
+                        {supersededBys.length ? <h4 className="superseded-acc">Superseded by {supersededBys.join(', ')}</h4> : null}
+                        {supersedes.length ? <h4 className="superseded-acc">Supersedes {supersedes.join(', ')}</h4> : null}
+                        <div className="status-line">
+                            <div className="characterization-status-labels">
+                                <StatusLabel status={statuses} />
+                            </div>
+                            {this.props.auditIndicators(context.audit, 'embedding-audit', { session: this.context.session })}
+                        </div>
+                    </div>
+                </header>
+                {this.props.auditDetail(context.audit, 'embedding-audit', { session: this.context.session, except: context['@id'] })}
+                <Panel addClasses="data-display">
+                    <PanelBody addClasses="panel-body-with-header">
+                        <div className="flexrow">
+                            <div className="flexcol-sm-6">
+                                <div className="flexcol-heading experiment-heading"><h4>Summary</h4></div>
+                                <dl className="key-value">
+                                    <div data-test="accession">
+                                        <dt>Accession</dt>
+                                        <dd>{context.accession}</dd>
+                                    </div>
+
+                                    {context.description ?
+                                        <div data-test="description">
+                                            <dt>Description</dt>
+                                            <dd>{context.description}</dd>
+                                        </div>
+                                    : null}
+
+                                    {context.biosample_term_name || biosampleSummary ?
+                                        <div data-test="biosample">
+                                            <dt>Biosample summary</dt>
+                                            <dd>
+                                                <DbxrefList context={context.biosample_term_name} dbxrefs={context.biosample_term_name} />
+                                                {context.biosample_term_name ? <span>{' '}</span> : null}
+                                                {biosampleSummary ? <span>({biosampleSummary})</span> : null}
+                                            </dd>
+                                        </div>
+                                    : null}
+
+                                    {context.biosample_type ?
+                                        <div data-test="biosampletype">
+                                            <dt>Biosample type</dt>
+                                            <dd><DbxrefList context={context.biosample_type} dbxrefs={context.biosample_type} /></dd>
+                                        </div>
+                                    : null}
+                                    {context.organism ?
+                                        <div data-test="organism">
+                                            <dt>Organism</dt>
+                                            <dd>{context.organism.name}</dd>
+                                        </div>
+                                    : null}
+
+                                    {context.embeddings_type ?
+                                        <div data-test="type">
+                                            <dt>Embeddings type</dt>
+                                            <dd className="sentence-case">{context.embeddings_type}</dd>
+                                        </div>
+                                    : null}
+                                    {context.embeddings_type_category ?
+                                        <div data-test="type">
+                                            <dt>Underlying assay</dt>
+                                            <dd className="sentence-case">{context.embeddings_type_category.map(function(item){ return <div className="item">{item}</div>; })}</dd>
+                                        </div>
+                                    : null}
+                                    {context.target ?
+                                        <div data-test="target">
+                                            <dt>Target</dt>
+                                            <dd><a href={context.target['@id']}>{context.target.label}</a></dd>
+                                        </div>
+                                    : null}
+
+                                    {context.software_used && context.software_used.length ?
+                                        <div data-test="softwareused">
+                                            <dt>Software used</dt>
+                                            <dd>{softwareVersionList(context.software_used)}</dd>
+                                        </div>
+                                    : null}
+                                </dl>
+                            </div>
+
+                            <div className="flexcol-sm-6">
+                                <div className="flexcol-heading experiment-heading">
+                                    <h4>Attribution</h4>
+                                    <ProjectBadge award={context.award} addClasses="badge-heading" />
+                                </div>
+                                <dl className="key-value">
+                                    {context.encyclopedia_version ?
+                                        <div data-test="encyclopediaversion">
+                                            <dt>Encyclopedia version</dt>
+                                            <dd>{context.encyclopedia_version}</dd>
+                                        </div>
+                                    : null}
+
+                                    {context.lab ?
+                                        <div data-test="lab">
+                                            <dt>Lab</dt>
+                                            <dd>{context.lab.title}</dd>
+                                        </div>
+                                    : null}
+
+                                    <AwardRef context={context} adminUser={adminUser} />
+
+                                    {context.aliases.length ?
+                                        <div data-test="aliases">
+                                            <dt>Aliases</dt>
+                                            <dd><DbxrefList context={context} dbxrefs={context.aliases} /></dd>
+                                        </div>
+                                    : null}
+
+                                    <div data-test="externalresources">
+                                        <dt>External resources</dt>
+                                        <dd>
+                                            {context.dbxrefs && context.dbxrefs.length ?
+                                                <DbxrefList context={context} dbxrefs={context.dbxrefs} />
+                                            : <em>None submitted</em> }
+                                        </dd>
+                                    </div>
+                                    <div data-test="collectiontags">
+                                        <dt>Collection Tags</dt>
+                                        <dd>
+                                            {context.collection_tags && context.collection_tags ?
+                                                <DbxrefList context={context} dbxrefs={context.collection_tags} />
+                                            : <em>None submitted</em> }
+                                        </dd>
+                                    </div>
+                                    {references ?
+                                        <div data-test="references">
+                                            <dt>Publications</dt>
+                                            <dd>{references}</dd>
+                                        </div>
+                                    : null}
+
+                                    {tagBadges ?
+                                        <div className="tag-badges" data-test="tags">
+                                            <dt>Tags</dt>
+                                            <dd>{tagBadges}</dd>
+                                        </div>
+                                    : null}
+                                </dl>
+                            </div>
+                        </div>
+                    </PanelBody>
+                </Panel>
+                <Panel addClasses="data-display">
+                    <PanelBody addClasses="panel-body-with-header">
+                        <div className="flexrow">
+                            <div className="flexcol-sm-12">
+                            <div style={{marginLeft: '2rem', marginRight: '2rem'}}>
+		             {context.datasets && context.datasets.length ?
+                                		 <div data-test="datasets">
+                                <h4>Datasets</h4>
+		 <dd>
+		 {context.datasets.map((dataset, i) => (
+		     <span key={i}>
+			 {i > 0 ? ', ' : ''}
+		         <a href={dataset['@id']}>{dataset.accession}</a>
+			 </span>
+			 ))}
+		 </dd>
+                 </div>
+		 : null}
+		 </div>
+	        </div>
+                </div>
+                </PanelBody>
+                </Panel> 
+                {/* Display the file widget with the facet, graph, and tables */}
+                <FileGallery context={context} encodevers={encodevers} />
+
+                <DocumentsPanelReq documents={datasetDocuments} />
+            </div>
+        );
+    }
+}
+
+EmbeddingComponent.propTypes = {
+    context: PropTypes.object, // Embeddings being displayed
+    auditIndicators: PropTypes.func.isRequired, // From audit decorator
+    auditDetail: PropTypes.func.isRequired, // From audit decorator
+};
+
+EmbeddingComponent.contextTypes = {
+    session: PropTypes.object, // Login session information
+    session_properties: PropTypes.object,
+};
+
+const Embedding = auditDecor(EmbeddingComponent);
+
+globals.contentViews.register(Embedding, 'Embedding');
 
 // Display Annotation page, a subtype of Dataset.
 class PublicationDataComponent extends React.Component {

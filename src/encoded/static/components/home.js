@@ -6,6 +6,7 @@ import moment from 'moment';
 import { FetchedData, FetchedItems, Param } from './fetched';
 import { Panel, PanelBody } from '../libs/bootstrap/panel';
 const newsUri = '/search/?type=Page&news=true&status=released';
+
 // Convert the selected organisms and assays into an encoded query.
 function generateQuery(selectedOrganisms, selectedAssayCategory) {
     // Make the base query.
@@ -178,18 +179,37 @@ class AssayClicking extends React.Component {
 		        <p></p>
 		 </div>
                             <div className="site-banner-intro-content">
-				<p style={{'margin': '20px'}}>This resource provides data on the human genome and epigenome to facilitate genetic studies of common metabolic disease risk as part of the AMP CMD consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of academic and industry partners.</p>
+				<p style={{'margin': '20px'}}>The Common Metabolic Functional Disease Genomics Atlas resource provides data on the human genome and epigenome to facilitate genetic studies of common metabolic disease risk as part of the AMP CMD consortium, which includes the National Institute for Diabetes and Digestive and Kidney Diseases (NIDDK) and an international collaboration of academic and industry partners.</p>
                             </div>
                         </div>
-		       <div className="site-banner-search">	       
-                       <h4 className="search-header">Search Database: </h4>
-                       <SearchEngine />
-                       <h5 style={{'margin-left': '20px', 'margin-top': '0px', 'font-weight': 'normal', 'font-style': 'italic'}}>search experiment, annotation, biosample & <a href="help/getting-started">more</a></h5>
-                       <AdvSearch />		
-		       </div>
+
+		       <div className="site-banner-search">
+                                     <div>
+                                     <span className="field-info">
+                                     <h4 className="homepage-header">Datasets:</h4>
+                                     <i class="icon icon-info-circle"><span className="sr-only">Access CMFDGA datasets, raw and processed files</span></i>
+                                     </span>
+                                     <a className="btn-sm btn-tools" href = { 'https://www.demo.commondiseaseepigenome.org/experiments' } style= {{ 'font-size': '17px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="Interactive ATAC-seq single-cell expression viewer">Experiments</a>
+                                     <a className="btn-sm btn-tools" href = { 'https://www.demo.commondiseaseepigenome.org/annotations' } style= {{'margin-left': '5px', 'font-size': '17px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif','margin-top': '5px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}}>Annotations</a>
+                                     <a className="btn-sm btn-tools" href = { 'https://www.demo.commondiseaseepigenome.org/embedding' } style= {{'margin-left': '5px', 'font-size': '17px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}}>Single Cell Embeddings</a>
+                                     </div>
+                                     <div>
+                                     <h4 className="homepage-header">Tools:</h4>
+                                     <a className="btn-sm btn-tools" target = "_blank" href = { 'http://www.single-cell.commondiseaseepigenome.org:5005' } style= {{'margin-left': '5px', 'font-size':'17px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif','margin-top': '5px' }}>Single Cell UMAP</a>
+<a className="btn-sm btn-tools" target = "_blank" href = { 'http://www.single-cell.commondiseaseepigenome.org/RShiny/' } style= {{'margin-left': '5px', 'font-size':'17px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif','margin-top': '5px' }}>Expression Profiles</a>
+<a className="btn-sm btn-tools" target = "_blank" href = { 'https://www.demo.commondiseaseepigenome.org/variant-search/' } style= {{'margin-left': '5px', 'font-size':'17px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif','margin-top': '5px' }}>Region Overlap</a>
+                                     </div>
+                                     <div>
+                                     <h4 className="homepage-header">Search Database: </h4>
+                                     <SearchEngine />
+                                     <h4 className="homepage-header">Browse Genetics:</h4>
+                                     <a className="btn-lg btn-info btn-sm" target = "_blank" href = { 'https://www.demo.commondiseaseepigenome.org/variant-search/' }> Common Metabolic Disease Knowledge Portal</a> 
+                       </div> 
+                       </div>
                     </div>
             </div>
             </div>
+
         );	    
     }
 }
@@ -1248,7 +1268,7 @@ class TwitterWidget extends React.Component {
                         className="twitter-timeline"
                         href="https://twitter.com/dga_amp" // from encodedcc twitter
                         data-chrome="noheader"
-                        data-screen-name="Diabetes Epigenome Atlas"
+                        data-screen-name="Common Metabolic Disease Genomic Portal"
                         data-height={this.props.height.toString()} // height so it matches with rest of site
                     >
                         @DGA_AMP

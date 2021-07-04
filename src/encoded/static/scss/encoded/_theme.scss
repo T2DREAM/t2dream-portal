@@ -47,7 +47,44 @@
         color: lighten(#428bca,20%) !important;
     }
 }
+.btn-tools {
+    color: #fff;
+    background-color: #428bca;
+    border: 1px solid #428bca;
+    .svg-icon {
+        path, rect, polygon {
+            fill: #428bca;
+        }
+    }
 
+    &:active, &:focus {
+        color: darken(#428bca,20%) !important;
+        background-color: #428bca !important;
+        border: 1px solid #428bca;
+    }
+
+    &.active, &:active.active, .dropdown.open & {
+        color: darken(#428bca,20%) !important;
+        background-color: lighten(#428bca,30%) !important;
+        border: 1px solid #428bca !important;
+    }
+    &:hover {
+        color: darken(#428bca,20%);
+        background-color: lighten(#428bca,30%);
+        border: 1px solid #428bca;
+
+        .svg-icon {
+            path {
+                fill: darken(#428bca,20%);
+            }
+        }
+    }
+
+    &[disabled] {
+        background-color: #428bca;
+        color: lighten(#428bca,20%) !important;
+    }
+}
 .btn-svgicon {
     line-height: 0.9;
     margin-right: 0 !important;

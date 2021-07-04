@@ -33,6 +33,7 @@ const portal = {
             children: [
                 { id: 'experiment', title: 'Experiments', url: '/matrix/?type=Experiment' },
                 { id: 'annotations', title: 'Annotations', url: '/matrix/?type=Annotation' },
+                { id: 'embeddings', title: 'Embeddings', url: '/matrix/?type=Embedding' },
 		{ id: 'sep-mm-1' },
                 { id: 'publications', title: 'Publications', url: '/search/?type=Publication' },
             ],
@@ -42,6 +43,9 @@ const portal = {
             title: 'Tools',
             children: [
                 { id: 'variant', title: 'Variant Search', url: '/variant-search/' },
+                { id: 'umap', title: 'Single Cell UMAP', url: 'http://www.single-cell.commondiseaseepigenome.org:5005' },
+                { id: 'expression', title: 'Expression Profiles', url: 'https://www.single-cell.commondiseaseepigenome.org/RShiny' },
+                { id: 'expression', title: 'Predict Target Genes', url: 'https://www.crocpot.org' },
             ],
         },
         {
