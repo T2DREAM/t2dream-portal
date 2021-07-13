@@ -296,7 +296,7 @@
             "title": "Mapped read length (nt)"
         },
         "status": {
-            "title"1: "File set status"
+            "title": "File set status"
         },
         "assembly": {
             "title": "Genome assembly (visualization)"
