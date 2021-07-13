@@ -341,7 +341,7 @@ def set_filters(request, query, result, static_items=None):
         terms = all_terms[field]
         if field in ['type', 'limit', 'y.limit', 'x.limit', 'mode', 'annotation',
                      'format', 'frame', 'datastore', 'field', 'region', 'genome',
-                     'sort', 'from', 'referrer', 'embedding']:
+                     'sort', 'from', 'referrer', 'embedding', 'perturbation', 'model']:
             continue
 
         # Add filter to result
@@ -526,7 +526,7 @@ def search_result_actions(request, doc_types, es_results, position=None):
 
     # generate batch hub URL for experiments
     # TODO we could enable them for Datasets as well here, but not sure how well it will work
-    if doc_types == ['Experiment'] or doc_types == ['Annotation'] or doc_types == ['Embedding']:
+    if doc_types == ['Experiment'] or doc_types == ['Annotation'] or doc_types == ['Embedding'] or doc_types == ['Perturbation'] or doc_types == ['Model']:
         viz = {}
         for bucket in aggregations['assembly']['assembly']['buckets']:
             if bucket['doc_count'] > 0:
@@ -988,6 +988,14 @@ def matrix(context, request):
         result['title'] = 'Embedding'
     else:
         result['title'] = type_info.name + ' Matrix'
+    if type_info.name is 'Model':
+        result['title'] = 'Model'
+    else:
+        result['title'] = type_info.name + ' Matrix'
+    if type_info.name is 'Perturbation':
+        result['title'] = 'Perturbation'
+    else:
+        result['title'] = type_info.name + ' Matrix'
 
     matrix = result['matrix'] = type_info.factory.matrix.copy()
     matrix['x']['limit'] = request.params.get('x.limit', 20)
@@ -1254,6 +1262,14 @@ def audit(context, request):
         result['title'] = type_info.name + ' Matrix'
     if type_info.name is 'Embedding':
         result['title'] = 'Embedding'
+    else:
+        result['title'] = type_info.name + ' Matrix'
+    if type_info.name is 'Perturbation':
+        result['title'] = 'Perturbation'
+    else:
+        result['title'] = type_info.name + ' Matrix'
+    if type_info.name is 'Model':
+        result['title'] = 'Model'
     else:
         result['title'] = type_info.name + ' Matrix'
 

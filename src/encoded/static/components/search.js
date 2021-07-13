@@ -22,6 +22,8 @@ const types = {
     antibody_lot: { title: 'Antibodies' },
     biosample: { title: 'Biosamples' },
     embedding: { title: 'Embeddings file set' },
+    model: { title: 'Statistical Model file set' },
+    perturbation: { title: 'Gene Perturbation file set' },
     experiment: { title: 'Experiments' },
     target: { title: 'Targets' },
     dataset: { title: 'Datasets' },
@@ -43,6 +45,10 @@ const types = {
 };
 
 const datasetTypes = {
+    Annotation: types.annotation.title,
+    Embedding: types.embedding.title,
+    Model: types.model.title,
+    Perturbation: types.perturbation.title,
     Dataset: types.dataset.title,
     MatchedSet: types.matched_set.title,
     OrganismDevelopmentSeries: types.organism_development_series.title,

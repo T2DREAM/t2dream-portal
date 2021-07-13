@@ -220,7 +220,7 @@
             "@type": "@id",
             "title": "Ontology ID",
             "description": "Ontology identifier describing biosample.",
-            "comment": "For detailed description of ontologies used by CMFDGA visit https://www.commondiseaseepigenome.org/help/getting-started/.",
+            "comment": "For detailed description of ontologies used by CMDGA visit https://www.commondiseaseepigenome.org/help/getting-started/.",
             "type": "string",
 	    "default": [],
             "uniqueItems": true,

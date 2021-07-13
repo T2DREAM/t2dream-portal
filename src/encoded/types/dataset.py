@@ -269,7 +269,7 @@ class FileSet(Dataset):
     name='annotations',
     unique_key='accession',
     properties={
-        'title': "Annotation file set",
+        'title': 'Annotation file set',
         'description': 'A set of annotation files produced by DGA.',
     })
 class Annotation(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, CalculatedVisualize):
@@ -338,7 +338,7 @@ class Annotation(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms,
     name='embedding',
     unique_key='accession',
     properties={
-        'title': "Embeddings file set",
+        'title': 'Embeddings file set',
         'description': 'A set of embeddings files produced by DGA.',
     })
 class Embedding(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, CalculatedVisualize):
@@ -363,6 +363,190 @@ class Embedding(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, 
         'files.quality_metrics.step_run.analysis_step_version.analysis_step',
         'files.replicate.library',
     ]
+    rev = Dataset.rev.copy()
+    rev.update({
+        'superseded_by': ('Embedding', 'supersedes')
+    })
+
+    matrix = {
+        'y': {
+            'facets': [
+                'organism.scientific_name',
+                'biosample_type',
+                'organ_slims',
+                'award.project',
+                'assembly',
+                'encyclopedia_version'
+            ],
+            'group_by': ['biosample_type', 'biosample_term_name'],
+            'label': 'Biosample',
+        },
+        'x': {
+            'facets': [
+                'embeddings_type',
+                'month_released',
+                'targets.label',
+                'files.file_type',
+            ],
+            'group_by': 'embeddings_type',
+            'label': 'Type',
+        },
+    }
+
+    @calculated_property(schema={
+        "title": "Superseded by",
+        "type": "array",
+        "items": {
+            "type": ['string', 'object'],
+            "linkFrom": "Embedding.supersedes",
+        },
+        "notSubmittable": True,
+    })
+    def superseded_by(self, request, superseded_by):
+        return paths_filtered_by_status(request, superseded_by)
+
+@collection(
+    name='perturbation',
+    unique_key='accession',
+    properties={
+        'title': 'Gene Perturbation file set',
+        'description': 'A set of gene perturbation files produced by DGA.',
+    })
+class Perturbation(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, CalculatedVisualize):
+    item_type = 'perturbation'
+    schema = load_schema('encoded:schemas/perturbation.json')
+    embedded = FileSet.embedded + [
+        'software_used',
+        'software_used.software',
+        'organism',
+        'targets',
+        'datasets',
+        'files.dataset',
+        'files.analysis_step_version.analysis_step',
+        'files.analysis_step_version.analysis_step.pipelines',
+        'files.analysis_step_version.analysis_step.versions',
+        'files.analysis_step_version.analysis_step.versions.software_versions',
+        'files.analysis_step_version.analysis_step.versions.software_versions.software',
+        'files.analysis_step_version.software_versions',
+        'files.analysis_step_version.software_versions.software',
+        'files.quality_metrics',
+        'files.quality_metrics.step_run',
+        'files.quality_metrics.step_run.analysis_step_version.analysis_step',
+        'files.replicate.library',
+    ]
+    rev = Dataset.rev.copy()
+    rev.update({
+        'superseded_by': ('Perturbation', 'supersedes')
+    })
+
+    matrix = {
+        'y': {
+            'facets': [
+                'organism.scientific_name',
+                'biosample_type',
+                'organ_slims',
+                'award.project',
+                'assembly',
+                'encyclopedia_version'
+            ],
+            'group_by': ['biosample_type', 'biosample_term_name'],
+            'label': 'Biosample',
+        },
+        'x': {
+            'facets': [
+                'perturbation_type',
+                'month_released',
+                'targets.label',
+                'files.file_type',
+            ],
+            'group_by': 'perturbation_type',
+            'label': 'Type',
+        },
+    }
+
+    @calculated_property(schema={
+        "title": "Superseded by",
+        "type": "array",
+        "items": {
+            "type": ['string', 'object'],
+            "linkFrom": "Perturbation.supersedes",
+        },
+        "notSubmittable": True,
+    })
+    def superseded_by(self, request, superseded_by):
+        return paths_filtered_by_status(request, superseded_by)
+
+@collection(
+    name='model',
+    unique_key='accession',
+    properties={
+        'title': 'Statistical Model file set',
+        'description': 'A set of statistical model files produced by DGA.',
+    })
+class Model(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, CalculatedVisualize):
+    item_type = 'model'
+    schema = load_schema('encoded:schemas/model.json')
+    embedded = FileSet.embedded + [
+        'software_used',
+        'software_used.software',
+        'organism',
+        'targets',
+        'datasets',
+        'files.dataset',
+        'files.analysis_step_version.analysis_step',
+        'files.analysis_step_version.analysis_step.pipelines',
+        'files.analysis_step_version.analysis_step.versions',
+        'files.analysis_step_version.analysis_step.versions.software_versions',
+        'files.analysis_step_version.analysis_step.versions.software_versions.software',
+        'files.analysis_step_version.software_versions',
+        'files.analysis_step_version.software_versions.software',
+        'files.quality_metrics',
+        'files.quality_metrics.step_run',
+        'files.quality_metrics.step_run.analysis_step_version.analysis_step',
+        'files.replicate.library',
+    ]
+    rev = Dataset.rev.copy()
+    rev.update({
+        'superseded_by': ('Model', 'supersedes')
+    })
+
+    matrix = {
+        'y': {
+            'facets': [
+                'organism.scientific_name',
+                'biosample_type',
+                'organ_slims',
+                'award.project',
+                'assembly',
+                'encyclopedia_version'
+            ],
+            'group_by': ['biosample_type', 'biosample_term_name'],
+            'label': 'Biosample',
+        },
+        'x': {
+            'facets': [
+                'model_name',
+                'month_released',
+                'targets.label',
+                'files.file_type',
+            ],
+            'group_by': 'model_name',
+            'label': 'Type',
+        },
+    }
+
+    @calculated_property(schema={
+        "title": "Superseded by",
+        "type": "array",
+        "items": {
+            "type": ['string', 'object'],
+            "linkFrom": "Model.supersedes",
+        },
+        "notSubmittable": True,
+    })
+    def superseded_by(self, request, superseded_by):
+        return paths_filtered_by_status(request, superseded_by)
+
 @collection(
     name='publication-data',
     unique_key='accession',

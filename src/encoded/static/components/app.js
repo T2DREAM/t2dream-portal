@@ -34,6 +34,8 @@ const portal = {
                 { id: 'experiment', title: 'Experiments', url: '/matrix/?type=Experiment' },
                 { id: 'annotations', title: 'Annotations', url: '/matrix/?type=Annotation' },
                 { id: 'embeddings', title: 'Embeddings', url: '/matrix/?type=Embedding' },
+                { id: 'model', title: 'Statistical Models', url: '/matrix/?type=Model' },
+                { id: 'perturbation', title: 'Gene Perturbation', url: '/matrix/?type=Perturbation' },
 		{ id: 'sep-mm-1' },
                 { id: 'publications', title: 'Publications', url: '/search/?type=Publication' },
             ],
@@ -45,7 +47,6 @@ const portal = {
                 { id: 'variant', title: 'Variant Search', url: '/variant-search/' },
                 { id: 'umap', title: 'Single Cell UMAP', url: 'http://www.single-cell.commondiseaseepigenome.org:5005' },
                 { id: 'expression', title: 'Expression Profiles', url: 'https://www.single-cell.commondiseaseepigenome.org/RShiny' },
-                { id: 'expression', title: 'Predict Target Genes', url: 'https://www.crocpot.org' },
             ],
         },
         {
