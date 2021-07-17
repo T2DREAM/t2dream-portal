@@ -79,7 +79,7 @@ runcmd:
 - sudo tar -xzvf /home/ubuntu/.aws/jdk-8u211-linux-x64.tar.gz --directory /usr/lib/jvm/
 - sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_211/bin/java 100
 - sudo -u ubuntu mv /home/ubuntu/.ssh/authorized_keys /home/ubuntu/.ssh/authorized_keys2
-- sudo -u ubuntu aws s3 cp --region=us-west-2 %(S3_AUTH_KEYS)s /home/ubuntu/.ssh/authorized_keys
+- sudo -u ubuntu aws s3 cp --region=us-west-2 s3://t2depi-conf-prod/ssh-keys/prod-authorized_keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
 # Ideally this would build as a different user so encoded only has read
 # permissions
 - MEMGIGS=$(awk '/MemTotal/{printf int($2 / 1024**2)}' /proc/meminfo)
