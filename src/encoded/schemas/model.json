@@ -4,7 +4,7 @@
     "id": "/profiles/model.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["award", "lab", "portal_usage", "model_name", "tissue_term_name", "biosample_term_name", "model_underlying_assay", "biosample_term_id", "tissue_term_id"],
+    "required": ["award", "lab", "portal_usage", "model_name", "biosample_term_name", "model_underlying_assay", "biosample_term_id"],
     "identifyingProperties": ["uuid", "accession" , "aliases"],
     "additionalProperties": false,
     "mixinProperties": [

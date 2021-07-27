@@ -4,7 +4,7 @@
     "id": "/profiles/perturbation.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": [ "award", "lab", "portal_usage", "perturbation_type", "perturbation_throughput", "tissue_term_name", "biosample_term_name", "biosample_term_id", "tissue_term_id"],
+    "required": [ "award", "lab", "portal_usage", "modification_type", "assay_design", "tissue_term_name", "biosample_term_name", "biosample_term_id", "tissue_term_id"],
     "identifyingProperties": ["uuid", "accession" , "aliases"],
     "additionalProperties": false,
     "mixinProperties": [
@@ -16,9 +16,9 @@
         { "$ref": "mixins.json#/references" },
         { "$ref": "mixins.json#/submitted" },
         { "$ref": "mixins.json#/notes" },
-        { "$ref": "mixins.json#/documents" },
         { "$ref": "dataset.json#/properties" },
-        { "$ref": "file_set.json#/properties" }
+        { "$ref": "file_set.json#/properties" },
+	{ "$ref": "mixins.json#/attachment" }
     ],
     "dependencies": {
         "status": {
@@ -47,28 +47,99 @@
         "schema_version": {
             "default": "17"
         },
-        "perturbation_type": {
-            "title": "Perturbation type",
-            "description": "The category that best describes the perturbation platform.",
+        "modification_type": {
+            "title": "Modification type",
+            "description": "Type of gene modification performed",
             "type": "string",
             "enum": [
-		"RNAi",
-                "shRNA",
-                "CRISPR"
+		"CRISPR deletion",
+                "CRISPR base editing",
+                "CRISPRi",
+		"CRISPRa",
+		"siRNA",
+		"shRNA",
+		"expression vector"
             ]
         },
-        "perturbation_throughput": {
-            "title": "Perturbation throughput",
-            "description": "Perturbation throughput",
+        "assay_design": {
+            "title": "Assay Design",
+            "description": "Design of the gene modification assay",
             "type": "string",
             "enum": [
 		"single gene",
-		"genome-wide"
+		"genome-wide pooled",
+		"candidate gene pooled",
+		"arrayed"
             ]
+        },
+        "assay_readout": {
+            "title": "Assay Readout",
+            "description": "Readout of the perturbation assay",
+            "type": "string",
+            "enum": [
+		"single cell sequencing",
+		"sequencing",
+		"imaging",
+		"cellular phenotype",
+		"molecular phenotype"
+            ]
+        },
+	"phenotypes_measured": {
+	    "title": "Phenotypes Measured",
+	    "description": "Phenotypes being measured directly or indirectly in assay",
+	    "type": "array",
+            "default": [],
+	    "items": {
+		"title": "Phenotypes Measured",
+		"description": "Phenotypes being measured directly or indirectly in assay",
+		"type": "string",
+		"enum" : [
+		    "cell death",
+		    "insulin content",
+		    "ER stress",
+		    "lipid levels"
+		]
+	    }
+	},
+	"library": {
+	    "title": "Library",
+	    "description": "Guide library used, if a known library then reference that otherwise 'custom' and then provide guide sequences in separate PDF file",
+	    "type": "array",
+            "default": [],
+	    "items": {
+		"title": "Library",
+		"description": "Guide library used, if a known library then reference that otherwise 'custom' and then provide guide sequences in separate PDF file",
+		"type": "string",
+		"enum" : [
+		    "GeCKO.v1",
+		    "GeCKO.v2",
+		    "TKOv3",
+		    "custom"
+		]
+	    }
+	},
+        "pooled_design": {
+            "title": "Pooled Design",
+            "description": "Phenotypes being measured directly or indirectly in assay",
+            "type": "string",
+            "enum": [
+		"sorting",
+		"partitioning"
+            ]
+        },
+        "gating_strategy": {
+            "title": "Gating Strategy",
+            "description": "For cell sorting experiments, description of the gating strategy used (full details in experimental protocol)",
+            "type": "string"
+        },
+        "partitioning_strategy": {
+            "title": "Partitioning Strategy",
+            "description": "For cell partitioning, description of how the cells were partitioned (full details in experimental protocol)",
+            "type": "string"
         },
         "portal_usage": {
             "title": "KP usage",
-            "description": "KP usage for gene perturbation type",
+            "description": "KP usage",
             "type": "string",
             "enum": [
 		"facet",
@@ -252,6 +323,22 @@
 		"type": "string"
 	    }
 	},
+	"biosample_conditions": {
+	    "title": "Biosample Conditions",
+	    "description": "Any specalized conditions the cells/tissues were subjected to",
+	    "type": "array",
+            "default": [],
+	    "items": {
+		"title": "Biosample Conditions",
+		"description": "Any specalized conditions the cells/tissues were subjected to",
+		"type": "string",
+		"enum" : [
+		    "glucose",
+		    "cytokines",
+		    "thapsigargin"
+		]
+	    }
+	},
 	"biosample_type": {
 	    "title": "Biosample type",
 	    "description": "The general category of the biosample.",
@@ -274,10 +361,10 @@
 	}
     },
     "facets": {
-        "perturbation_type": {
+        "modification_type": {
             "title": "Perturbation type"
         },
-        "perturbation_throughput": {
+        "assay_design": {
             "title": "Perturbation throughput"
         },
         "files.replicate.experiment.assay_term_name": {

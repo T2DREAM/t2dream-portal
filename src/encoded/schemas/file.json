@@ -637,6 +637,7 @@
                         "tar",
                         "tsv",
                         "h5ad",
+			"pth",
                         "vcf",
                         "wig"
                     ]
@@ -1035,7 +1036,8 @@
 			"RPKM counts matrix",
 			"TPM counts matrix",
 			"Raw count matrix",
-			"barcode info",			
+			"barcode info",
+                        "accessible chromatin",
                         "unfiltered alignments",
                         "variant calls"
                     ]
@@ -1442,6 +1444,7 @@
         "candidate regulatory elements": "annotation",
         "representative dnase hypersensitivity sites":"annotation",
         "variant calls": "annotation",
+        "accessible chromatin": "annotation",
         "maternal variant calls": "annotation",
         "paternal variant calls": "annotation",
         "phased variant calls": "annotation",
@@ -1498,6 +1501,7 @@
         "hic": ".hic",
 	"ibed": ".ibed",
         "hdf5": ".h5",
+	"pth": ".pth",
         "idat": ".idat",
         "PWM":".pwm",
         "rcc": ".rcc",

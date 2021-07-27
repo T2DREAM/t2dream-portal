@@ -13,7 +13,7 @@ export default class Home extends React.Component {
         super(props);
         // Set initial React state.
         this.state = {
-            socialHeight: 600,
+            socialHeight: 600
         };
     }
     render() {
@@ -41,13 +41,20 @@ export default class Home extends React.Component {
                         <Search />
                         </div>
                         <div className="site-search">Browse data:<br/>
+                        <select class="form-select" name="dataset" onChange="window.document.location.href=this.options[this.selectedIndex].value;">
+                        <option></option>
+                        <option value="http://www.demo.commondiseaseepigenome.org/matrix/?type=Experiment">Experiment</option>
+                        <option value="annotation">Annotation</option>
+                        <option value="embeddings">Single Cell Embeddings</option>
+                        <option value="model">Statistical Models</option>
+                        <option value="perturbation">Gene Perturbations</option>
+                        </select>
                         </div>
                         </div>
                         <div className="site-banner-text">
-<div className="site-search">Annotate genetic variants:<a className="btn-lg btn-tools" href = { 'http://www.demo.commondiseaseepigenome.org/variant-search/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-<div className="site-search">Single cell browser:<a className="btn-lg btn-tools" href = { 'http://www.single-cell.commondiseaseepigenome.org:5005' } style= {{ 'font-size': '14px', 'font\
--family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'80px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-<div className="site-search">Gene expression browser:<a className="btn-lg btn-tools" href = { 'http://www.tools.lungepigenome.org:3838/RShiny/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
+<div className="site-search">Annotate genetic variants:<a className="btn-lg btn-tools" target="_blank" href = { '/variant-search/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
+<div className="site-search">Single cell browser:<a className="btn-lg btn-tools" target="_blank" href = { 'http://www.single-cell.cmdga.org/cellxgene/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'78px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
+<div className="site-search">Gene expression browser:<a className="btn-lg btn-tools" target="_blank" href = { 'http://www.single-cell.cmdga.org/gene-expression/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
                         </div>
                         </div>
                         </div>

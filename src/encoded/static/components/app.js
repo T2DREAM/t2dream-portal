@@ -45,8 +45,8 @@ const portal = {
             title: 'Tools',
             children: [
                 { id: 'variant', title: 'Variant Search', url: '/variant-search/' },
-                { id: 'umap', title: 'Single Cell UMAP', url: 'http://www.single-cell.commondiseaseepigenome.org:5005' },
-                { id: 'expression', title: 'Expression Profiles', url: 'https://www.single-cell.commondiseaseepigenome.org/RShiny' },
+                { id: 'umap', title: 'Single Cell UMAP', url: 'http://www.single-cell.cmdga.org/cellxgene' },
+                { id: 'expression', title: 'Expression Profiles', url: 'http://www.single-cell.cmdga.org/gene-expression' },
             ],
         },
         {
