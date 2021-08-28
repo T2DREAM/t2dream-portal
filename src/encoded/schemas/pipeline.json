@@ -227,12 +227,12 @@
         },
         "workflow_language": {
             "title": "Workflow Language",
-            "description": "Type of pipeline: wdl, snakemake, ruffus, cwl, github_readme, text_file, notebook",
+            "description": "Language used if workflow script",
             "type": "string"
         },
         "pipeline_output": {
             "title": "Pipeline Output",
-            "description": "Type of pipeline: wdl, snakemake, ruffus, cwl, github_readme, text_file, notebook",
+            "description": "Outputs produced by the pipeline",
             "type": "string"
         },
         "pipeline_chain": {

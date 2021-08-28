@@ -440,10 +440,46 @@ class PipelineComponent extends React.Component {
                                 </div>
                             : null}
 
+                            {context.pipeline_type ?
+                                <div data-test="description">
+                                    <dt>Pipeline Type</dt>
+                                    <dd>{context.pipeline_type}</dd>
+                                </div>
+                            : null}
+
+                            {context.pipeline_chain ?
+                                <div data-test="description">
+                                    <dt>Pipeline Chain</dt>
+                                    <dd>{context.pipeline_chain}</dd>
+                                </div>
+                            : null}
+
+                            {context.workflow_language ?
+                                <div data-test="description">
+                                    <dt>Workflow Language</dt>
+                                    <dd>{context.workflow_language}</dd>
+                                </div>
+                            : null}
+
+
+                            {context.pipeline_output ?
+                                <div data-test="description">
+                                    <dt>Pipeline Output</dt>
+                                    <dd>{context.pipeline_output}</dd>
+                                </div>
+                            : null}
+
                             {context.standards_page ?
                                 <div data-test="standardspage">
                                     <dt>Pipeline standards</dt>
                                     <dd><a href={context.standards_page['@id']}>{context.standards_page.title}</a></dd>
+                                </div>
+                            : null}
+
+                            {context.pipeline_newer_version ?
+                                <div data-test="description">
+                                    <dt>Pipeline Latest Version</dt>
+                                    <dd>{context.pipeline_newer_version}</dd>
                                 </div>
                             : null}
 
