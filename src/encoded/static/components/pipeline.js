@@ -456,6 +456,53 @@ class PipelineComponent extends React.Component {
                         </dl>
                     </PanelBody>
                 </Panel>
+                             {context.datasets_annotation && context.datasets_annotation.length ?
+                <Panel addClasses="data-display">
+                    <PanelBody addClasses="panel-body-with-header">
+                        <div className="flexrow">
+                            <div className="flexcol-sm-12">
+                            <div style={{marginLeft: '2rem', marginRight: '2rem'}}>
+                                                 <div data-test="datasets">
+                                <h4>Annotations</h4>
+                 <dd>
+                 {context.datasets_annotation.map((annotation, i) => (
+                     <span key={i}>
+                         {i > 0 ? ', ' : ''}
+                         <a href={annotation['@id']}>{annotation.accession}</a>
+                         </span>
+                         ))}
+                 </dd>
+                 </div>
+                 </div>
+                </div>
+                </div>
+                </PanelBody>
+                </Panel>
+                 : null}
+                     {context.datasets_experiment && context.datasets_experiment.length ?
+                <Panel addClasses="data-display">
+                    <PanelBody addClasses="panel-body-with-header">
+                        <div className="flexrow">
+                            <div className="flexcol-sm-12">
+                            <div style={{marginLeft: '2rem', marginRight: '2rem'}}>
+
+                                                 <div data-test="assay">
+                                <h4>Assays</h4>
+                 <dd>
+                 {context.datasets_experiment.map((dataset, i) => (
+                     <span key={i}>
+                         {i > 0 ? ', ' : ''}
+                         <a href={dataset['@id']}>{dataset.accession}</a>
+                         </span>
+                         ))}
+                 </dd>
+                 </div>
+                 </div>
+                </div>
+                </div>
+                </PanelBody>
+                </Panel>
+                 : null}
 
                 {this.jsonGraph ?
                     <Panel>

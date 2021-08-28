@@ -75,6 +75,9 @@ export const dbxrefPrefixMap = {
     ENSEMBL: {
         pattern: 'http://www.ensembl.org/Homo_sapiens/Gene/Summary?g={0}',
     },
+    ENI: {
+        pattern: 'https://www.ebi.ac.uk/ena/browser/view/{0}',
+    },
     GeneID: {
         pattern: 'https://www.ncbi.nlm.nih.gov/gene/{0}',
     },

@@ -29,6 +29,8 @@ class Pipeline(Item):
         'documents.lab',
         'documents.submitted_by',
         'analysis_steps',
+        'datasets_experiment',
+        'datasets_annotation',
         'analysis_steps.documents',
         'analysis_steps.pipelines',
         'analysis_steps.current_version.software_versions',
@@ -42,7 +44,22 @@ class Pipeline(Item):
         'award.pi.lab',
         'standards_page'
     ]
-
+    matrix = {
+        'y': {
+            'facets': [
+                'award.project',
+            ],
+            'group_by': ['pipeline_type', 'pipeline_type'],
+            'label': 'Pipeline Type',
+        },
+        'x': {
+            'facets': [
+                'month_released',
+            ],
+            'group_by': 'data_type',
+            'label': 'Data Type',
+        },
+    }
 
 @collection(
     name='analysis-steps',

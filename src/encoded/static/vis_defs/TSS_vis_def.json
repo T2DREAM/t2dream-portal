@@ -2,8 +2,8 @@
     "TSS": {
         "rule": "'{assay_term_name}' in ['RAMPAGE','CAGE']",
         "assay_composite": {
-            "longLabel":  "Collection of Diabetes Epigenome Atlas RAMPAGE/CAGE experiments",
-            "shortLabel": "Diabetes Epigenome Atlas RAMPAGE/CAGE"
+            "longLabel":  "Collection of Common Metabolic Disease Genome Atlas RAMPAGE/CAGE experiments",
+            "shortLabel": "Common Metabolic Disease Genome Atlas RAMPAGE/CAGE"
         },
         "longLabel":  "{assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{assay_title} of {biosample_term_name} - {accession}",

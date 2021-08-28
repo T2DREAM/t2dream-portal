@@ -10,17 +10,17 @@ import subprocess
 import sys
 import time
 
-host = ''
-encoded_access_key = ''
-encoded_secret_access_key = ''
+host = 'https://www.demo.cmdga.org'
+encoded_access_key = '4R4EPAGV'
+encoded_secret_access_key = 'iczi5fhwmrlf7rl2'
 
-path = ''
-my_lab = ''
-my_award = ''
+path = '/home/ubuntu/T1D.scRNA.final.h5ad.gz'
+my_lab = '/labs/kyle-gaulton/'
+my_award = '/awards/1R01DK122607-01/'
 
 # From http://hgwdev.cse.ucsc.edu/~galt/encode3/validatePackage/validateEncode3-latest.tgz
 encValData = 'encValData'
-assembly = ''
+assembly = 'hg19'
 
 # ~2s/GB
 print("Calculating md5sum.")
@@ -30,14 +30,14 @@ with open(path, 'rb') as f:
         md5sum.update(chunk)
 
 data = {
-    "dataset": "",
+    "dataset": "/embedding/DSR601XUG/",
     #"replicate": "/replicates/6e85c807-684a-46e3-b4b9-1f7990e85720/",
-    "file_format": "",
-    "assembly": "",
-    "file_format_type": "",
+    "file_format": "h5ad",
+    "assembly": "hg19",
+    #"file_format_type": "",
     "file_size": os.path.getsize(path),
     "md5sum": md5sum.hexdigest(),
-    "output_type": "",
+    "output_type": "open chromatin regions",
     #"read_length": 101,
     #"run_type": "single-ended",
     #"platform": "ENCODE:HiSeq2000",

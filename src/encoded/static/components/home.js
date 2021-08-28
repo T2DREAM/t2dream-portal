@@ -13,7 +13,7 @@ export default class Home extends React.Component {
         super(props);
         // Set initial React state.
         this.state = {
-            socialHeight: 600,
+            socialHeight: 600
         };
     }
     render() {
@@ -27,7 +27,7 @@ export default class Home extends React.Component {
                         <div ref="graphdisplay">
                         <div className="overall-classic">
                         <div className="site-banner">
-		        <img src="/static/img/logo.png" alt="logo"/>
+		        <img src="/static/img/banner.png" alt="logo"/>
                         </div>
                         </div>
                         </div>
@@ -40,14 +40,14 @@ export default class Home extends React.Component {
                         <div className="site-search">Search meta-data:
                         <Search />
                         </div>
-                        <div className="site-search">Browse data:<br/>
-                        </div>
+			<div className="site-search">Browse data:<br/>
+		        <DataEngine />
+		        </div>
                         </div>
                         <div className="site-banner-text">
-<div className="site-search">Annotate genetic variants:<a className="btn-lg btn-tools" href = { 'http://www.demo.commondiseaseepigenome.org/variant-search/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-<div className="site-search">Single cell browser:<a className="btn-lg btn-tools" href = { 'http://www.single-cell.commondiseaseepigenome.org:5005' } style= {{ 'font-size': '14px', 'font\
--family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'80px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-<div className="site-search">Gene expression browser:<a className="btn-lg btn-tools" href = { 'http://www.tools.lungepigenome.org:3838/RShiny/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
+<div className="site-search">Annotate genetic variants:<a className="btn-lg btn-tools" target="_blank" href = { '/variant-search/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
+<div className="site-search">Single cell browser:<a className="btn-lg btn-tools" target="_blank" href = { 'http://www.tools.cmdga.org/cellxgene/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'78px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
+<div className="site-search">Gene expression browser:<a className="btn-lg btn-tools" target="_blank" href = { 'http://www.tools.cmdga.org/gene-expression/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
                         </div>
                         </div>
                         </div>
@@ -57,12 +57,12 @@ export default class Home extends React.Component {
                                  <div className="social">
                                 <h6 style= {{ 'font-size': '1.3rem', 'font-weight':'normal', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '50px', 'margin-left':'50px', 'word-break': 'break-word', 'display': '-webkit-inline-box'}}>The <a href='https://fnih.org/our-programs/amp/accelerating-medicines-common-metabolic-diseases'>AMP CMD Consortium</a> is a collaboration among the following organizations, which also provide funding and/or governance:</h6>
                                 <div className="social-news">
-                                <img src="/static/img/thumbnail_nih_2021.png" alt="logo"/>
-                                <img src="/static/img/thumbnail_fnih_2021.png" alt="logo"/>
-                                <img src="/static/img/thumbnail_amgen_2021.png" alt="logo"/>
-                                <img src="/static/img/thumbnail_lilly_2021.png" alt="logo"/>
-                                <img src="/static/img/thumbnail_nordisk_2021.png" alt="logo"/>
-                                <img src="/static/img/thumbnail_pfizer_2021.png" alt="logo"/>
+                                <a target="_blank" rel="noopener noreferrer" href="https://www.niddk.nih.gov"><img src="/static/img/thumbnail_nih_2021.png" alt="logo"/></a>
+                                <a target="_blank" rel="noopener noreferrer" href="https://www.fnih.org"><img src="/static/img/thumbnail_fnih_2021.png" alt="logo"/></a>
+                                <a target="_blank" rel="noopener noreferrer" href="https://www.amgen.com"><img src="/static/img/thumbnail_amgen_2021.png" alt="logo"/></a>
+                                <a target="_blank" rel="noopener noreferrer" href="https://www.lilly.com"><img src="/static/img/thumbnail_lilly_2021.png" alt="logo"/></a>
+                                <a target="_blank" rel="noopener noreferrer" href="https://www.novonordisk.com"><img src="/static/img/thumbnail_nordisk_2021.png" alt="logo"/></a>
+                                <a target="_blank" rel="noopener noreferrer" href="https://www.pfizer.com"><img src="/static/img/thumbnail_pfizer_2021.png" alt="logo"/></a>
                                 </div>		
                             </div>
                         </Panel>
@@ -106,6 +106,64 @@ const Search = (props, context) => {
 };
 
 Search.contextTypes = {
+    location_href: PropTypes.string,
+};
+
+const Datasets = [
+    { value: 'Experiment', display: 'Experiments' },
+    { value: 'Annotation', display: 'Annotations' },
+    { value: 'Embedding', display: 'Single Cell Embeddings' },
+    { value: 'Model', display: 'Statistical Models' },
+    { value: 'Perturbation', display: 'Gene Perturbations' },
+    { value: 'Pipeline', display: 'Pipelines' },
+];
+class DataEngine extends React.Component {
+    constructor() {
+	super();
+	this.state = {
+	    dataset: Datasets[0].value,
+	};
+	this.handleDiscloseClick = this.handleDiscloseClick.bind(this);
+	this.handleDatasetsSelect = this.handleDatasetsSelect.bind(this);
+	}
+    componentDidMount() {
+	// Use timer to limit to one request per second
+	this.timer = setInterval(this.tick, 1000);
+    }
+    componentWillUnmount() {
+	clearInterval(this.timer);
+    }
+    handleDiscloseClick() {
+	this.setState(prevState => ({
+	    disclosed: !prevState.disclosed,
+	}));
+    }
+    handleDatasetsSelect(event) {
+	this.setState({ dataset: event.target.value });
+    }
+    render() {
+	const context = this.props.context;
+	const id = url.parse(this.context.location_href, true);
+	return (
+                <form id="dataset-form"  ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1" action="/matrix/?type=">
+                <div>
+		<select value={this.state.dataset} name="type" onChange={this.handleDatasetsSelect}>
+		{Datasets.map(datasetId =>
+			      <option key={datasetId.value} value={datasetId.value}>{datasetId.display}</option>
+				 )}
+	        </select>
+		<input type="submit" value="GO" className="btn btn-search" style={{'margin-left': '30px', 'margin-right': '30px'}} />
+		</div>
+                </form>
+	);
+    }
+}
+
+DataEngine.propTypes = {
+    context: PropTypes.object.isRequired,
+};
+
+DataEngine.contextTypes = {
     location_href: PropTypes.string,
 };
 const regionGenomes = [
@@ -283,8 +341,7 @@ class AdvSearch extends React.Component {
         const id = url.parse(this.context.location_href, true);
         const region = id.query.region || '';
 
-        return (
-                    
+        return (  
                     <form id="home-form"  ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1" action="/variant-search/">
                         <input type="hidden" name="annotation" value={this.state.terms.annotation} />
                         <div className="form-group">

@@ -152,10 +152,14 @@
 }
 
 select {
-    border: 1px solid #428bca !important;
-    color: #428bca !important;
-    font-weight: bold;
-
+    border: 1px solid #999 !important;
+    font-weight: 400;
+    padding-right: 40px;
+    padding-left: 40px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    margin-bottom: 20px;
+    font-size: 18px;
     &::-ms-expand {
         display: none;
     }

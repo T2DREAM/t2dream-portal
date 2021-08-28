@@ -42,7 +42,7 @@ export function annotationBiosampleSummary(annotation) {
     return null;
 }
 
-export function embeddingsBiosampleSummary(embedding) {
+export function embeddingBiosampleSummary(embedding) {
     const organismName = (embedding.organism && embedding.organism.scientific_name) ? <i>{embedding.organism.scientific_name}</i> : null;
     const lifeStageString = (embedding.relevant_life_stage && embedding.relevant_life_stage !== 'unknown') ? <span>{embedding.relevant_life_stage}</span> : null;
     const timepointString = embedding.relevant_timepoint ? <span>{embedding.relevant_timepoint + (embedding.relevant_timepoint_units ? ` ${embedding.relevant_timepoint_units}` : '')}</span> : null;
@@ -445,10 +445,9 @@ class EmbeddingComponent extends React.Component {
                                             <dd>{context.organism.name}</dd>
                                         </div>
                                     : null}
-
                                     {context.embeddings_type ?
                                         <div data-test="type">
-                                            <dt>Embeddings type</dt>
+                                            <dt>Type</dt>
                                             <dd className="sentence-case">{context.embeddings_type}</dd>
                                         </div>
                                     : null}
@@ -456,6 +455,36 @@ class EmbeddingComponent extends React.Component {
                                         <div data-test="type">
                                             <dt>Underlying assay</dt>
                                             <dd className="sentence-case">{context.embeddings_type_category.map(function(item){ return <div className="item">{item}</div>; })}</dd>
+                                        </div>
+                                    : null}
+                                    {context.embeddings_category ?
+                                        <div data-test="type">
+                                            <dt>Category</dt>
+                                            <dd className="sentence-case">{context.embeddings_category}</dd>
+                                        </div>
+                                    : null}
+                                    {context.embeddings_source ?
+                                        <div data-test="type">
+                                            <dt>Source</dt>
+                                            <dd className="sentence-case">{context.embeddings_source}</dd>
+                                        </div>
+                                    : null}
+                                    {context.embeddings_pipeline ?
+                                        <div data-test="type">
+                                            <dt>Pipeline</dt>
+                                            <dd className="sentence-case">{context.embeddings_pipeline}</dd>
+                                        </div>
+                                    : null}
+                                    {context.embeddings_unit ?
+                                        <div data-test="type">
+                                            <dt>Unit</dt>
+                                            <dd className="sentence-case">{context.embeddings_unit}</dd>
+                                        </div>
+                                    : null}
+                                    {context.embeddings_cells ?
+                                        <div data-test="type">
+                                            <dt>Number of Cells</dt>
+                                            <dd className="sentence-case">{context.embeddings_cells}</dd>
                                         </div>
                                     : null}
                                     {context.target ?
@@ -537,16 +566,40 @@ class EmbeddingComponent extends React.Component {
                         </div>
                     </PanelBody>
                 </Panel>
+		             {context.datasets_annotation && context.datasets_annotation.length ?
                 <Panel addClasses="data-display">
                     <PanelBody addClasses="panel-body-with-header">
                         <div className="flexrow">
                             <div className="flexcol-sm-12">
                             <div style={{marginLeft: '2rem', marginRight: '2rem'}}>
-		             {context.datasets && context.datasets.length ?
                                 		 <div data-test="datasets">
-                                <h4>Datasets</h4>
+                                <h4>Annotations</h4>
 		 <dd>
-		 {context.datasets.map((dataset, i) => (
+		 {context.datasets_annotation.map((annotation, i) => (
+		     <span key={i}>
+			 {i > 0 ? ', ' : ''}
+		         <a href={annotation['@id']}>{annotation.accession}</a>
+			 </span>
+			 ))}
+		 </dd>
+                 </div>
+		 </div>
+	        </div>
+                </div>
+                </PanelBody>
+                </Panel> 
+		 : null}
+	             {context.datasets_experiment && context.datasets_experiment.length ?
+                <Panel addClasses="data-display">
+                    <PanelBody addClasses="panel-body-with-header">
+                        <div className="flexrow">
+                            <div className="flexcol-sm-12">
+                            <div style={{marginLeft: '2rem', marginRight: '2rem'}}>
+	
+                                		 <div data-test="assay">
+                                <h4>Assays</h4>
+		 <dd>
+		 {context.datasets_experiment.map((dataset, i) => (
 		     <span key={i}>
 			 {i > 0 ? ', ' : ''}
 		         <a href={dataset['@id']}>{dataset.accession}</a>
@@ -554,12 +607,12 @@ class EmbeddingComponent extends React.Component {
 			 ))}
 		 </dd>
                  </div>
-		 : null}
 		 </div>
 	        </div>
                 </div>
                 </PanelBody>
                 </Panel> 
+		 : null}
                 {/* Display the file widget with the facet, graph, and tables */}
                 <FileGallery context={context} encodevers={encodevers} />
 
@@ -685,23 +738,40 @@ class PerturbationComponent extends React.Component {
                                             <dd><DbxrefList context={context.biosample_type} dbxrefs={context.biosample_type} /></dd>
                                         </div>
                                     : null}
+                                    {context.biosample_conditions ?
+                                        <div data-test="biosampletype">
+                                            <dt>Biosample Conditions</dt>
+                                            <dd><DbxrefList context={context.biosample_conditions} dbxrefs={context.biosample_conditions} /></dd>
+                                        </div>
+                                    : null}
+                                    {context.phenotypes_measured ?
+                                        <div data-test="biosampletype">
+                                            <dt>Phenotypes Measured</dt>
+                                            <dd><DbxrefList context={context.phenotypes_measured} dbxrefs={context.phenotypes_measured} /></dd>
+                                        </div>
+                                    : null}
                                     {context.organism ?
                                         <div data-test="organism">
                                             <dt>Organism</dt>
                                             <dd>{context.organism.name}</dd>
                                         </div>
                                     : null}
-
-                                    {context.perturbation_type ?
+                                    {context.modification_type ?
                                         <div data-test="type">
-                                            <dt>Gene perturbation type</dt>
-                                            <dd className="sentence-case">{context.perturbation_type}</dd>
+                                            <dt>Modification type</dt>
+                                            <dd className="sentence-case">{context.modification_type}</dd>
                                         </div>
                                     : null}
-                                    {context.perturbation_throughput ?
+                                    {context.assay_design ?
                                         <div data-test="type">
-                                            <dt>Perturbation throughput</dt>
-                                            <dd className="sentence-case">{context.perturbation_throughput}</dd>
+                                            <dt>Assay Design</dt>
+                                            <dd className="sentence-case">{context.assay_design}</dd>
+                                        </div>
+                                    : null}
+                                    {context.assay_readout ?
+                                        <div data-test="type">
+                                            <dt>Assay Readout</dt>
+                                            <dd className="sentence-case">{context.assay_readout}</dd>
                                         </div>
                                     : null}
                                     {context.target ?
@@ -710,7 +780,42 @@ class PerturbationComponent extends React.Component {
                                             <dd><a href={context.target['@id']}>{context.target.label}</a></dd>
                                         </div>
                                     : null}
-
+                                    {context.pooled_design ?
+                                        <div data-test="type">
+                                            <dt>Pooled Design</dt>
+                                            <dd className="sentence-case">{context.pooled_design}</dd>
+                                        </div>
+                                    : null}
+                                    {context.library ?
+                                        <div data-test="type">
+                                            <dt>Library</dt>
+                                            <dd className="sentence-case">{context.library}</dd>
+                                        </div>
+                                    : null}
+                                    {context.gating_strategy ?
+                                        <div data-test="type">
+                                            <dt>Gating Strategy</dt>
+                                            <dd className="sentence-case">{context.gating_strategy}</dd>
+                                        </div>
+                                    : null}
+                                    {context.partitioning_strategy ?
+                                        <div data-test="type">
+                                            <dt>Partitioning Strategy</dt>
+                                            <dd className="sentence-case">{context.partitioning_strategy}</dd>
+                                        </div>
+                                    : null}
+                                    {context.source_rna ?
+                                        <div data-test="type">
+                                            <dt>Source of siRNA/shRNA</dt>
+                                            <dd className="sentence-case">{context.source_rna}</dd>
+                                        </div>
+                                    : null}
+                                    {context.commerical_assay ?
+                                        <div data-test="type">
+                                            <dt>Commerical Assays</dt>
+                                            <dd className="sentence-case">{context.commerical_assay}</dd>
+                                        </div>
+                                    : null}
                                     {context.software_used && context.software_used.length ?
                                         <div data-test="softwareused">
                                             <dt>Software used</dt>
@@ -783,33 +888,9 @@ class PerturbationComponent extends React.Component {
                         </div>
                     </PanelBody>
                 </Panel>
-                <Panel addClasses="data-display">
-                    <PanelBody addClasses="panel-body-with-header">
-                        <div className="flexrow">
-                            <div className="flexcol-sm-12">
-                            <div style={{marginLeft: '2rem', marginRight: '2rem'}}>
-		             {context.datasets && context.datasets.length ?
-                                		 <div data-test="datasets">
-                                <h4>Datasets</h4>
-		 <dd>
-		 {context.datasets.map((dataset, i) => (
-		     <span key={i}>
-			 {i > 0 ? ', ' : ''}
-		         <a href={dataset['@id']}>{dataset.accession}</a>
-			 </span>
-			 ))}
-		 </dd>
-                 </div>
-		 : null}
-		 </div>
-	        </div>
-                </div>
-                </PanelBody>
-                </Panel> 
                 {/* Display the file widget with the facet, graph, and tables */}
                 <FileGallery context={context} encodevers={encodevers} />
-
-                <DocumentsPanelReq documents={datasetDocuments} />
+		 <DocumentsPanelReq documents={datasetDocuments} />
             </div>
         );
     }
@@ -906,25 +987,18 @@ class ModelComponent extends React.Component {
                                         <dt>Accession</dt>
                                         <dd>{context.accession}</dd>
                                     </div>
-
                                     {context.description ?
                                         <div data-test="description">
                                             <dt>Description</dt>
                                             <dd>{context.description}</dd>
                                         </div>
                                     : null}
-
-                                    {context.biosample_term_name || biosampleSummary ?
-                                        <div data-test="biosample">
-                                            <dt>Biosample summary</dt>
-                                            <dd>
-                                                <DbxrefList context={context.biosample_term_name} dbxrefs={context.biosample_term_name} />
-                                                {context.biosample_term_name ? <span>{' '}</span> : null}
-                                                {biosampleSummary ? <span>({biosampleSummary})</span> : null}
-                                            </dd>
+                                    {context.model_biosamples ?
+                                        <div data-test="description">
+                                            <dt>Biosamples</dt>
+                                            <dd>{context.model_biosamples}</dd>
                                         </div>
                                     : null}
-
                                     {context.biosample_type ?
                                         <div data-test="biosampletype">
                                             <dt>Biosample type</dt>
@@ -937,17 +1011,52 @@ class ModelComponent extends React.Component {
                                             <dd>{context.organism.name}</dd>
                                         </div>
                                     : null}
-
                                     {context.model_name ?
                                         <div data-test="type">
-                                            <dt>Model name</dt>
-                                            <dd className="sentence-case">{context.perturbation_type}</dd>
+                                            <dt>Name</dt>
+                                            <dd className="sentence-case">{context.model_name}</dd>
+                                        </div>
+                                    : null}
+                                    {context.model_type ?
+                                        <div data-test="type">
+                                            <dt>Type</dt>
+                                            <dd className="sentence-case">{context.model_type}</dd>
                                         </div>
                                     : null}
                                     {context.model_underlying_assay ?
                                         <div data-test="type">
                                             <dt>Underlying assay for statistical model</dt>
                                             <dd className="sentence-case">{context.model_underlying_assay}</dd>
+                                        </div>
+                                    : null}
+                                    {context.model_input_format ?
+                                        <div data-test="type">
+                                            <dt>Input</dt>
+                                            <dd className="sentence-case">{context.model_input_format}</dd>
+                                        </div>
+                                    : null}
+                                    {context.model_output ?
+                                        <div data-test="type">
+                                            <dt>Output</dt>
+                                            <dd className="sentence-case">{context.model_output}</dd>
+                                        </div>
+                                    : null}
+                                    {context.model_format ?
+                                        <div data-test="type">
+                                            <dt>Format</dt>
+                                            <dd className="sentence-case">{context.model_format}</dd>
+                                        </div>
+                                    : null}
+                                    {context.model_training ?
+                                        <div data-test="type">
+                                            <dt>Training</dt>
+                                            <dd className="sentence-case">{context.model_training}</dd>
+                                        </div>
+                                    : null}
+                                    {context.model_validation ?
+                                        <div data-test="type">
+                                            <dt>Validation</dt>
+                                            <dd className="sentence-case">{context.model_validation}</dd>
                                         </div>
                                     : null}
                                     {context.target ?
@@ -1029,16 +1138,16 @@ class ModelComponent extends React.Component {
                         </div>
                     </PanelBody>
                 </Panel>
+		             {context.datasets_annotation && context.datasets_annotation.length ?
                 <Panel addClasses="data-display">
                     <PanelBody addClasses="panel-body-with-header">
                         <div className="flexrow">
                             <div className="flexcol-sm-12">
                             <div style={{marginLeft: '2rem', marginRight: '2rem'}}>
-		             {context.datasets && context.datasets.length ?
-                                		 <div data-test="datasets">
-                                <h4>Datasets</h4>
+                                		 <div data-test="annotation">
+                                <h4>Annotations</h4>
 		 <dd>
-		 {context.datasets.map((dataset, i) => (
+		 {context.datasets_annotation.map((dataset, i) => (
 		     <span key={i}>
 			 {i > 0 ? ', ' : ''}
 		         <a href={dataset['@id']}>{dataset.accession}</a>
@@ -1046,12 +1155,35 @@ class ModelComponent extends React.Component {
 			 ))}
 		 </dd>
                  </div>
-		 : null}
 		 </div>
 	        </div>
                 </div>
                 </PanelBody>
                 </Panel> 
+		 : null}
+		             {context.datasets_experiment && context.datasets_experiments.length ?
+                <Panel addClasses="data-display">
+                    <PanelBody addClasses="panel-body-with-header">
+                        <div className="flexrow">
+                            <div className="flexcol-sm-12">
+                            <div style={{marginLeft: '2rem', marginRight: '2rem'}}>
+                                		 <div data-test="assay">
+                                <h4>Assays</h4>
+		 <dd>
+		 {context.datasets_experiment.map((dataset, i) => (
+		     <span key={i}>
+			 {i > 0 ? ', ' : ''}
+		         <a href={dataset['@id']}>{dataset.accession}</a>
+			 </span>
+			 ))}
+		 </dd>
+                 </div>
+		 </div>
+	        </div>
+                </div>
+                </PanelBody>
+                </Panel> 
+		 : null}
                 {/* Display the file widget with the facet, graph, and tables */}
                 <FileGallery context={context} encodevers={encodevers} />
 

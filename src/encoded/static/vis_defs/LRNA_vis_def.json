@@ -1,8 +1,8 @@
 {
     "LRNA": {
         "assay_composite": {
-            "longLabel":  "Collection of Diabetes Epigenome Atlas long-RNA-seq experiments",
-            "shortLabel": "Diabetes Epigenome Atlas long-RNA-seq"
+            "longLabel":  "Collection of Common Metabolic Disease Genome Atlas long-RNA-seq experiments",
+            "shortLabel": "Common Metabolic Disease Genome Atlas long-RNA-seq"
         },
         "longLabel":  "{assay_title} of {replicates.library.biosample.summary} - {accession}",
         "shortLabel": "{assay_title} of {biosample_term_name} {accession}",
