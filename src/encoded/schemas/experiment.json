@@ -209,6 +209,12 @@
                 "whole organisms"
             ]
         },
+        "secondary_awards": {
+            "title": "Secondary Award",
+            "description": "Multiple Awards.",
+            "type": "string",
+	    "linkTo": "Award"
+        },
         "dbxrefs": {
             "@type": "@id",
             "rdfs:subPropertyOf": "rdfs:seeAlso",

@@ -394,6 +394,8 @@
                             "enum": [
                                 "rcc",
                                 "idat",
+				"xls",
+				"txt",
                                 "CEL",
                                 "csfasta",
                                 "csqual"
@@ -409,6 +411,7 @@
                         "file_format": {
                             "enum": [
                                 "fastq",
+				"zippedFastqFolder",
                                 "sra"
                             ]
                         }
@@ -438,7 +441,6 @@
                                 "sam",
 				"bedgraph",
 				"xls",
-				"zippedFastqFolder",
 				"txt",
                                 "gtf",
                                 "bigWig"
@@ -454,6 +456,7 @@
                                     "rcc",
                                     "idat",
                                     "CEL",
+				    "txt",
                                     "fastq",
                                     "gff",
                                     "gtf",
@@ -623,8 +626,11 @@
                         "chain",
                         "csv",
                         "fasta",
+			"zippedFastqFolder",
                         "fastq",
                         "gff",
+			"txt",
+			"xls",
                         "gtf",
                         "hdf5",
                         "hic",
@@ -636,6 +642,8 @@
                         "tagAlign",
                         "tar",
                         "tsv",
+                        "h5ad",
+			"pth",
                         "vcf",
                         "wig"
                     ]
@@ -1034,7 +1042,8 @@
 			"RPKM counts matrix",
 			"TPM counts matrix",
 			"Raw count matrix",
-			"barcode info",			
+			"barcode info",
+                        "accessible chromatin",
                         "unfiltered alignments",
                         "variant calls"
                     ]
@@ -1441,6 +1450,7 @@
         "candidate regulatory elements": "annotation",
         "representative dnase hypersensitivity sites":"annotation",
         "variant calls": "annotation",
+        "accessible chromatin": "annotation",
         "maternal variant calls": "annotation",
         "paternal variant calls": "annotation",
         "phased variant calls": "annotation",
@@ -1497,6 +1507,7 @@
         "hic": ".hic",
 	"ibed": ".ibed",
         "hdf5": ".h5",
+	"pth": ".pth",
         "idat": ".idat",
         "PWM":".pwm",
         "rcc": ".rcc",
@@ -1504,6 +1515,7 @@
         "tagAlign": ".tagAlign.gz",
         "tar": ".tar.gz",
         "tsv": ".tsv.gz",
+        "h5ad": ".h5ad.gz",
         "csv": ".csv",
         "vcf": ".vcf.gz",
         "wig": ".wig.gz",
