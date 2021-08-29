@@ -31,8 +31,7 @@ export default class Footer extends React.Component {
 
                             <div className="col-sm-6 col-sm-pull-6">
                                 <ul className="footer-logos">
-                                    <li><a href="/"><img src="/static/img/logo_final.png" alt="Diabetes Epigenome Atlas" id="t2dream-logo" height="55px" width="130px" /></a></li>
-                                    <li><a href="http://www.ucsd.edu"><img src="/static/img/UCSanDiegoLogo-BlueGold.png" alt="UC San Diego" id="ucsd-logo" width="130px" height="40px" /></a></li>
+                                    <li><a target="_blank" rel="noopener noreferrer" href="http://www.ucsd.edu"><img src="/static/img/UCSanDiegoLogo-BlueGold.png" alt="UC San Diego" id="ucsd-logo" width="130px" height="40px" /></a></li>
                                 </ul>
                             </div>
                         </div>

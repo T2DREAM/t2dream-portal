@@ -14,7 +14,7 @@ import Home from './home';
 import newsHead from './page';
 
 const portal = {
-    portal_title: 'Diabetes Epigenome Atlas',
+    portal_title: 'Common Metabolic Disease Genome Atlas',
     global_sections: [
         {
             id: 'about',
@@ -37,6 +37,7 @@ const portal = {
                 { id: 'model', title: 'Statistical Models', url: '/matrix/?type=Model' },
                 { id: 'perturbation', title: 'Gene Perturbation', url: '/matrix/?type=Perturbation' },
 		{ id: 'sep-mm-1' },
+		{ id: 'pipeline', title: 'Pipelines', url: '/search/?type=Pipeline' },
                 { id: 'publications', title: 'Publications', url: '/search/?type=Publication' },
             ],
         },
@@ -45,8 +46,13 @@ const portal = {
             title: 'Tools',
             children: [
                 { id: 'variant', title: 'Variant Search', url: '/variant-search/' },
+<<<<<<< HEAD
                 { id: 'umap', title: 'Single Cell UMAP', url: 'http://www.single-cell.cmdga.org/cellxgene' },
                 { id: 'expression', title: 'Expression Profiles', url: 'http://www.single-cell.cmdga.org/gene-expression' },
+=======
+                { id: 'umap', title: 'Single Cell UMAP', url: 'http://www.tools.cmdga.org/cellxgene' },
+                { id: 'expression', title: 'Expression Profiles', url: 'http://www.tools.cmdga.org/gene-expression' },
+>>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
             ],
         },
         {
@@ -54,7 +60,6 @@ const portal = {
             title: 'Help',
             children: [
                 { id: 'gettingstarted', title: 'Getting started', url: '/help/getting-started/' },
-                { id: 'restapi', title: 'REST API', url: '/help/rest-api/' },
 		{ id: 'profiles', title: 'Schema', url: '/profiles/' },
             ],
         },

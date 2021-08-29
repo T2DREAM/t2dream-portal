@@ -4,7 +4,11 @@
     "id": "/profiles/model.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
+<<<<<<< HEAD
     "required": ["award", "lab", "portal_usage", "model_name", "biosample_term_name", "model_underlying_assay", "biosample_term_id"],
+=======
+    "required": ["award", "lab", "portal_usage", "model_name", "biosample_term_name", "model_underlying_assay", "biosample_term_id", "model_type", "model_output", "model_format", "model_training"],
+>>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
     "identifyingProperties": ["uuid", "accession" , "aliases"],
     "additionalProperties": false,
     "mixinProperties": [
@@ -54,6 +58,53 @@
             "enum": [
 		"Basset Model"
             ]
+        },
+        "model_type": {
+            "title": "Model Type",
+            "description": "Model type.",
+            "type": "string",
+            "enum": [
+		"Convolutional neural network"
+            ]
+        },
+        "model_input": {
+            "title": "Model Input",
+            "description": "Model Input.",
+            "type": "string",
+            "enum": [
+		"Genomic intervals"
+            ]
+        },
+        "model_output": {
+            "title": "Model Output",
+            "description": "Model Output.",
+            "type": "string",
+            "enum": [
+		"Interval probabilities"
+            ]
+        },
+        "model_format": {
+            "title": "Model Format",
+            "description": "Model Format.",
+            "type": "string",
+            "enum": [
+		"PyTorch"
+            ]
+        },
+        "model_training": {
+            "title": "Model Training",
+            "description": "Description of model training.",
+            "type": "string"
+        },
+        "model_validation": {
+            "title": "Model Validation",
+            "description": "Description of model validation.",
+            "type": "string"
+        },
+        "model_biosamples": {
+            "title": "Model Biosamples",
+            "description": "Multiple Model Biosamples, attach list.",
+            "type": "string"
         },
         "model_underlying_assay": {
             "title": "Underlying Assay",
@@ -187,17 +238,30 @@
                 "linkTo": "SoftwareVersion"
             }
         },
-        "datasets": {
-            "title": "Dataset",
-            "description": "The datasets referred associated with model.",
+        "datasets_annotation": {
+            "title": "Annotation",
+            "description": "The annotation referred associated with model.",
             "type": "array",
             "uniqueItems": true,
             "items": {
-                "title": "Datasets",
-                "description": "A datasets referred to by the publication.",
-                "comment": "See dataset.json for available identifiers.",
+                "title": "Annotation",
+                "description": "A Annotation referred to by the publication.",
+                "comment": "See annotation.json for available identifiers.",
                 "type":  "string",
-                "linkTo": "Dataset"
+                "linkTo": "Annotation"
+            }
+        },
+        "datasets_experiment": {
+            "title": "Assay",
+            "description": "The assay referred associated with model.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Assay",
+                "description": "A Experiment referred to by model.",
+                "comment": "See experiment.json for available identifiers.",
+                "type":  "string",
+                "linkTo": "Experiment"
             }
         },
 	"biosample_term_id": {

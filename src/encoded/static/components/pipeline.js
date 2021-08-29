@@ -440,10 +440,46 @@ class PipelineComponent extends React.Component {
                                 </div>
                             : null}
 
+                            {context.pipeline_type ?
+                                <div data-test="description">
+                                    <dt>Pipeline Type</dt>
+                                    <dd>{context.pipeline_type}</dd>
+                                </div>
+                            : null}
+
+                            {context.pipeline_chain ?
+                                <div data-test="description">
+                                    <dt>Pipeline Chain</dt>
+                                    <dd>{context.pipeline_chain}</dd>
+                                </div>
+                            : null}
+
+                            {context.workflow_language ?
+                                <div data-test="description">
+                                    <dt>Workflow Language</dt>
+                                    <dd>{context.workflow_language}</dd>
+                                </div>
+                            : null}
+
+
+                            {context.pipeline_output ?
+                                <div data-test="description">
+                                    <dt>Pipeline Output</dt>
+                                    <dd>{context.pipeline_output}</dd>
+                                </div>
+                            : null}
+
                             {context.standards_page ?
                                 <div data-test="standardspage">
                                     <dt>Pipeline standards</dt>
                                     <dd><a href={context.standards_page['@id']}>{context.standards_page.title}</a></dd>
+                                </div>
+                            : null}
+
+                            {context.pipeline_newer_version ?
+                                <div data-test="description">
+                                    <dt>Pipeline Latest Version</dt>
+                                    <dd>{context.pipeline_newer_version}</dd>
                                 </div>
                             : null}
 
@@ -456,6 +492,53 @@ class PipelineComponent extends React.Component {
                         </dl>
                     </PanelBody>
                 </Panel>
+                             {context.datasets_annotation && context.datasets_annotation.length ?
+                <Panel addClasses="data-display">
+                    <PanelBody addClasses="panel-body-with-header">
+                        <div className="flexrow">
+                            <div className="flexcol-sm-12">
+                            <div style={{marginLeft: '2rem', marginRight: '2rem'}}>
+                                                 <div data-test="datasets">
+                                <h4>Annotations</h4>
+                 <dd>
+                 {context.datasets_annotation.map((annotation, i) => (
+                     <span key={i}>
+                         {i > 0 ? ', ' : ''}
+                         <a href={annotation['@id']}>{annotation.accession}</a>
+                         </span>
+                         ))}
+                 </dd>
+                 </div>
+                 </div>
+                </div>
+                </div>
+                </PanelBody>
+                </Panel>
+                 : null}
+                     {context.datasets_experiment && context.datasets_experiment.length ?
+                <Panel addClasses="data-display">
+                    <PanelBody addClasses="panel-body-with-header">
+                        <div className="flexrow">
+                            <div className="flexcol-sm-12">
+                            <div style={{marginLeft: '2rem', marginRight: '2rem'}}>
+
+                                                 <div data-test="assay">
+                                <h4>Assays</h4>
+                 <dd>
+                 {context.datasets_experiment.map((dataset, i) => (
+                     <span key={i}>
+                         {i > 0 ? ', ' : ''}
+                         <a href={dataset['@id']}>{dataset.accession}</a>
+                         </span>
+                         ))}
+                 </dd>
+                 </div>
+                 </div>
+                </div>
+                </div>
+                </PanelBody>
+                </Panel>
+                 : null}
 
                 {this.jsonGraph ?
                     <Panel>

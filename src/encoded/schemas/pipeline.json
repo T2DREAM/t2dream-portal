@@ -4,7 +4,7 @@
     "id": "/profiles/pipeline.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["title", "lab", "award"],
+    "required": ["title", "lab", "award", "pipeline_type"],
     "identifyingProperties": ["uuid", "aliases", "accession"],
     "additionalProperties": false,
     "mixinProperties": [
@@ -15,6 +15,7 @@
         { "$ref": "mixins.json#/attribution" },
         { "$ref": "mixins.json#/notes"},
         { "$ref": "mixins.json#/references" },
+	{ "$ref": "dataset.json#/properties" },
         { "$ref": "mixins.json#/submitted"},
         { "$ref": "mixins.json#/documents" },
         { "$ref": "mixins.json#/submitter_comment" }
@@ -133,6 +134,43 @@
                 "replaced"
             ]
         },
+        "data_type": {
+            "title": "Data Type",
+            "type": "string",
+            "enum": [
+                "experiment",
+                "annotation",
+                "embedding",
+                "gene perturbation",
+                "statistical model"
+            ]
+        },
+        "datasets_annotation": {
+            "title": "Annotation",
+            "description": "The annotations referred associated with embeddings.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Annotation",
+                "description": "Annotations referred to by the embeding.",
+                "comment": "See annotation.json for available identifiers.",
+                "type":  "string",
+                "linkTo": "Dataset"
+            }
+        },
+        "datasets_experiment": {
+            "title": "Assay",
+            "description": "The assay referred associated with embeddings.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Assay",
+                "description": "Assays referred to by the embeddings.",
+                "comment": "See dataset.json for available identifiers.",
+                "type":  "string",
+                "linkTo": "Dataset"
+            }
+        },
         "title": {
             "title": "Title",
             "description": "The preferred viewable name of the pipeline.",
@@ -182,10 +220,37 @@
             "type": "string",
             "linkTo": "Page"
         },
+        "pipeline_type": {
+            "title": "Pipeline Type",
+            "description": "Type of pipeline: wdl, snakemake, ruffus, cwl, github_readme, text_file, notebook",
+            "type": "string"
+        },
+        "workflow_language": {
+            "title": "Workflow Language",
+            "description": "Language used if workflow script",
+            "type": "string"
+        },
+        "pipeline_output": {
+            "title": "Pipeline Output",
+            "description": "Outputs produced by the pipeline",
+            "type": "string"
+        },
+        "pipeline_chain": {
+            "title": "Pipeline chain",
+            "description": "An link to pipelines in same chain",
+            "type": "string",
+            "linkTo": "Pipeline"
+        },
         "pipeline_version": {
             "title": "Pipeline version",
             "description": "The pipeline version.",
             "comment": "Please increment as whole numbers starting from 1.",
+            "type": "integer",
+            "pattern": "^[1-9]\\d*$"
+        },
+        "pipeline_newer_version": {
+            "title": "Pipeline Latest version",
+            "description": "The pipeline latest version.",
             "type": "integer",
             "pattern": "^[1-9]\\d*$"
         }

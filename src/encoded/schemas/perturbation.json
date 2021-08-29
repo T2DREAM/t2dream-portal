@@ -18,7 +18,11 @@
         { "$ref": "mixins.json#/notes" },
         { "$ref": "dataset.json#/properties" },
         { "$ref": "file_set.json#/properties" },
+<<<<<<< HEAD
 	{ "$ref": "mixins.json#/attachment" }
+=======
+	{ "$ref": "mixins.json#/documents" }
+>>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
     ],
     "dependencies": {
         "status": {
@@ -78,6 +82,10 @@
             "type": "string",
             "enum": [
 		"single cell sequencing",
+<<<<<<< HEAD
+=======
+		"Sequencing of sorted samples",
+>>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
 		"sequencing",
 		"imaging",
 		"cellular phenotype",
@@ -95,6 +103,10 @@
 		"type": "string",
 		"enum" : [
 		    "cell death",
+<<<<<<< HEAD
+=======
+		    "Insulin secretion (glucose stimulated, Tolbutamide & IBMX stimulated), cell number",
+>>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
 		    "insulin content",
 		    "ER stress",
 		    "lipid levels"
@@ -127,6 +139,19 @@
 		"partitioning"
             ]
         },
+<<<<<<< HEAD
+=======
+        "source_rna": {
+            "title": "Source of siRNA/shRNA",
+            "description": "Details of source of siRNA reagents and their sequence",
+            "type": "string"
+        },
+        "commerical_assay": {
+            "title": "Details of any commerically available assays used",
+            "description": "Details of any commerically available assays used",
+            "type": "string"
+        },
+>>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
         "gating_strategy": {
             "title": "Gating Strategy",
             "description": "For cell sorting experiments, description of the gating strategy used (full details in experimental protocol)",
@@ -333,6 +358,14 @@
 		"description": "Any specalized conditions the cells/tissues were subjected to",
 		"type": "string",
 		"enum" : [
+<<<<<<< HEAD
+=======
+		    "low glucose stimulated insulin secretion",
+		    "high glucose stimulated insulin secretion",
+		    "tolbutamide stimulated insulin secretion",
+		    "IBMX stimulated insulin secretion",
+		    "cell number",
+>>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
 		    "glucose",
 		    "cytokines",
 		    "thapsigargin"
@@ -440,6 +473,10 @@
             "title": "Collection Tags",
             "type": "string"
         },
+        "modification_type": {
+            "title": "Type",
+            "type": "string"
+        },
         "files.replicate.experiment.assay_term_name": {
             "title": "Assay Type",
             "type": "string"
@@ -498,6 +535,7 @@
         "alternate_accessions": 1.0,
         "dbxrefs": 1.0,
         "aliases": 1.0,
+	"modification_type": 1.0,
         "files.replicate.experiment.assay_term_name": 1.0,
         "biosample_term_id": 1.0,
         "biosample_term_name": 1.0,

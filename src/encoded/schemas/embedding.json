@@ -52,9 +52,10 @@
             "description": "The category that best describes the embeddings set.",
             "type": "string",
             "enum": [
-		"single-cell ATAC-seq",
-                "single-cell RNA-seq",
-                "single-cell Multiomics"
+		"Accessible chromatin",
+                "Gene expression",
+                "Paired accessible chromatin and gene expression",
+		"Integrated accessible chromatin and gene expression"
             ]
         },
         "embeddings_category": {
@@ -62,10 +63,32 @@
             "description": "The name of the cell embedding that will be used as default for display on cellxgene, which should correspond to a key in ‘obsm’..",
             "type": "string",
             "enum": [
-		"X_umap",
-		"X_tsne",
-		"X_spatial"
+		"umap",
+		"tsne",
+		"spatial",
+		"pca"
             ]
+        },
+        "embeddings_unit": {
+            "title": "Embedding Unit",
+            "description": "Unit used to create embedding",
+            "type": "string",
+            "enum": [
+		"Genes",
+		"Peaks",
+		"Windows"
+            ]
+        },
+        "embeddings_cells": {
+            "title": "Embeddings Cells",
+            "description": "Number of cells/nuclei in embedding",
+            "type": "string"
+        },
+        "embeddings_pipeline": {
+            "title": "Embedding Pipeline",
+            "comment": "See pipeline.json for available identifiers.",
+            "type": "string",
+            "linkTo": "Pipeline"
         },
         "portal_usage": {
             "title": "KP usage",
@@ -79,12 +102,13 @@
         },
         "embeddings_source": {
             "title": "Embeddings Source",
-            "description": "Meta-data field in embeddings record with source",
+            "description": "The name of the cell embedding that will be used as default for use on cellxgene, which should correspond to obsm",
             "type": "string",
             "enum": [
-		"Seurat UMAP",
-		"Custom Code",
-		"Unknown"
+		"Seurat",
+		"Signac",
+		"ArchR",
+		"Scanpy"
             ]
         },	
 	"embeddings_underlying_assay": {
@@ -94,10 +118,13 @@
 	    "items": {
 		"type": "string",
 		"enum": [
-                    "scRNA-seq",
-                    "snRNA-seq",		    
-                    "snATAC-seq",
-                    "scATAC-seq",
+                    "Drop-seq",
+                    "Smart-seq",		    
+                    "10X scRNA-seq",
+                    "10X snRNA-seq",
+		    "sciATAC-seq",
+		    "10X snATAC-seq",
+		    "10X multiome",
 		    "other"
 		]
 	    }	    
@@ -213,14 +240,27 @@
                 "linkTo": "SoftwareVersion"
             }
         },
-        "datasets": {
-            "title": "Dataset",
-            "description": "The datasets referred associated with embeddings.",
+        "datasets_annotation": {
+            "title": "Annotation",
+            "description": "The annotations referred associated with embeddings.",
             "type": "array",
             "uniqueItems": true,
             "items": {
-                "title": "Datasets",
-                "description": "A datasets referred to by the publication.",
+                "title": "Annotation",
+                "description": "Annotations referred to by the embeding.",
+                "comment": "See annotation.json for available identifiers.",
+                "type":  "string",
+                "linkTo": "Annotation"
+            }
+        },
+        "datasets_experiment": {
+            "title": "Assay",
+            "description": "The assay referred associated with embeddings.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Assay",
+                "description": "Assays referred to by the embeddings.",
                 "comment": "See dataset.json for available identifiers.",
                 "type":  "string",
                 "linkTo": "Dataset"

@@ -350,6 +350,8 @@ class Embedding(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, 
         'organism',
         'targets',
         'datasets',
+        'datasets_experiment',
+        'datasets_annotation',
         'files.dataset',
         'files.analysis_step_version.analysis_step',
         'files.analysis_step_version.analysis_step.pipelines',
@@ -459,7 +461,7 @@ class Perturbation(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonym
                 'targets.label',
                 'files.file_type',
             ],
-            'group_by': 'perturbation_type',
+            'group_by': 'modification_type',
             'label': 'Type',
         },
     }
@@ -492,6 +494,8 @@ class Model(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, Calc
         'organism',
         'targets',
         'datasets',
+        'datasets_experiment',
+        'datasets_annotation',
         'files.dataset',
         'files.analysis_step_version.analysis_step',
         'files.analysis_step_version.analysis_step.pipelines',
@@ -520,8 +524,8 @@ class Model(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, Calc
                 'assembly',
                 'encyclopedia_version'
             ],
-            'group_by': ['biosample_type', 'biosample_term_name'],
-            'label': 'Biosample',
+            'group_by': ['model_underlying_assay','model_underlying_assay'],
+            'label': 'Assay',
         },
         'x': {
             'facets': [
@@ -534,7 +538,6 @@ class Model(FileSet, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, Calc
             'label': 'Type',
         },
     }
-
     @calculated_property(schema={
         "title": "Superseded by",
         "type": "array",

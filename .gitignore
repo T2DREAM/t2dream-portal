@@ -1,4 +1,5 @@
 .aws/
+.npm/
 .coverage
 .gitconfig
 /.installed.cfg
