@@ -394,6 +394,8 @@
                             "enum": [
                                 "rcc",
                                 "idat",
+				"xls",
+				"txt",
                                 "CEL",
                                 "csfasta",
                                 "csqual"
@@ -409,6 +411,7 @@
                         "file_format": {
                             "enum": [
                                 "fastq",
+				"zippedFastqFolder",
                                 "sra"
                             ]
                         }
@@ -438,7 +441,6 @@
                                 "sam",
 				"bedgraph",
 				"xls",
-				"zippedFastqFolder",
 				"txt",
                                 "gtf",
                                 "bigWig"
@@ -454,6 +456,7 @@
                                     "rcc",
                                     "idat",
                                     "CEL",
+				    "txt",
                                     "fastq",
                                     "gff",
                                     "gtf",
@@ -623,8 +626,11 @@
                         "chain",
                         "csv",
                         "fasta",
+			"zippedFastqFolder",
                         "fastq",
                         "gff",
+			"txt",
+			"xls",
                         "gtf",
                         "hdf5",
                         "hic",

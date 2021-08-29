@@ -61,6 +61,7 @@
 		"hQTL",
 		"meQTL",
 		"sQTL",
+		"pQTL",
                 "binding sites",
                 "blacklist",
 		"MeRIP-seq",
@@ -101,6 +102,12 @@
 		"Others"
             ]
         },
+        "secondary_awards": {
+            "title": "Secondary Award",
+            "description": "Multiple Awards.",
+            "type": "string",
+	    "linkTo": "Award"
+        },
         "portal_usage": {
             "title": "KP usage",
             "description": "Meta-data field in annotation record with type",
@@ -123,6 +130,7 @@
 		"ChIP-seq peaks",
 		"chromatin loops",
 		"Chromatin loops",
+		"protein QTLs",
 		"ChromHMM states",
 		"Cicero co-accessibility",
 		"deltaSVM predictions",
@@ -140,6 +148,8 @@
 		"type": "string",
 		"enum": [
                     "ChIP-seq",
+		    "SNP-SELEX",
+		    "Expression arrays",
                     "RNA-seq",
 		    "DNA methylation profiling by array assay",
                     "DNase-seq",
@@ -164,6 +174,7 @@
                     "small RNA-seq",
                     "Bru-seq",
                     "BruChase-seq",
+		    "quantitative proteomics",
                     "genetic modification followed by DNase-seq",
                     "snATAC-seq",
 		    "other"
