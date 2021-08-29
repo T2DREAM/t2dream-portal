@@ -4,11 +4,8 @@
     "id": "/profiles/model.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-<<<<<<< HEAD
     "required": ["award", "lab", "portal_usage", "model_name", "biosample_term_name", "model_underlying_assay", "biosample_term_id"],
-=======
     "required": ["award", "lab", "portal_usage", "model_name", "biosample_term_name", "model_underlying_assay", "biosample_term_id", "model_type", "model_output", "model_format", "model_training"],
->>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
     "identifyingProperties": ["uuid", "accession" , "aliases"],
     "additionalProperties": false,
     "mixinProperties": [
