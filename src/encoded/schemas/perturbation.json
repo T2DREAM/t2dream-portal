@@ -4,7 +4,7 @@
     "id": "/profiles/perturbation.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": [ "award", "lab", "portal_usage", "modification_type", "assay_design", "tissue_term_name", "biosample_term_name", "biosample_term_id", "tissue_term_id"],
+    "required": [ "award", "lab", "portal_usage", "perturbation_type", "assay_design", "tissue_term_name", "biosample_term_name", "biosample_term_id", "tissue_term_id"],
     "identifyingProperties": ["uuid", "accession" , "aliases"],
     "additionalProperties": false,
     "mixinProperties": [
@@ -48,7 +48,7 @@
         "schema_version": {
             "default": "17"
         },
-        "modification_type": {
+        "perturbation_type": {
             "title": "Modification type",
             "description": "Type of gene modification performed",
             "type": "string",
@@ -379,7 +379,7 @@
 	}
     },
     "facets": {
-        "modification_type": {
+        "perturbation_type": {
             "title": "Perturbation type"
         },
         "assay_design": {
@@ -458,7 +458,7 @@
             "title": "Collection Tags",
             "type": "string"
         },
-        "modification_type": {
+        "perturbation_type": {
             "title": "Type",
             "type": "string"
         },
@@ -520,7 +520,7 @@
         "alternate_accessions": 1.0,
         "dbxrefs": 1.0,
         "aliases": 1.0,
-	"modification_type": 1.0,
+	"perturbation_type": 1.0,
         "files.replicate.experiment.assay_term_name": 1.0,
         "biosample_term_id": 1.0,
         "biosample_term_name": 1.0,
@@ -549,7 +549,6 @@
         "organism.name": 1.0,
         "organism.scientific_name": 1.0,
         "organism.taxon_id": 1.0,
-        "perturbation_type": 1.0,
         "internal_tags": 1.0
     },
     "changelog": "/profiles/changelogs/perturbation.md"
