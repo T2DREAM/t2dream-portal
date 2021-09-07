@@ -97,7 +97,7 @@
 		"type": "string",
 		"enum" : [
 		    "cell death",
-		    "Insulin secretion (glucose stimulated, Tolbutamide & IBMX stimulated), cell number",
+		    "Insulin secretion, cell number",
 		    "insulin content",
 		    "ER stress",
 		    "lipid levels"
@@ -344,17 +344,7 @@
 	    "items": {
 		"title": "Biosample Conditions",
 		"description": "Any specalized conditions the cells/tissues were subjected to",
-		"type": "string",
-		"enum" : [
-		    "low glucose stimulated insulin secretion",
-		    "high glucose stimulated insulin secretion",
-		    "tolbutamide stimulated insulin secretion",
-		    "IBMX stimulated insulin secretion",
-		    "cell number",
-		    "glucose",
-		    "cytokines",
-		    "thapsigargin"
-		]
+		"type": "string"
 	    }
 	},
 	"biosample_type": {

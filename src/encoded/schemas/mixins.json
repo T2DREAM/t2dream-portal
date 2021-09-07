@@ -184,6 +184,7 @@
                     "type": "string",
                     "enum": [
                         "application/pdf",
+			"application/wdl",
                         "image/gif",
                         "image/jpeg",
                         "image/png",

@@ -113,8 +113,8 @@ var AmpBanner = React.createClass({
 		    <div>
 		    <meta charSet="utf-8" />
 		    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
-		    <div className="container-fluid" style={{borderBottom: 'solid 1px #fff', backgroundImage: "url('/static/components/assets/images/AMP_banner.png')", backgroundPosition: 'center', backgroundRepeat: 'repeat-x', backgroundColor: '#397eb5',height: 75, padding: 0, minWidth: '100%'}}>
-		    </div>
+		    <a target="_blank" rel="noopener noreferrer" href="https://www.nih.gov/research-training/accelerating-medicines-partnership-amp/common-metabolic-diseases"><div className="container-fluid" style={{borderBottom: 'solid 1px #fff', backgroundImage: "url('/static/components/assets/images/AMP_banner.png')", backgroundPosition: 'center', backgroundRepeat: 'repeat-x', backgroundColor: '#397eb5',height: 75, padding: 0, minWidth: '100%'}}>
+		    </div></a>
 		    </div>
 		    );
 	}

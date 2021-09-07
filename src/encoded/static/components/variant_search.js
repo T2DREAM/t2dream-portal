@@ -265,12 +265,10 @@ class VariantSearch extends React.Component {
         const filters = context.filters;
         const facets = context.facets;
         const total = context.total;
-	var kp = context['query'];
 	var genome = context['genome'];
 	var chromosome = context['chromosome']
 	var start = context['start'] - 5000
 	var end = context['end'] + 5000
-	const domain = 'https://hugeamp.org/variant.html?variant=';
 	const loggedIn = this.context.session && this.context.session['auth.userid'];
         const visualizeDisabled = total > visualizeLimit;
 
@@ -339,7 +337,6 @@ class VariantSearch extends React.Component {
 			         </DropdownMenu>
 			         </DropdownButton>
 			         : null}
-		          <a className="btn btn-info btn-sm" target = "_blank" href = { `${domain}${kp}` }>Knowledge Portal</a>
                                         </div>
                                     </div>
 
