@@ -81,10 +81,10 @@ const LoginDenied = (props) => {
             <div className="row">
                 <div className="col-sm-12">
                     <h2>Our Apologies!</h2>
-                    <p>The email address you have provided us does not match any user of the Common Metabolic Disease Genome Atlas.</p>
+                    <p>The email address you have provided us does not match any user of the Common Metabolic Diseases Genome Atlas.</p>
                     <p>As you know, we have recently changed our login system.</p>
 
-                    <p>The Common Metabolic Disease Genome Atlas now uses a variety of common identity providers to verify you are who say you are.<br />
+                    <p>The Common Metabolic Diseases Genome Atlas now uses a variety of common identity providers to verify you are who say you are.<br />
                         The email address you use as your &ldquot;id&rdquot; must match exactly the email address in our system.</p>
 
                     <p>Please be aware that login access (to unreleased data) is available only to AMP Consortium members.</p>

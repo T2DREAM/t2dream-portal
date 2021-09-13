@@ -14,7 +14,7 @@ import Home from './home';
 import newsHead from './page';
 
 const portal = {
-    portal_title: 'Common Metabolic Disease Genome Atlas',
+    portal_title: 'Common Metabolic Diseases Genome Atlas',
     global_sections: [
         {
             id: 'about',
