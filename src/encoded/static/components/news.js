@@ -384,7 +384,7 @@ const News = (props) => {
     return (
         <Panel addClasses="news-blank">
             <h2>No matching news items</h2>
-            <a href="/news/">Latest Common Metabolic Disease Genome Atlas News</a>
+            <a href="/news/">Latest Common Metabolic Diseases Genome Atlas News</a>
         </Panel>
     );
 };

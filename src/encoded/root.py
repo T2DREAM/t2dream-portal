@@ -47,7 +47,7 @@ def acl_from_settings(settings):
 class EncodedRoot(Root):
     properties = {
         'title': 'Home',
-        'portal_title': 'Common Metabolic Disease Genome Atlas',
+        'portal_title': 'Common Metabolic Diseases Genome Atlas',
     }
 
     @reify

@@ -11,7 +11,7 @@ export default class Footer extends React.Component {
         let userActionRender;
 
         if (!(session && session['auth.userid'])) {
-            userActionRender = <a href="#" data-trigger="login" disabled={disabled}>User sign-in</a>;
+            userActionRender = <a href="#" data-trigger="login" disabled={disabled}>AMP Consortium sign-in</a>;
         } else {
             userActionRender = <a href="#" data-trigger="logout">User sign out</a>;
         }

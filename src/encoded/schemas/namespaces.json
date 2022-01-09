@@ -11,7 +11,7 @@
     "GeneID": "https://www.ncbi.nlm.nih.gov/gene/",
     "T2D": "http://www.type2diabetesgenetics.org/",
     "Diabetes Epigenome Atlas": "https://www.diabetesepigenome.org/",
-    "Common Metabolic Disease Genome Atlas": "https://www.cmdga.org/",
+    "Common Metabolic Diseases Genome Atlas": "https://www.cmdga.org/",
     "GEO": "http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=",
     "Caltech": "http://jumpgate.caltech.edu/library/",
     "FlyBase": "http://flybase.org/cgi-bin/quicksearch_solr.cgi?caller=quicksearch&tab=basic_tab&data_class=FBgn&species=Dmel&search_type=all&context=",
