@@ -4,7 +4,7 @@
     "id": "/profiles/embedding.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": [ "award", "lab", "portal_usage", "embeddings_source", "embeddings_type", "tissue_term_name", "biosample_term_name", "embeddings_category", "biosample_term_id", "tissue_term_id"],
+    "required": [ "award", "lab", "portal_usage", "embeddings_type", "tissue_term_name", "biosample_term_name", "embeddings_category", "biosample_term_id", "tissue_term_id"],
     "identifyingProperties": ["uuid", "accession" , "aliases"],
     "additionalProperties": false,
     "mixinProperties": [

@@ -28,9 +28,12 @@ log = logging.getLogger(__name__)
 def includeme(config):
     config.add_route('peak_metadata', '/peak_metadata/{search_params}/{tsv}')
     config.add_route('region_metadata', '/region_metadata/{search_params}/{tsv}')
-    config.add_route('experiment_metadata', '/experiment_metadata/{search_params}/{json}')
     config.add_route('annotation_metadata', '/annotation_metadata/{search_params}/{tsv}')
+    config.add_route('annotation_amp', '/annotation_amp/{search_params}/{tsv}')
+    config.add_route('assay_amp', '/assay_amp/{search_params}/{tsv}')
+    config.add_route('embedding_amp', '/embedding_amp/{search_params}/{tsv}')
     config.add_route('annotation_registry_metadata', '/annotation_registry_metadata/{search_params}/{tsv}')
+    config.add_route('data_filters', '/data_filters/{search_params}/{json}')
     config.scan(__name__)
 
 # includes concatenated properties
@@ -40,10 +43,19 @@ _tsv_mapping = OrderedDict([
     ('Output type', ['files.output_type']),
     ('Experiment accession', ['accession']),
     ('Annotation accession', ['accession']),
+    ('Embedding accession', ['accession']),
     ('Assay', ['assay_term_name']),
+    ('Assay Title', ['assay_title']),
     ('Annotation', ['annotation_type']),
+    ('Embedding', ['embeddings_type']),
+    ('Embedding Source', ['embeddings_source']),
+    ('Embedding Pipeline', ['embeddings_pipeline']),
+    ('Embedding Cells', ['embeddings_cells']),
+    ('Embedding Unit', ['embeddings_unit']),
+    ('Embedding Assay', ['embeddings_underlying_assay']),
+    ('Embedding Category', ['embeddings_category']),    
     ('Annotation Category', ['annotation_category']),
-    ('Assay Type', ['annotation_type_category']),
+    ('Assay Type', ['annotation_type_category']),    
     ('Status', ['status']),
     ('Version', ['schema_version']),
     ('Collection Tags',  ['collection_tags']),
@@ -55,6 +67,7 @@ _tsv_mapping = OrderedDict([
     ('Biosample type', ['biosample_type']),
     ('Biosample synonyms', ['biosample_synonyms']),
     ('software_used', ['software_used']),
+    ('annotation_pipeline', ['annotation_pipeline']),
     ('System slims', ['system_slims']),
     ('Organ slims', ['organ_slims']),
     ('Biosample life stage', ['replicates.library.biosample.life_stage']),
@@ -455,72 +468,6 @@ def region_metadata(context, request):
         body=fout.getvalue(),
         content_disposition='attachment;filename="%s"' % 'region_metadata.tsv'
     )
-
-@view_config(route_name= 'experiment_metadata', request_method='GET')
-def experiment_metadata(context, request):
-    param_list = parse_qs(request.matchdict['search_params'])
-    if 'referrer' in param_list:
-        search_path = '/{}/'.format(param_list.pop('referrer')[0])
-    else:
-        search_path = '/search/'
-    param_list['field'] = []
-    file_attributes = []
-    for prop in _tsv_mapping:
-        param_list['field'] = param_list['field'] + _tsv_mapping[prop]
-        if _tsv_mapping[prop][0].startswith('files'):
-            file_attributes = file_attributes + [_tsv_mapping[prop][0]]
-    param_list['limit'] = ['all']
-    path = '{}?{}'.format(search_path, urlencode(param_list, True))
-    results = request.embed(path, as_user=True)
-    json_doc = {}
-    for experiment_json in results['@graph']:
-        files = {}
-        for f in experiment_json['files']:
-            title = f['title']
-            lab = f['lab']['title']
-            href = request.host_url + f['href']
-            status = f['status']
-            if title not in files:
-                files[title] = []
-                files[title].append({
-                    'href': href,
-                    'status': status,
-                    'lab': lab
-                    })
-            else:
-                files[title].append({
-                    'href': href,
-                    'status': status,
-                    'lab': lab
-                    })                
-        assay_id = experiment_json['accession']
-        assay = experiment_json['assay_term_name']
-        biosample_term = experiment_json['biosample_term_name']
-        replicate = experiment_json['replicates']
-        if assay not in json_doc:
-            json_doc[assay] = []
-            json_doc[assay].append({
-                'assay_term_name': assay,
-                'assay_id': assay_id,
-                'biosample_term': biosample_term,
-                'file_download': files,
-                'replicates': replicate
-                })  
-        else:
-            json_doc[assay].append({
-                'assay': assay,
-                'assay id': assay_id,
-                'biosample_term': biosample_term,
-                'file_download': files,
-                'replicates': replicate
-                })  
-    if 'experiment_metadata.json' in request.url:
-        return Response(
-            content_type='text/plain',
-            body=json.dumps(json_doc,indent=2,sort_keys=True),
-            content_disposition='attachment;filename="%s"' % 'experiment_metadata.json'
-    )
-
 @view_config(route_name= 'annotation_metadata', request_method='GET')
 def annotation_metadata(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
@@ -671,6 +618,311 @@ def annotation_metadata(context, request):
             body=json.dumps(json_doc,indent=2,sort_keys=True),
             content_disposition='attachment;filename="%s"' % 'annotation_metadata.json'
     )
+@view_config(route_name= 'annotation_amp', request_method='GET')
+def annotation_amp(context, request):
+    param_list = parse_qs(request.matchdict['search_params'])
+    if 'referrer' in param_list:
+        search_path = '/{}/'.format(param_list.pop('referrer')[0])
+    else:
+        search_path = '/search/'
+    param_list['field'] = []
+    file_attributes = []
+    for prop in _tsv_mapping:
+        param_list['field'] = param_list['field'] + _tsv_mapping[prop]
+        if _tsv_mapping[prop][0].startswith('files'):
+            file_attributes = file_attributes + [_tsv_mapping[prop][0]]
+    param_list['limit'] = ['all']
+    path = '{}?{}'.format(search_path, urlencode(param_list, True))
+    results = request.embed(path, as_user=True)
+    json_doc = {}
+    for annotation_amp_json in results['@graph']:
+        files = {}
+        for f in annotation_amp_json.get('files', []):
+            title = f['title']
+            href = request.host_url + f['href']
+            status = f['status']
+            assembly = f['assembly']
+            output_type = f['output_type']
+            file_type = f['file_type']
+            if f['status'] != 'archived':
+                if title not in files:
+                    files[title] = []
+                    files[title].append({
+                        'files_href': href,
+                        'files_status': status,
+                        'files_assembly': assembly,
+                        'output_type': output_type,
+                        'file_type':file_type
+                    })
+                else:
+                    files[title].append({
+                        'files_href': href,
+                        'files_status': status,
+                        'files_assembly': assembly,
+                        'output_type': output_type,
+                        'file_type': file_type
+                    })
+        references = []
+        for r in annotation_amp_json['references']:
+            identifier = 'identifiers'
+            if  identifier in r:
+                identifiers = r['identifiers']
+            else:
+                identifiers = []
+            references.extend(identifiers)
+        documents = {}
+        for d in annotation_amp_json.get('documents', []):
+            href = request.host_url + d['attachment']['href']
+            md5sum = d['attachment']['md5sum']
+            description = d['description']
+            uuid = d['uuid']
+            status = d['status']
+            if uuid not in documents:
+                documents[uuid] = []
+                documents[uuid].append({
+                    'documents_md5sum': md5sum,
+                    'documents_description': description,
+                    'documents_href': href,
+                    'documents_status': status
+                })
+            else:
+                documents[uuid].append({
+                    'documents_md5sum': md5sum,
+                    'documents_description': description,
+                    'documents_href': href,
+                    'documents_status': status
+                    })
+        annotation_id = annotation_amp_json['accession']
+        project = annotation_amp_json['award']['project']
+        annotation_type = annotation_amp_json['annotation_type']
+        status = annotation_amp_json['status']
+        version = annotation_amp_json['schema_version']
+        assay_type = annotation_amp_json.get("annotation_type_category", None)
+        pipeline = None if annotation_amp_json.get('annotation_pipeline') == None else annotation_amp_json['annotation_pipeline'][0]['title']
+        biosample_term_name = annotation_amp_json.get("biosample_term_name", None)
+        biosample_type = annotation_amp_json.get("biosample_type", None)
+        biosample_term_id = annotation_amp_json['biosample_term_id'] if 'biosample_term_id' in annotation_amp_json else None
+        dbxrefs = annotation_amp_json['dbxrefs']
+        annotation_source = None if annotation_amp_json.get('annotation_source')== None else annotation_amp_json['annotation_source']
+        annotation_category = annotation_amp_json['annotation_category'] if 'annotation_category' in annotation_amp_json else 'Others'
+        #publication = None if annotation_amp_json.get("references")== None else annotation_amp_json['references']['identifiers']
+        if files:
+            if version not in json_doc:
+                json_doc[version] = []
+                json_doc[version].append({
+                    'annotation_type': annotation_type,
+                    'annotation_id': annotation_id,
+                    'dbxrefs': dbxrefs,
+                    'project': project,
+                    'biosample_term_name': biosample_term_name,
+                    'biosample_type': biosample_type,
+                    'file_download': files,
+                    'dataset_status': status,
+                    'underlying_assay': assay_type,
+                    'pipeline': pipeline,
+                    'publications': references,
+                    'annotation_source': annotation_source,
+                    'annotation_category': annotation_category
+                })  
+            else:
+                json_doc[version].append({
+                    'annotation_type': annotation_type,
+                    'annotation_id': annotation_id,
+                    'dbxrefs': dbxrefs,
+                    'project': project,
+                    'biosample_term_name': biosample_term_name,
+                    'biosample_type': biosample_type,
+                    'file_download': files,
+                    'dataset_status': status,
+                    'underlying_assay':assay_type,
+                    'pipeline': pipeline,
+                    'publications': references,
+                    'annotation_source': annotation_source,
+                    'annotation_category': annotation_category
+                    })             
+    if 'annotation_amp.json' in request.url:
+        return Response(
+            content_type='text/plain',
+            body=json.dumps(json_doc,indent=2,sort_keys=True),
+            content_disposition='attachment;filename="%s"' % 'annotation_amp.json'
+    )
+@view_config(route_name= 'embedding_amp', request_method='GET')
+def embedding_amp(context, request):
+    param_list = parse_qs(request.matchdict['search_params'])
+    if 'referrer' in param_list:
+        search_path = '/{}/'.format(param_list.pop('referrer')[0])
+    else:
+        search_path = '/search/'
+    param_list['field'] = []
+    file_attributes = []
+    for prop in _tsv_mapping:
+        param_list['field'] = param_list['field'] + _tsv_mapping[prop]
+        if _tsv_mapping[prop][0].startswith('files'):
+            file_attributes = file_attributes + [_tsv_mapping[prop][0]]
+    param_list['limit'] = ['all']
+    path = '{}?{}'.format(search_path, urlencode(param_list, True))
+    results = request.embed(path, as_user=True)
+    json_doc = {}
+    for embedding_amp_json in results['@graph']:
+        files = {}
+        for f in embedding_amp_json.get('files', []):
+            title = f['title']
+            href = request.host_url + f['href']
+            status = f['status']
+            assembly = f['assembly']
+            output_type = f['output_type']
+            file_type = f['file_type']
+            if f['status'] != 'archived':
+                if title not in files:
+                    files[title] = []
+                    files[title].append({
+                        'files_href': href,
+                        'files_status': status,
+                        'files_assembly': assembly,
+                        'output_type': output_type,
+                        'file_type':file_type
+                    })
+                else:
+                    files[title].append({
+                        'files_href': href,
+                        'files_status': status,
+                        'files_assembly': assembly,
+                        'output_type': output_type,
+                        'file_type': file_type
+                    })
+        references = []
+        for r in embedding_amp_json['references']:
+            identifier = 'identifiers'
+            if  identifier in r:
+                identifiers = r['identifiers']
+            else:
+                identifiers = []
+            references.extend(identifiers)
+        embedding_id = embedding_amp_json['accession']
+        project = embedding_amp_json['award']['project']
+        embedding_type = embedding_amp_json['embeddings_type']
+        status = embedding_amp_json['status']
+        version = embedding_amp_json['schema_version']
+        biosample_term_name = embedding_amp_json.get("biosample_term_name", None)
+        biosample_type = embedding_amp_json.get("biosample_type", None)
+        dbxrefs = embedding_amp_json['dbxrefs']
+        embedding_source = None if embedding_amp_json.get('embeddings_source')== None else embedding_amp_json['embeddings_source']
+        embedding_pipeline = None if embedding_amp_json.get('embeddings_pipeline')== None else embedding_amp_json['embeddings_pipeline']
+        embedding_cells = embedding_amp_json['embeddings_cells'] if 'embedding_cells' in embedding_amp_json else None
+        embedding_unit = None if embedding_amp_json.get('embeddings_unit')== None else embedding_amp_json['embeddings_unit']
+        embedding_underlying_assay = None if embedding_amp_json.get('embeddings_underlying_assay')== None else embedding_amp_json['embeddings_underlying_assay']
+        embedding_category = embedding_amp_json['embeddings_category'] if 'embedding_category' in embedding_amp_json else 'Others'
+        if files:
+            if version not in json_doc:
+                json_doc[version] = []
+                json_doc[version].append({
+                    'embedding_type': embedding_type,
+                    'embedding_id': embedding_id,
+                    'dbxrefs': dbxrefs,
+                    'publications': references,
+                    'project': project,
+                    'biosample_term_name': biosample_term_name,
+                    'biosample_type': biosample_type,
+                    'file_download': files,
+                    'dataset_status': status,
+                    'embedding_underlying_assay': embedding_underlying_assay,
+                    'embedding_source': embedding_source,
+                    'embedding_pipeline': embedding_pipeline,
+                    'embedding_cells': embedding_cells,
+                    'embedding_unit': embedding_unit,
+                    'embedding_category': embedding_category
+                })  
+            else:
+                json_doc[version].append({
+                    'embedding_type': embedding_type,
+                    'embedding_id': embedding_id,
+                    'dbxrefs': dbxrefs,
+                    'publications': references,
+                    'project': project,
+                    'biosample_term_name': biosample_term_name,
+                    'biosample_type': biosample_type,
+                    'file_download': files,
+                    'dataset_status': status,
+                    'embedding_underlying_assay': embedding_underlying_assay,
+                    'embedding_source': embedding_source,
+                    'embedding_pipeline': embedding_pipeline,
+                    'embedding_cells': embedding_cells,
+                    'embedding_unit': embedding_unit,
+                    'embedding_category': embedding_category
+                    })             
+    if 'embedding_amp.json' in request.url:
+        return Response(
+            content_type='text/plain',
+            body=json.dumps(json_doc,indent=2,sort_keys=True),
+            content_disposition='attachment;filename="%s"' % 'embedding_amp.json'
+    )
+@view_config(route_name= 'assay_amp', request_method='GET')
+def assay_amp(context, request):
+    param_list = parse_qs(request.matchdict['search_params'])
+    if 'referrer' in param_list:
+        search_path = '/{}/'.format(param_list.pop('referrer')[0])
+    else:
+        search_path = '/search/'
+    param_list['field'] = []
+    file_attributes = []
+    for prop in _tsv_mapping:
+        param_list['field'] = param_list['field'] + _tsv_mapping[prop]
+        if _tsv_mapping[prop][0].startswith('files'):
+            file_attributes = file_attributes + [_tsv_mapping[prop][0]]
+    param_list['limit'] = ['all']
+    path = '{}?{}'.format(search_path, urlencode(param_list, True))
+    results = request.embed(path, as_user=True)
+    json_doc = {}
+    for assay_amp_json in results['@graph']:
+        references = []
+        for r in assay_amp_json['references']:
+            identifier = 'identifiers'
+            if  identifier in r:
+                identifiers = r['identifiers']
+            else:
+                identifiers = []
+            references.extend(identifiers)
+        assay_id = assay_amp_json['accession']
+        project = assay_amp_json['award']['project']
+        assay_title = assay_amp_json['assay_title']
+        status = assay_amp_json['status']
+        version = assay_amp_json['schema_version']
+        biosample_term_name = assay_amp_json.get("biosample_term_name", None)
+        biosample_type = assay_amp_json.get("biosample_type", None)
+        biosample_term_id = assay_amp_json['biosample_term_id'] if 'biosample_term_id' in assay_amp_json else None
+        files = None if assay_amp_json.get("files")== None else assay_amp_json['files'][0]['href']
+        #files = request.host_url + files_href
+        #log.warn(files)
+        if version not in json_doc:
+            #log.warn(version)
+            json_doc[version] = []
+            json_doc[version].append({
+                'assay_id': assay_id,
+                'assay_title': assay_title,
+                'project': project,
+                'biosample_term_name': biosample_term_name,
+                'biosample_type': biosample_type,
+                'dataset_status': status,
+                'files': files,
+                'reference': references
+            })  
+        else:
+            json_doc[version].append({
+                'assay_id': assay_id,
+                'assay_title': assay_title,
+                'project': project,
+                'biosample_term_name': biosample_term_name,
+                'biosample_type': biosample_type,
+                'dataset_status': status,
+                'files': files,
+                'reference': references
+            })
+    if 'assay_amp.json' in request.url:
+        return Response(
+            content_type='text/plain',
+            body=json.dumps(json_doc,indent=2,sort_keys=True),
+            content_disposition='attachment;filename="%s"' % 'assay_amp.json'
+    )
 @view_config(route_name= 'annotation_registry_metadata', request_method='GET')
 def annotation_registry_metadata(context, request):
     param_list = parse_qs(request.matchdict['search_params'])
@@ -768,4 +1020,32 @@ def annotation_registry_metadata(context, request):
             content_type='text/plain',
             body=json.dumps(json_doc,indent=2,sort_keys=True),
             content_disposition='attachment;filename="%s"' % 'annotation_registry_metadata.json'
+    )
+@view_config(route_name= 'data_filters', request_method='GET')
+def data_filters(context, request):
+    param_list = parse_qs(request.matchdict['search_params'])
+    if 'referrer' in param_list:
+        search_path = '/{}/'.format(param_list.pop('referrer')[0])
+    else:
+        search_path = '/search/'
+    param_list['field'] = []
+    param_list['limit'] = ['all']
+    path = '{}?{}'.format(search_path, urlencode(param_list, True))
+    results = request.embed(path, as_user=True)
+    json_doc = {}
+    for dataFilter_json in results['facets']:
+        field = dataFilter_json['field']
+        for term in dataFilter_json['terms']:
+            #log.warn(term)
+            if term['doc_count'] != 0:
+                if field not in json_doc:
+                    json_doc[field] = []
+                    json_doc[field].append(term['key'])
+                else:
+                    json_doc[field].append(term['key'])
+    if 'data_filters.json' in request.url:
+        return Response(
+            content_type='text/plain',
+            body=json.dumps(json_doc,indent=2,sort_keys=True),
+            content_disposition='attachment;filename="%s"' % 'data_filters.json'
     )

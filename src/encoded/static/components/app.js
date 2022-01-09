@@ -14,7 +14,7 @@ import Home from './home';
 import newsHead from './page';
 
 const portal = {
-    portal_title: 'Common Metabolic Disease Genome Atlas',
+    portal_title: 'Common Metabolic Diseases Genome Atlas',
     global_sections: [
         {
             id: 'about',
@@ -23,7 +23,6 @@ const portal = {
                 { id: 'projectoverview', title: 'Project overview', url: '/about/contributors/' },
                 { id: 'policies', title: 'Policies', url: '/data-access-policies/' },
                 { id: 'news', title: 'News', url: '/search/?type=Page&news=true&status=released' },
-                { id: 'acknowledgements', title: 'Acknowledgements', url: '/acknowledgements/' },
                 { id: 'contact', title: 'Contact', url: '/help/contacts/' },
             ],
         },
@@ -33,10 +32,11 @@ const portal = {
             children: [
                 { id: 'experiment', title: 'Experiments', url: '/matrix/?type=Experiment' },
                 { id: 'annotations', title: 'Annotations', url: '/matrix/?type=Annotation' },
-                { id: 'embeddings', title: 'Embeddings', url: '/matrix/?type=Embedding' },
+                { id: 'embeddings', title: 'Single Cell Embeddings', url: '/matrix/?type=Embedding' },
                 { id: 'model', title: 'Statistical Models', url: '/matrix/?type=Model' },
-                { id: 'perturbation', title: 'Gene Perturbation', url: '/matrix/?type=Perturbation' },
+                { id: 'perturbation', title: 'Gene Perturbations', url: '/matrix/?type=Perturbation' },
 		{ id: 'sep-mm-1' },
+		{ id: 'standards', title: 'Data Standards & QC', url: '/data-standards' },
 		{ id: 'pipeline', title: 'Pipelines', url: '/search/?type=Pipeline' },
                 { id: 'publications', title: 'Publications', url: '/search/?type=Publication' },
             ],
@@ -45,14 +45,9 @@ const portal = {
             id: 'tools',
             title: 'Tools',
             children: [
-                { id: 'variant', title: 'Variant Search', url: '/variant-search/' },
-<<<<<<< HEAD
-                { id: 'umap', title: 'Single Cell UMAP', url: 'http://www.single-cell.cmdga.org/cellxgene' },
-                { id: 'expression', title: 'Expression Profiles', url: 'http://www.single-cell.cmdga.org/gene-expression' },
-=======
-                { id: 'umap', title: 'Single Cell UMAP', url: 'http://www.tools.cmdga.org/cellxgene' },
-                { id: 'expression', title: 'Expression Profiles', url: 'http://www.tools.cmdga.org/gene-expression' },
->>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
+                { id: 'variant', title: 'Annotate Genetic Variants', url: '/variant-search/' },
+                { id: 'umap', title: 'Single Cell Browser', url: '/cell-browser/' },
+                { id: 'expression', title: 'Gene Expression Browser', url: '/gene-expression/' },
             ],
         },
         {

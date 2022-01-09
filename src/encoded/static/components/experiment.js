@@ -555,7 +555,17 @@ class ExperimentComponent extends React.Component {
                                             </dd>
                                         </div>
                                     : null}
-
+                             {context.assay_pipeline && context.assay_pipeline.length ?
+                              <div data-test="pipelineused">
+                                <dt>Pipeline used</dt>
+                                {context.assay_pipeline.map((assay_pipeline, i) => (
+                                <span key={i}>
+					{i > 0 ? ', ' : ''}
+                                <a href={assay_pipeline['@id']}>{assay_pipeline.accession}</a>
+                                </span>
+                               ))}
+                             </div>
+                             : null}
                                     {context.possible_controls && context.possible_controls.length ?
                                         <div data-test="possible-controls">
                                             <dt>Controls</dt>
@@ -593,6 +603,23 @@ class ExperimentComponent extends React.Component {
                                         <dt>Project</dt>
                                         <dd>{context.award.project}</dd>
                                     </div>
+
+                                    {context.secondary_awards && context.secondary_awards.length ?
+                                        <div data-test="secondary-awards">
+                                            <dt>Secondary Awards</dt>
+                                            <dd>
+                                                <ul>
+                                                    {context.secondary_awards.map(award => (
+                                                        <li key={award['@id']} className="multi-comma">
+                                                            <a href={award['@id']}>
+                                                                {award}
+                                                            </a>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                                </dd>
+                                                </div>
+				     :null}
 
                                     {context.dbxrefs.length ?
                                         <div data-test="external-resources">

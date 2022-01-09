@@ -81,6 +81,9 @@ export const dbxrefPrefixMap = {
     GeneID: {
         pattern: 'https://www.ncbi.nlm.nih.gov/gene/{0}',
     },
+    HPAP: {
+        pattern: 'https://hpap.pmacs.upenn.edu/explore/donor/{0}',
+    },
     GEO: {
         pattern: 'https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc={0}',
         preprocessor: (context, dbxref) => {
@@ -165,6 +168,9 @@ export const dbxrefPrefixMap = {
     },
     'UCSC-GB-hg19': {
         pattern: 'http://genome.cse.ucsc.edu/cgi-bin/hgTrackUi?db=hg19&g={0}',
+    },
+    'ENCODE': {
+        pattern: 'https://www.encodeproject.org/{0}',
     },
     PMID: {
         pattern: 'https://www.ncbi.nlm.nih.gov/pubmed/?term={0}',

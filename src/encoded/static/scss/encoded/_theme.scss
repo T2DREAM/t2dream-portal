@@ -50,7 +50,7 @@
 .btn-search {
     color: #fff;
     background-color: #428bca;
-    border: 2px solid #428bca;
+    border: 3px solid #428bca;
 
     .svg-icon {
         path, rect, polygon {
@@ -61,19 +61,19 @@
     &:active, &:focus {
         color: darken(#428bca,20%) !important;
         background-color: #fff !important;
-        border: 2px solid #428bca;
+        border: 3px solid #428bca;
     }
 
     &.active, &:active.active, .dropdown.open & {
         color: darken(#428bca,20%) !important;
         background-color: lighten(#428bca,30%) !important;
-        border: 2px solid #428bca !important;
+        border: 3px solid #428bca !important;
     }
 
     &:hover {
         color: darken(#428bca,20%);
         background-color: lighten(#428bca,30%);
-        border: 2px solid #428bca;
+        border: 3px solid #428bca;
 
         .svg-icon {
             path {
@@ -154,16 +154,23 @@
 select {
     border: 1px solid #999 !important;
     font-weight: 400;
-<<<<<<< HEAD
-    padding-right: 70px;
-    padding-left: 45px;
-=======
-    padding-right: 40px;
-    padding-left: 40px;
->>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
+    padding-right: 1%;
+    padding-left: 1%;
     padding-bottom: 5px;
     padding-top: 5px;
-    margin-bottom: 20px;
+    max-width: 100%;
+    font-size: 18px;
+    &::-ms-expand {
+        display: none;
+    }
+}
+region-search-select {
+    border: 1px solid #999 !important;
+    font-weight: 400;
+    padding-right: 5%;
+    padding-left: 5%;
+    padding-bottom: 5px;
+    padding-top: 5px;
     font-size: 18px;
     &::-ms-expand {
         display: none;

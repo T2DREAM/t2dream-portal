@@ -184,6 +184,7 @@
                     "type": "string",
                     "enum": [
                         "application/pdf",
+			"application/wdl",
                         "image/gif",
                         "image/jpeg",
                         "image/png",
@@ -366,6 +367,7 @@
                 "ChIA-PET",
                 "ChIP-seq",
                 "Circulome-seq",
+		"CRISPR genome editing followed by DNA sequencing",
                 "Clone-seq",
                 "comparative genomic hybridization by array",
                 "CRISPR genome editing followed by RNA-seq",
@@ -384,6 +386,7 @@
                 "genotype phasing by HiC",
                 "genotyping by high throughput sequencing assay",
                 "HiC",
+		"HiChIP",
                 "iCLIP",
                 "icSHAPE",
                 "ISO-seq",

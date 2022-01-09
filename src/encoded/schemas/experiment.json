@@ -213,7 +213,28 @@
             "title": "Secondary Award",
             "description": "Multiple Awards.",
             "type": "string",
-	    "linkTo": "Award"
+            "type": "array",
+            "default": [],
+            "uniqueItems": true,
+            "items": {
+                "title": "Secondary award",
+                "description": "Multiple Awards",
+                "type": "string",
+                "linkTo": "Award"
+            }
+        },
+        "assay_pipeline": {
+            "title": "Pipeline",
+            "description": "The pipeline associated with assay.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Pipeline",
+                "description": "Pipeline referred to by the assay.",
+                "comment": "See pipeline.json for available identifiers.",
+                "type":  "string",
+                "linkTo": "Pipeline"
+            }
         },
         "dbxrefs": {
             "@type": "@id",

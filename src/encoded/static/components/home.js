@@ -27,7 +27,7 @@ export default class Home extends React.Component {
                         <div ref="graphdisplay">
                         <div className="overall-classic">
                         <div className="site-banner">
-		        <img src="/static/img/banner.png" alt="logo"/>
+		       <img src="/static/img/banner.png" alt="logo"/>
                         </div>
                         </div>
                         </div>
@@ -37,35 +37,18 @@ export default class Home extends React.Component {
                         <div className="overall-classic">
                         <div className="site-tools">
                         <div className="site-banner-intro">
-                        <div className="site-search">Search meta-data:
+                        <div className="site-search">Search metadata:
                         <Search />
+                        <h5 style={{'margin-left': '20px', 'margin-top': '0px', 'font-weight': 'normal', 'font-style': 'italic'}}>search annotations, experiments  & <a href="help/getting-started">more</a></h5>
                         </div>
-<<<<<<< HEAD
-                        <div className="site-search">Browse data:<br/>
-                        <select class="form-select" name="dataset" onChange="window.document.location.href=this.options[this.selectedIndex].value;">
-                        <option></option>
-                        <option value="http://www.demo.commondiseaseepigenome.org/matrix/?type=Experiment">Experiment</option>
-                        <option value="annotation">Annotation</option>
-                        <option value="embeddings">Single Cell Embeddings</option>
-                        <option value="model">Statistical Models</option>
-                        <option value="perturbation">Gene Perturbations</option>
-                        </select>
-                        </div>
-                        </div>
-                        <div className="site-banner-text">
-<div className="site-search">Annotate genetic variants:<a className="btn-lg btn-tools" target="_blank" href = { '/variant-search/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-<div className="site-search">Single cell browser:<a className="btn-lg btn-tools" target="_blank" href = { 'http://www.single-cell.cmdga.org/cellxgene/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'78px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-<div className="site-search">Gene expression browser:<a className="btn-lg btn-tools" target="_blank" href = { 'http://www.single-cell.cmdga.org/gene-expression/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-=======
 			<div className="site-search">Browse data:<br/>
 		        <DataEngine />
 		        </div>
                         </div>
                         <div className="site-banner-text">
-<div className="site-search">Annotate genetic variants:<a className="btn-lg btn-tools" target="_blank" href = { '/variant-search/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-<div className="site-search">Single cell browser:<a className="btn-lg btn-tools" target="_blank" href = { 'http://www.tools.cmdga.org/cellxgene/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'78px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-<div className="site-search">Gene expression browser:<a className="btn-lg btn-tools" target="_blank" href = { 'http://www.tools.cmdga.org/gene-expression/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
->>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
+<div className="site-search">Annotate genetic variants:<a className="btn-lg btn-tools" href = { '/variant-search/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
+<div className="site-search">Single cell browser:<a className="btn-lg btn-tools" href = { '/cell-browser/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'78px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
+<div className="site-search">Gene expression browser:<a className="btn-lg btn-tools" href = { '/gene-expression/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
                         </div>
                         </div>
                         </div>
@@ -73,7 +56,7 @@ export default class Home extends React.Component {
                         <div className="row">
                         </div>                     
                                  <div className="social">
-                                <h6 style= {{ 'font-size': '1.3rem', 'font-weight':'normal', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '50px', 'margin-left':'50px', 'word-break': 'break-word', 'display': '-webkit-inline-box'}}>The <a href='https://fnih.org/our-programs/amp/accelerating-medicines-common-metabolic-diseases'>AMP CMD Consortium</a> is a collaboration among the following organizations, which also provide funding and/or governance:</h6>
+                                <p style= {{ 'font-size': '1.2rem', 'font-weight':'normal', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-right':'50px', 'margin-top': '50px', 'margin-left':'50px', 'word-break': 'break-word', 'display': '-webkit-inline-box'}}>ACCELERATING MEDICINES PARTNERSHIP<sup>&reg;</sup> and AMP<sup>&reg;</sup> are registered service marks of the U.S. Department of Health and Human Services. The <a href='https://fnih.org/our-programs/amp/accelerating-medicines-common-metabolic-diseases'>AMP<sup>&reg;</sup> CMD Consortium</a> is a collaboration among the following organizations, which also provide funding and/or governance:</p>
                                 <div className="social-news">
                                 <a target="_blank" rel="noopener noreferrer" href="https://www.niddk.nih.gov"><img src="/static/img/thumbnail_nih_2021.png" alt="logo"/></a>
                                 <a target="_blank" rel="noopener noreferrer" href="https://www.fnih.org"><img src="/static/img/thumbnail_fnih_2021.png" alt="logo"/></a>

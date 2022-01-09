@@ -240,8 +240,19 @@ class AnnotationComponent extends React.Component {
                                             <dt>Target</dt>
                                             <dd><a href={context.target['@id']}>{context.target.label}</a></dd>
                                         </div>
-                                    : null}
-
+				     : null}
+		             {context.annotation_pipeline && context.annotation_pipeline.length ?
+			      <div data-test="pipelineused">
+                                <dt>Pipeline used</dt>
+		                {context.annotation_pipeline.map((annotation_pipeline, i) => (
+		                <span key={i}>
+			        {i > 0 ? ', ' : ''}
+		                <dd><a href={annotation_pipeline['@id']}>{annotation_pipeline.accession}</a></dd>
+			        </span>
+			       ))}
+                             </div>
+		             : null}
+                                
                                     {context.software_used && context.software_used.length ?
                                         <div data-test="softwareused">
                                             <dt>Software used</dt>
@@ -250,7 +261,7 @@ class AnnotationComponent extends React.Component {
                                     : null}
                                 </dl>
                             </div>
-
+                           
                             <div className="flexcol-sm-6">
                                 <div className="flexcol-heading experiment-heading">
                                     <h4>Attribution</h4>
@@ -449,6 +460,12 @@ class EmbeddingComponent extends React.Component {
                                         <div data-test="type">
                                             <dt>Type</dt>
                                             <dd className="sentence-case">{context.embeddings_type}</dd>
+                                        </div>
+                                    : null}
+                                    {context.embeddings_underlying_assay ?
+                                        <div data-test="type">
+                                            <dt>Underlying Assay</dt>
+                                            <dd className="sentence-case">{context.embeddings_underlying_assay}</dd>
                                         </div>
                                     : null}
                                     {context.embeddings_type_category ?
@@ -760,7 +777,6 @@ class PerturbationComponent extends React.Component {
                                         <div data-test="type">
                                             <dt>Modification type</dt>
                                             <dd className="sentence-case">{context.modification_type}</dd>
-<<<<<<< HEAD
                                         </div>
                                     : null}
                                     {context.assay_design ?
@@ -771,18 +787,6 @@ class PerturbationComponent extends React.Component {
                                     : null}
                                     {context.assay_readout ?
                                         <div data-test="type">
-=======
-                                        </div>
-                                    : null}
-                                    {context.assay_design ?
-                                        <div data-test="type">
-                                            <dt>Assay Design</dt>
-                                            <dd className="sentence-case">{context.assay_design}</dd>
-                                        </div>
-                                    : null}
-                                    {context.assay_readout ?
-                                        <div data-test="type">
->>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
                                             <dt>Assay Readout</dt>
                                             <dd className="sentence-case">{context.assay_readout}</dd>
                                         </div>
@@ -817,9 +821,6 @@ class PerturbationComponent extends React.Component {
                                             <dd className="sentence-case">{context.partitioning_strategy}</dd>
                                         </div>
                                     : null}
-<<<<<<< HEAD
-
-=======
                                     {context.source_rna ?
                                         <div data-test="type">
                                             <dt>Source of siRNA/shRNA</dt>
@@ -832,7 +833,12 @@ class PerturbationComponent extends React.Component {
                                             <dd className="sentence-case">{context.commerical_assay}</dd>
                                         </div>
                                     : null}
->>>>>>> 1d9148b2613b1fb261f20f8cdc428a52b94e0ede
+                                    {context.target ?
+                                        <div data-test="target">
+                                            <dt>Target</dt>
+                                            <dd><a href={context.target['@id']}>{context.target.label}</a></dd>
+                                        </div>
+                                    : null}
                                     {context.software_used && context.software_used.length ?
                                         <div data-test="softwareused">
                                             <dt>Software used</dt>

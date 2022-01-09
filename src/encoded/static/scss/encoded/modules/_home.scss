@@ -147,7 +147,7 @@
     margin-right: 50px;
     position: relative;
     font-size: 1.7rem;
-    line-height: 1.8;
+    line-height: 2.5;
     padding: 10px 20px;
 
     @media screen and (min-width: $screen-md-min) {
@@ -436,7 +436,6 @@
     border-top: 1px solid #a0a0a0;
 
     @media screen and (min-width: $screen-md-min) {
-        display: flex;
         flex-wrap: nowrap;
         justify-content: flex-start;
         align-items: stretch;
