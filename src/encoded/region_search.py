@@ -36,13 +36,11 @@ _REGION_FIELDS = [
 ]
 
 _FACETS = [
-    ('assay_term_name', {'title': 'Assay'}),
+    ('annotation_type', {'title': 'Annotation Type'}),
     ('biosample_term_name', {'title': 'Biosample term'}),
-    ('target.label', {'title': 'Target'}),
-    ('replicates.library.biosample.donor.organism.scientific_name', {
-        'title': 'Organism'
-    }),
     ('organ_slims', {'title': 'Organ'}),
+    ('annotation_source', {'title': 'Annotation Source'}),
+    ('annotation_type_category', {'title': 'Underlying Assay'}),
     ('assembly', {'title': 'Genome assembly'}),
     ('files.file_type', {'title': 'Available data'})
 ]
@@ -145,7 +143,11 @@ def sanitize_coordinates(term):
     if term.count(':') != 1 or term.count('-') > 1:
         return ('', '', '')
     terms = term.split(':')
-    chromosome = terms[0]
+    chromosome_prefix = terms[0]
+    if chromosome_prefix.startswith('chr'):
+        chromosome = chromosome_prefix
+    else:
+        chromosome = 'chr' + chromosome_prefix
     positions = terms[1].split('-')
     if len(positions) == 1:
         start = end = positions[0].replace(',', '')
@@ -361,10 +363,10 @@ def region_search(context, request):
         })
         used_filters = set_filters(request, query, result)
         used_filters['files.uuid'] = file_uuids
-        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Experiment'])
-        schemas = (types[item_type].schema for item_type in ['Experiment'])
+        query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Annotation'])
+        schemas = (types[item_type].schema for item_type in ['Annotation'])
         es_results = es.search(
-            body=query, index='experiment', doc_type='experiment', size=size, request_timeout=60
+            body=query, index='annotation', doc_type='annotation', size=size, request_timeout=60
         )
         result['@graph'] = list(format_results(request, es_results['hits']['hits']))
         result['total'] = total = es_results['hits']['total']
@@ -374,7 +376,7 @@ def region_search(context, request):
         if result['total'] > 0:
             result['notification'] = 'Success'
             position_for_browser = format_position(result['coordinates'], 200)
-            result.update(search_result_actions(request, ['Experiment'], es_results, position=position_for_browser))
+            result.update(search_result_actions(request, ['Annotation'], es_results, position=position_for_browser))
 
     return result
 

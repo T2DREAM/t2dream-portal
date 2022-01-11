@@ -243,7 +243,6 @@ def main(global_config, **local_config):
             maxsize=50
         )
         config.include('.region_search')
-        config.include('.variant_search')
         config.include('.region_indexer')
     config.include(static_resources)
     config.include(changelogs)

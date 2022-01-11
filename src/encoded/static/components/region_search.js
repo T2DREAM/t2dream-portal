@@ -12,8 +12,6 @@ import * as globals from './globals';
 const regionGenomes = [
     { value: 'GRCh37', display: 'hg19' },
     { value: 'GRCh38', display: 'GRCh38' },
-    { value: 'GRCm37', display: 'mm9' },
-    { value: 'GRCm38', display: 'mm10' },
 ];
 
 
@@ -323,21 +321,6 @@ class RegionSearch extends React.Component {
                                                     : null}
                                                 </span>
                                             }
-
-                                            {visualizeKeys ?
-                                                <DropdownButton disabled={visualizeDisabled} title={visualizeDisabled ? `Filter to ${visualizeLimit} to visualize` : 'Visualize'} label="batchhubs" wrapperClasses="results-table-button">
-                                                    <DropdownMenu>
-                                                        {visualizeKeys.map(assembly =>
-                                                            Object.keys(context.visualize_batch[assembly]).sort().map(browser =>
-                                                                <a key={[assembly, '_', browser].join()} data-bypass="true" target="_blank" rel="noopener noreferrer" href={context.visualize_batch[assembly][browser]}>
-                                                                    {assembly} {browser}
-                                                                </a>
-                                                            )
-                                                        )}
-                                                    </DropdownMenu>
-                                                </DropdownButton>
-                                            : null}
-
                                         </div>
                                     </div>
 

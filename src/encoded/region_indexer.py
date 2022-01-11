@@ -54,22 +54,58 @@ ENCODED_ALLOWED_STATUSES = ['released', 'uploading']
 RESIDENT_REGIONSET_KEY = 'resident_regionsets'  # in regions_es, keeps track of what datsets are resident in one place
 
 ENCODED_REGION_REQUIREMENTS = {
-    #'chromatin state': {
-    #    'output_type': ['semi-automated genome annotation'],
-    #    'file_format': ['bed']
-    #}
-    #'accessible chromatin': {
-    #    'output_type': ['peaks'],
-    #    'file_format': ['bed']
-    #    }
-    #'eQTL': {
-    #    'file_type': ['bed bed3+'],
-    #    'file_format': ['bed']
-    #    }
-    #'target gene predictions': {
-    #    'file_type': ['bed bed3+'],
-    #    'file_format': ['bed']
-    #   }
+    'chromatin state': {
+        'output_type': ['semi-automated genome annotation'],
+        'file_format': ['bed']
+    },
+    'accessible chromatin': {
+        'output_type': ['peaks'],
+        'file_format': ['bed']
+    },
+    'histone modifications': {
+        'output_type': ['peaks'],
+        'file_format': ['bed']
+    },
+    'candidate regulatory elements': {
+        'output_type': ['candidate regulatory elements'],
+        'file_format': ['bed']
+    },
+    'binding sites': {
+        'output_type': ['peaks'],
+        'file_format': ['bed']
+    },
+    'variant allelic effects': {
+        'file_type': ['bed bed3+'],
+        'file_format': ['bed']
+    },
+    'eQTL': {
+        'file_type': ['bed bed3+'],
+        'file_format': ['bed']
+    },
+    'caQTL': {
+        'file_type': ['bed bed3+'],
+        'file_format': ['bed']
+    },
+    'hQTL': {
+        'file_type': ['bed bed3+'],
+        'file_format': ['bed']
+    },
+    'sQTL': {
+        'file_type': ['bed bed3+'],
+        'file_format': ['bed']
+    },
+    'meQTL': {
+        'file_type': ['bed bed3+'],
+        'file_format': ['bed']
+    },
+    'pQTL': {
+        'file_type': ['bed bed3+'],
+        'file_format': ['bed']
+    },
+    'target gene predictions': {
+        'file_type': ['bed bed3+'],
+        'file_format': ['bed']
+    }
 }
 
 # On local instance, these are the only files that can be downloaded and regionalizable.  Currently only one is!
@@ -115,12 +151,6 @@ def get_mapping(assembly_name='hg19'):
                         },
                         'end': {
                             'type': 'long'
-                        },
-                        'state_annotation': {
-                            'type': 'string'
-                        },
-                        'value_annotation': {
-                            'type': 'string'
                         }
                     }
                 }
@@ -627,18 +657,16 @@ class RegionIndexer(Indexer):
             # NOTE: requests doesn't require gzip but http.request does.
             with gzip.open(file_in_mem, mode='rt') as file:  # localhost:8000 would not require localhost
                 for row in tsvreader(file):
-                    chrom, start, end, state_annotation, value_annotation = row[0].lower(), int(row[1]), int(row[2]), row[3], row[4]
+                    chrom, start, end = row[0].lower(), int(row[1]), int(row[2])
                     if isinstance(start, int) and isinstance(end, int):
                         if chrom in file_data:
                             file_data[chrom].append({
-                                'start': start,
-                                'end': end,
-                                'state_annotation': state_annotation,
-                                'value_annotation': value_annotation,
+                                'start': start + 1,
+                                'end': end + 1
                             })
                             
                         else:
-                            file_data[chrom] = [{'start': start, 'end': end, 'state_annotation': state_annotation, 'value_annotation': value_annotation}]
+                            file_data[chrom] = [{'start': start +1, 'end': end + 1}]
                     else:
                         log.warn('positions are not integers, will not index file')
         #else:  Other file types?
