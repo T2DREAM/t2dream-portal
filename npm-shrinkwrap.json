@@ -2124,7 +2124,7 @@
           "integrity": "sha1-YRrhrPFPXoH3KVB0coGf6XM1WKk=",
           "requires": {
             "node-fetch": "1.7.3",
-            "whatwg-fetch": "git+https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
+            "whatwg-fetch": "https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
           }
         },
         "js-tokens": {
@@ -2409,7 +2409,7 @@
       }
     },
     "dagre-d3": {
-      "version": "git+https://github.com/ENCODE-DCC/dagre-d3.git#aecd13a26ba47e4d36dce52a39af6ed942456488",
+      "version": "https://github.com/ENCODE-DCC/dagre-d3.git#aecd13a26ba47e4d36dce52a39af6ed942456488",
       "requires": {
         "d3": "3.5.17",
         "dagre": "0.7.4",
@@ -2418,7 +2418,7 @@
       }
     },
     "dalliance": {
-      "version": "git://github.com/ENCODE-DCC/dalliance.git#f8cb3e60af399560041021ac527e33eef935814b",
+      "version": "https://github.com/ENCODE-DCC/dalliance.git#f8cb3e60af399560041021ac527e33eef935814b",
       "requires": {
         "es6-promise": "3.0.2",
         "jszlib": "github:dasmoth/jszlib#4e562c7b88749f3e1e402737ddef5f96bf0906c6",
@@ -5544,7 +5544,7 @@
       "dev": true,
       "requires": {
         "node-fetch": "https://registry.npmjs.org/node-fetch/-/node-fetch-1.6.3.tgz",
-        "whatwg-fetch": "git+https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
+        "whatwg-fetch": "https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
       }
     },
     "isstream": {
@@ -8024,7 +8024,7 @@
           "integrity": "sha1-YRrhrPFPXoH3KVB0coGf6XM1WKk=",
           "requires": {
             "node-fetch": "1.7.3",
-            "whatwg-fetch": "git+https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
+            "whatwg-fetch": "https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
           }
         },
         "js-tokens": {
@@ -8237,7 +8237,7 @@
           "integrity": "sha1-YRrhrPFPXoH3KVB0coGf6XM1WKk=",
           "requires": {
             "node-fetch": "1.7.3",
-            "whatwg-fetch": "git+https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
+            "whatwg-fetch": "https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
           }
         },
         "js-tokens": {
@@ -8352,7 +8352,7 @@
           "integrity": "sha1-YRrhrPFPXoH3KVB0coGf6XM1WKk=",
           "requires": {
             "node-fetch": "1.7.3",
-            "whatwg-fetch": "git+https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
+            "whatwg-fetch": "https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
           }
         },
         "js-tokens": {
@@ -10065,7 +10065,7 @@
       }
     },
     "whatwg-fetch": {
-      "version": "git+https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
+      "version": "https://github.com/ENCODE-DCC/fetch.git#d3941e75b8430cb3c880a421b219f5a317cae391"
     },
     "whatwg-url": {
       "version": "4.8.0",
