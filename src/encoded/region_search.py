@@ -1,7 +1,6 @@
 from pyramid.view import view_config
 from snovault import TYPES
 from snovault.elasticsearch.interfaces import ELASTIC_SEARCH
-from snovault.elasticsearch.indexer import MAX_CLAUSES_FOR_ES
 from pyramid.security import effective_principals
 from .search import (
     format_results,
@@ -47,16 +46,12 @@ _FACETS = [
 
 _GENOME_TO_SPECIES = {
     'GRCh37': 'homo_sapiens',
-    'GRCh38': 'homo_sapiens',
-    'GRCm37': 'mus_musculus',
-    'GRCm38': 'mus_musculus'
+    'GRCh38': 'homo_sapiens'
 }
 
 _GENOME_TO_ALIAS = {
     'GRCh37': 'hg19',
-    'GRCh38': 'GRCh38',
-    'GRCm37': 'mm9',
-    'GRCm38': 'mm10'
+    'GRCh38': 'GRCh38'
 }
 
 
@@ -143,11 +138,7 @@ def sanitize_coordinates(term):
     if term.count(':') != 1 or term.count('-') > 1:
         return ('', '', '')
     terms = term.split(':')
-    chromosome_prefix = terms[0]
-    if chromosome_prefix.startswith('chr'):
-        chromosome = chromosome_prefix
-    else:
-        chromosome = 'chr' + chromosome_prefix
+    chromosome = terms[0]
     positions = terms[1].split('-')
     if len(positions) == 1:
         start = end = positions[0].replace(',', '')
@@ -266,7 +257,7 @@ def region_search(context, request):
     result = {
         '@id': '/region-search/' + ('?' + request.query_string.split('&referrer')[0] if request.query_string else ''),
         '@type': ['region-search'],
-        'title': 'Search by Region',
+        'title': 'Search by region',
         'facets': [],
         '@graph': [],
         'columns': OrderedDict(),
@@ -346,15 +337,8 @@ def region_search(context, request):
 
 
     # if more than one peak found return the experiments with those peak files
-    uuid_count = len(file_uuids)
-    if uuid_count > MAX_CLAUSES_FOR_ES:
-        log.error("REGION_SEARCH WARNING: region with %d file_uuids is being restricted to %d" % \
-                                                            (uuid_count, MAX_CLAUSES_FOR_ES))
-        file_uuids = file_uuids[:MAX_CLAUSES_FOR_ES]
-        uuid_count = len(file_uuids)
-
-    if uuid_count:
-        query = get_filtered_query('', [], set(), principals, ['Experiment'])
+    if len(file_uuids):
+        query = get_filtered_query('', [], set(), principals, ['Annotation'])
         del query['query']
         query['post_filter']['bool']['must'].append({
             'terms': {
@@ -366,7 +350,7 @@ def region_search(context, request):
         query['aggs'] = set_facets(_FACETS, used_filters, principals, ['Annotation'])
         schemas = (types[item_type].schema for item_type in ['Annotation'])
         es_results = es.search(
-            body=query, index='annotation', doc_type='annotation', size=size, request_timeout=60
+            body=query, index='annotation', doc_type='annotation', size=size
         )
         result['@graph'] = list(format_results(request, es_results['hits']['hits']))
         result['total'] = total = es_results['hits']['total']

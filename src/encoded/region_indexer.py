@@ -72,7 +72,7 @@ ENCODED_REGION_REQUIREMENTS = {
     },
     'binding sites': {
         'output_type': ['peaks'],
-        'file_format': ['bed']
+        'file_type': ['bed bed3+']
     },
     'variant allelic effects': {
         'file_type': ['bed bed3+'],
@@ -80,24 +80,24 @@ ENCODED_REGION_REQUIREMENTS = {
     },
     'eQTL': {
         'file_type': ['bed bed3+'],
-        'file_format': ['bed']
+        'output_type': ['normalized signal of significant reads']
     },
     'caQTL': {
         'file_type': ['bed bed3+'],
         'file_format': ['bed']
     },
-    'hQTL': {
-        'file_type': ['bed bed3+'],
-        'file_format': ['bed']
-    },
+    #'hQTL': {
+    #    'file_type': ['bed bed3+'],
+    #    'file_format': ['bed']
+    #},
     'sQTL': {
         'file_type': ['bed bed3+'],
         'file_format': ['bed']
     },
-    'meQTL': {
-        'file_type': ['bed bed3+'],
-        'file_format': ['bed']
-    },
+    #'meQTL': {
+    #    'file_type': ['bed bed3+'],
+    #    'file_format': ['bed']
+    #},
     'pQTL': {
         'file_type': ['bed bed3+'],
         'file_format': ['bed']
@@ -653,7 +653,7 @@ class RegionIndexer(Indexer):
         r.release_conn()
 
         file_data = {}
-        if afile['file_format'] == 'bed' and afile['uuid'] != '45aac1a8-9fe5-4475-88f4-a49ad811eed3' and afile['uuid'] != '309cea9e-2f4f-4e65-91d7-27cbf5d880ad' and afile['uuid'] != '46200779-a9af-4ebc-9af8-6a3bd42f13d7' and afile['uuid'] != 'eb32e0b8-569c-4bcf-9da7-500c0152908a':
+        if afile['file_format'] == 'bed' and afile['uuid'] != '45aac1a8-9fe5-4475-88f4-a49ad811eed3' and afile['uuid'] != '309cea9e-2f4f-4e65-91d7-27cbf5d880ad' and afile['uuid'] != '46200779-a9af-4ebc-9af8-6a3bd42f13d7' and afile['uuid'] != 'eb32e0b8-569c-4bcf-9da7-500c0152908a' and afile['uuid'] != '03ca2407-31b4-449e-9b50-040468bb7945' and afile['uuid'] != 'bc253c99-b662-41c0-809b-d5d5d3e18148' and afile['uuid'] != 'b845a07a-7b75-436f-ba80-5f585cfa1059' and afile['uuid'] != '24898955-a27e-45e8-9a1f-dbdbb6f3d44d' and afile['uuid'] != '3fa0426b-7975-4dc2-9cd7-d3af025545f3' and afile['uuid'] != '8be94e36-9f99-47b8-b975-0fb8dbb72510' and afile['uuid'] != '4d320c08-0922-40e8-be05-ecbd6975fed1' and afile['uuid'] != 'ae13f3b0-2e3b-41a0-b438-06b4c90b4c84' and afile['uuid'] != '8be94e36-9f99-47b8-b975-0fb8dbb72510' and afile['uuid'] != '3fa0426b-7975-4dc2-9cd7-d3af025545f3' and afile['uuid'] != '4d320c08-0922-40e8-be05-ecbd6975fed1' and afile['uuid'] != '9473997b-eea8-4982-8845-bc50f7f43e7c' and afile['uuid'] != '3fa0426b-7975-4dc2-9cd7-d3af025545f3':
             # NOTE: requests doesn't require gzip but http.request does.
             with gzip.open(file_in_mem, mode='rt') as file:  # localhost:8000 would not require localhost
                 for row in tsvreader(file):

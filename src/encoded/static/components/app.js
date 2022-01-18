@@ -45,7 +45,7 @@ const portal = {
             id: 'tools',
             title: 'Tools',
             children: [
-                { id: 'variant', title: 'Annotate Genetic Variants', url: '/variant-search/' },
+                { id: 'region', title: 'Annotate Genetic Regions', url: '/region-search/' },
                 { id: 'umap', title: 'Single Cell Browser', url: '/cell-browser/' },
                 { id: 'expression', title: 'Gene Expression Browser', url: '/gene-expression/' },
             ],
