@@ -993,6 +993,8 @@
 			"matrix eQTL results",
                         "nested topologically associated domains",
                         "normalized signal of all reads",
+			"QTL result",
+			"QTL significant result",
                         "open chromatin regions",
                         "optimal idr thresholded peaks",
                         "paternal haplotype mapping",
