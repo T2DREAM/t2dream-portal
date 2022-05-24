@@ -1,4 +1,4 @@
-Babel>=2.9.1
+Babel==2.2.0
 argparse==1.2.1
 azure==1.0.3
 azure-common==1.0.0
