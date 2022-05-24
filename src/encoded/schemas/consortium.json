@@ -1,0 +1,263 @@
+{
+    "title": "Consortium",
+    "description": "Schema for a consortium page.",
+    "id": "/profiles/consortium.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [ "title", "project", "rfa", "name" ],
+    "identifyingProperties": ["title", "rfa", "project", "name"],
+    "additionalProperties": false,
+    "mixinProperties": [
+        { "$ref": "mixins.json#/schema_version" },
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/url" },
+        { "$ref": "mixins.json#/shared_status" }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "6"
+        },
+        "title": {
+            "title": "Title",
+            "description": "Title of the Consortium.",
+            "uniqueKey": true,
+            "type": "string"
+        },
+        "name": {
+            "title": "Name",
+            "description": "A short unique name for the lab, current convention is lower cased and hyphen delimited ",
+            "uniqueKey": "consortium:name",
+	    "pattern": "^[a-z0-9\\-]+$",
+            "type": "string"
+        },
+        "description": {
+            "rdfs:subPropertyOf": "dc:description",
+            "title": "Description",
+            "description": "Brief description of consortium.",
+            "type": "string"
+        },
+        "status": {
+            "title": "Status",
+            "type": "string",
+            "default": "in progress",
+            "enum" : [
+                "deleted",
+                "in progress",
+                "released"
+            ]
+        },
+        "project": {
+            "title": "BioProject",
+            "type": "string",
+	    "description": "The collection of biological data related to a single initiative, originating from a consortium.",
+            "enum" : [
+                "ENCODE",
+                "GGR",
+                "AMP",
+                "HPAP",
+                "T1D",
+                "Roadmap",
+                "modENCODE",
+                "modERN",
+                "community",
+		"LungMap"
+            ]
+        },
+        "rfa": {
+            "title": "Phase",
+            "type": "string",
+	    "description": "The name of the bioproject phase.",
+            "enum" : [
+                "ENCODE",
+                "ENCODE2",
+                "ENCODE2-Mouse",
+                "ENCODE3",
+                "ENCODE4",
+                "GGR",
+                "AMP",
+                "AMP2",
+                "HPAP",
+                "T1D",
+                "Roadmap",
+                "modENCODE",
+                "modERN",
+                "community",
+		"LungMap2"
+            ]
+        },
+        "start_date": {
+            "title": "Start date",
+	    "comment": "Date can be submitted as YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSTZD (TZD is the time zone designator; use Z to express time in UTC or for time expressed in local time add a time zone offset from UTC +HH:MM or -HH:MM).",
+            "type": "string",
+            "anyOf" : [
+		{"format": "date-time"},
+		{"format": "date"}
+            ]
+        },
+        "end_date": {
+            "title": "End date",
+	    "comment": "Date can be submitted as YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSTZD (TZD is the time zone designator; use Z to express time in UTC or for time expressed in local time add a time zone offset from UTC +HH:MM or -HH:MM).",
+            "type": "string",
+            "anyOf" : [
+		{"format": "date-time"},
+		{"format": "date"}
+            ]
+        },
+        "labs": {
+            "title": "Labs",
+            "description": "Consortium Labs.",
+            "type": "array",
+	    "default": [],
+            "uniqueItems": true,
+            "items": {
+                "title": "Labs",
+                "description": "Consortium Labs.",
+                "comment": "See lab.json for available identifiers.",
+                "type":  "string",
+                "linkTo": "Lab"
+            }
+        },
+        "grants": {
+            "title": "Grants",
+            "description": "Consortium Grants.",
+            "type": "array",
+	    "default": [],
+            "uniqueItems": true,
+            "items": {
+                "title": "Grants",
+                "description": "Consortium Grants.",
+                "comment": "See award.json for available identifiers.",
+                "type":  "string",
+                "linkTo": "Award"
+            }
+        },
+        "publications": {
+            "title": "Publications",
+            "description": "Consortium Publications.",
+            "type": "array",
+	    "default": [],
+            "uniqueItems": true,
+            "items": {
+                "title": "Publication",
+                "description": "Consortium Publication.",
+                "comment": "See publication.json for available identifiers.",
+                "type":  "string",
+                "linkTo": "Publication"
+            }
+        },
+        "datasets": {
+            "title": "Dataset",
+            "description": "The datasets generated by consortium members.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Datasets",
+                "description": "A datasets generated by consortium members.",
+                "comment": "See dataset.json for available identifiers.",
+                "type":  "string",
+                "linkTo": "Dataset"
+            }
+        },
+        "consortium_tools": {
+            "title": "consortium_tools",
+            "description": "Tools & applications to visualize consortium data.",
+            "type": "array",
+            "default": [],
+            "items": {
+                "title": "Consortium Tools",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "url": {
+                        "title": "URL",
+                        "description": "Tools & applications to visualize consortium data.",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "consortium_tool_type": {
+                        "title": "Consortium Tool type",
+                        "description": ".",
+                        "type": "string",
+                        "enum" : [
+                            "Genome Browser",
+                            "Single Cell snATAC Browser",
+			    "Single Cell snRNA Browser",
+			    "Single Cell Multiome Browser",
+                            "Gene Expression Browser",
+                            "website"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "facets": {
+        "rfa": {
+            "rfa": "RFA"
+        },
+        "Project": {
+            "title": "Project"
+        },
+        "consortium_tools.consortium_tools_type": {
+            "title": "Available Consortium Tools"
+        },
+        "datasets.accession": {
+            "type": "exists",
+            "title": "Has dataset"
+        }
+    },
+    "columns": {
+        "title": {
+            "title": "Title"
+        },
+        "project": {
+            "title": "BioProject"
+        },
+        "rfa": {
+            "title": "Phase"
+        },
+        "status": {
+            "title": "Consortium status"
+        },
+        "start_date": {
+            "title": "Start Date"
+        },
+        "end_date": {
+            "title": "End Date"
+        },
+        "labs": {
+            "title": "Labs"
+        },
+        "grants": {
+            "title": "Grants"
+        },
+        "Publications": {
+            "title": "Publications"
+        },
+        "description": {
+            "title": "Description"
+        },
+        "consortium_tools.consortium_tool_type": {
+            "title": "Available Tools"
+        },
+        "consortium_tools.url": {
+            "title": "URL"
+        },
+        "datasets": {
+            "title": "Datasets"
+        }
+    },
+    "boost_values": {
+        "title": 1.0,
+        "description": 1.0
+    },
+    "sort_by": {
+        "start_date": {
+            "unmapped_type": "keyword",
+            "order": "desc",
+            "missing": "_last" 
+        }
+    },
+    "changelog": "/profiles/changelogs/consortium.md"
+
+}

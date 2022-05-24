@@ -4,6 +4,7 @@
     "ArrayExpress": "https://www.ebi.ac.uk/arrayexpress/experiments/",
     "SRA": "https://www.ncbi.nlm.nih.gov/sra/?term=",
     "HPAP": "https://hpap.pmacs.upenn.edu/explore/donor/",
+    "LungMap": "https://lungmap.net/",
     "EBI": "https://www.ebi.ac.uk/arrayexpress/experiments/",
     "ENI": "https://www.ebi.ac.uk/ena/browser/view/",
     "HGNC": "http://www.genecards.org/cgi-bin/carddisp.pl?gene=",

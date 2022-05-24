@@ -23,6 +23,8 @@ def groupfinder(login, request):
         elif localname in ['TEST_AUTHENTICATED']:
             return ['viewing_group.HPAP']
         elif localname in ['TEST_AUTHENTICATED']:
+            return ['viewing_group.LungMap']
+        elif localname in ['TEST_AUTHENTICATED']:
             return ['viewing_group.reviwer2020']
         elif localname in ['TEST_AUTHENTICATED']:
             return ['viewing_group.susztak-katalin']

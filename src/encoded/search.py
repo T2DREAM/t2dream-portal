@@ -48,6 +48,7 @@ DEFAULT_DOC_TYPES = [
     'Page',
     'Pipeline',
     'Publication',
+    'Consortium',
     'Software',
     'Target',
 ]

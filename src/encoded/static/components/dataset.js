@@ -241,6 +241,7 @@ class AnnotationComponent extends React.Component {
                                             <dd><a href={context.target['@id']}>{context.target.label}</a></dd>
                                         </div>
 				     : null}
+
 		             {context.annotation_pipeline && context.annotation_pipeline.length ?
 			      <div data-test="pipelineused">
                                 <dt>Pipeline used</dt>
@@ -797,6 +798,17 @@ class PerturbationComponent extends React.Component {
                                             <dd><a href={context.target['@id']}>{context.target.label}</a></dd>
                                         </div>
                                     : null}
+		             {context.annotation_pipeline && context.annotation_pipeline.length ?
+			      <div data-test="pipelineused">
+                                <dt>Pipeline used</dt>
+		                {context.annotation_pipeline.map((annotation_pipeline, i) => (
+		                <span key={i}>
+			        {i > 0 ? ', ' : ''}
+		                <dd><a href={annotation_pipeline['@id']}>{annotation_pipeline.accession}</a></dd>
+			        </span>
+			       ))}
+                             </div>
+		             : null}
                                     {context.pooled_design ?
                                         <div data-test="type">
                                             <dt>Pooled Design</dt>
@@ -839,6 +851,18 @@ class PerturbationComponent extends React.Component {
                                             <dd><a href={context.target['@id']}>{context.target.label}</a></dd>
                                         </div>
                                     : null}
+
+		             {context.perturbation_pipeline && context.perturbation_pipeline.length ?
+			      <div data-test="pipelineused">
+                                <dt>Pipeline used</dt>
+		                {context.perturbation_pipeline.map((perturbation_pipeline, i) => (
+		                <span key={i}>
+			        {i > 0 ? ', ' : ''}
+		                <dd><a href={perturbation_pipeline['@id']}>{perturbation_pipeline.accession}</a></dd>
+			        </span>
+			       ))}
+                             </div>
+		             : null}
                                     {context.software_used && context.software_used.length ?
                                         <div data-test="softwareused">
                                             <dt>Software used</dt>

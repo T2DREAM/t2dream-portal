@@ -118,6 +118,36 @@
 		"None"
             ]
         },
+        "consortium_cohort": {
+            "title": "Cohort",
+            "description": "Experiment Cohort. Optional field",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Cohort",
+                "description": "Experiment Cohort.",
+                "type":  "string",
+                "enum" : [
+                    "HPAP",
+                    "LungMap",
+                    "UCSD",
+                    "nPOD"
+                ]
+                }
+        },
+        "consortium": {
+            "title": "Consortium",
+            "description": "Consortium if applicable to the dataset. Optional field",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Consortium",
+                "description": "Consortium if applicable to the dataset.",
+                "comment": "See consortium.json for available identifiers.",
+                "type":  "string",
+                "linkTo": "Consortium"
+            }
+        },
         "annotation_source": {
             "title": "Annotation Source",
             "description": "Meta-data field in annotation record with source",
@@ -338,6 +368,12 @@
         "annotation_category": {
             "title": "Annotation Category"
         },	
+        "consortium_cohort": {
+            "title": "Cohort"
+        },	
+        "consortium": {
+            "title": "Consortium"
+        },	
 	"annotation_type_category": {
 	    "title": "Annotation type Category"
         },	
@@ -411,6 +447,14 @@
             "title": "Collection Tags",
             "type": "string"
         },
+        "consortium_cohort": {
+            "title": "Cohort",
+            "type": "array"
+        },
+        "consortium": {
+            "title": "Consortium",
+            "type": "array"
+        },
         "annotation_type_category": {
             "title": "Category",
             "type": "string"
@@ -472,6 +516,8 @@
         "files.replicate.experiment.assay_term_name": 1.0,
         "biosample_term_id": 1.0,
         "biosample_term_name": 1.0,
+        "consortium_cohort": 1.0,
+        "consortium": 1.0,
         "biosample_type": 1.0,
         "organ_slims": 1.0,
         "developmental_slims": 1.0,

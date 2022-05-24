@@ -10,13 +10,13 @@ import subprocess
 import sys
 import time
 
-host = ''
-encoded_access_key = ''
-encoded_secret_access_key = ''
+host = 'https://cmdga.org'
+encoded_access_key = 'PK4T67WI'
+encoded_secret_access_key = 'w45ra7fofwyzz2k3'
 
-path = ''
-my_lab = ''
-my_award = ''
+path = '/home/ubuntu/LEBFF144SXB.bed.gz'
+my_lab = '/labs/xin-sun/'
+my_award = '/awards/1U01HL148867-01/'
 
 # From http://hgwdev.cse.ucsc.edu/~galt/encode3/validatePackage/validateEncode3-latest.tgz
 encValData = 'encValData'
@@ -30,14 +30,14 @@ with open(path, 'rb') as f:
         md5sum.update(chunk)
 
 data = {
-    "dataset": "",
+    "dataset": "/annotations/DSR476DPZ/",
     #"replicate": "/replicates/6e85c807-684a-46e3-b4b9-1f7990e85720/",
-    "file_format": "",
-    "assembly": "",
-    #"file_format_type": "",
+    "file_format": "bed",
+    "assembly": "hg19",
+    "file_format_type": "bed3+",
     "file_size": os.path.getsize(path),
     "md5sum": md5sum.hexdigest(),
-    "output_type": "",
+    "output_type": "open chromatin regions",
     #"read_length": 101,
     #"run_type": "single-ended",
     #"platform": "ENCODE:HiSeq2000",

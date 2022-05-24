@@ -34,8 +34,8 @@ def item_is_revoked(request, path):
 
 def calculate_assembly(request, files_list, status):
     assembly = set()
-    viewable_file_formats = ['bigWig', 'bigBed', 'hic', 'bedgraph','ibed', 'long range chromatin interactions']
-    viewable_file_status = ['released','in progress']
+    viewable_file_formats = ['bigWig', 'bed', 'bigBed', 'hic', 'bedgraph','ibed', 'long range chromatin interactions']
+    viewable_file_status = ['released','in progress', 'uploading']
 
     for path in files_list:
         properties = request.embed(path, '@@object')

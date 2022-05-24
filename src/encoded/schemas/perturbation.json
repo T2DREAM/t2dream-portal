@@ -176,6 +176,19 @@
 		"type": "string"
 		}
         },
+        "perturbation_pipeline": {
+            "title": "Pipeline",
+            "description": "The pipeline associated with perturbations.",
+            "type": "array",
+	    "uniqueItems": true,
+	    "items": {
+		"title": "Pipeline",
+		"description": "Pipeline referred to by the perturbation.",
+		"comment": "See pipeline.json for available identifiers.",
+		"type": "string",
+		"linkTo": "Pipeline"
+		}
+        },
         "disease_area": {
             "title": "Knowledge Portal Disease Area",
             "description": "Knowledge Portal Disease Area such as Common Metabolic Diseases, Sleep Disorder, Cerebrovascular Disease, T1D, T2D, Cardiovascular Disease, Musculoskeletal.",

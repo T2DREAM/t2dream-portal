@@ -203,6 +203,20 @@ class Publication(Item):
 
 
 @collection(
+    name='consortium',
+    unique_key='consortium:name',
+    properties={
+        'title': 'Consortium',
+        'description': 'Consortium pages',
+    })
+class Consortium(Item):
+    item_type = 'consortium'
+    schema = load_schema('encoded:schemas/consortium.json')
+    embedded = ['datasets', 'labs', 'publications', 'grants']
+    name_key = 'name'
+
+
+@collection(
     name='software',
     unique_key='software:name',
     properties={

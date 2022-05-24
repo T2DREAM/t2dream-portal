@@ -19,6 +19,7 @@ ORDER = [
     'source',
     'target',
     'publication',
+    'consortium',
     'document',
     'antibody_lot',
     'antibody_characterization',

@@ -25,6 +25,7 @@ require('./report');
 require('./matrix');
 require('./target');
 require('./publication');
+require('./consortium');
 require('./pipeline');
 require('./software');
 require('./news');
