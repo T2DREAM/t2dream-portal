@@ -11,8 +11,8 @@ import sys
 import time
 
 host = 'https://cmdga.org'
-encoded_access_key = 'PK4T67WI'
-encoded_secret_access_key = 'w45ra7fofwyzz2k3'
+encoded_access_key = ''
+encoded_secret_access_key = ''
 
 path = '/home/ubuntu/LEBFF144SXB.bed.gz'
 my_lab = '/labs/xin-sun/'
