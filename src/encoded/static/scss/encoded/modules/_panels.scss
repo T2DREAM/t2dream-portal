@@ -478,8 +478,7 @@ $nav-tab-border-radius: 4px;
 
 .tab-nav {
     position: relative;
-    background-color: #f0f0f0;
-    border-bottom: 1px solid #a0a0a0;
+    border-right: 1px solid #a0a0a0;
 }
 
 .nav.nav-tabs {
@@ -511,7 +510,7 @@ $nav-tab-border-radius: 4px;
 
         &.active {
             a {
-                border-top: 3px solid #00cc00;
+                border-top: 3px solid #5778b8;
                 border-right: $nav-tab-border-style;
                 border-left: $nav-tab-border-style;
                 border-bottom: 1px solid #fff;

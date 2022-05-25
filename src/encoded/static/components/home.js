@@ -4,7 +4,7 @@ import _ from 'underscore';
 var url = require('url');
 import moment from 'moment';
 import { FetchedData, FetchedItems, Param } from './fetched';
-import { Panel, PanelBody } from '../libs/bootstrap/panel';
+import { Panel, PanelBody,TabPanel, TabPanelPane } from '../libs/bootstrap/panel';
 
 
 // Main page component to render the home page
@@ -34,24 +34,21 @@ export default class Home extends React.Component {
                         <div className="row">
                         </div>
                         <div ref="graphdisplay">
-                        <div className="overall-classic">
-                        <div className="site-tools">
-                        <div className="site-banner-intro">
-                        <div className="site-search">Search metadata:
+                        <div className="overall-classic" style={{'float':'right', 'width':'80%', 'font-size':'1.2rem'}}>
+                        <TabPanel  tabs={{ search: 'Search Metadata', data: 'Browse Data', tool: 'Browse Tools' }}>
+                        <TabPanelPane key="search">
                         <Search />
                         <h5 style={{'margin-left': '20px', 'margin-top': '0px', 'font-weight': 'normal', 'font-style': 'italic'}}>search annotations, experiments  & <a href="help/getting-started">more</a></h5>
-                        </div>
-			<div className="site-search">Browse data:<br/>
-		        <DataEngine />
-		        </div>
-                        </div>
-                        <div className="site-banner-text">
-<div className="site-search">Annotate genetic regions:<a className="btn-lg btn-tools" href = { '/region-search/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-<div className="site-search">Single cell browser:<a className="btn-lg btn-tools" href = { '/cell-browser/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'78px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-<div className="site-search">Gene expression browser:<a className="btn-lg btn-tools" href = { '/gene-expression/' } style= {{ 'font-size': '14px', 'font-family': 'Helvetica Neue,Helvetica,Arial,sans-serif', 'margin-top': '5px', 'margin-left':'20px', 'word-break': 'break-word', 'display': '-webkit-inline-box','justify-content': 'center', 'text-align': 'center', 'align-items': 'center'}} title="search">GO</a></div>
-                        </div>
-                        </div>
-                        </div>
+                        </TabPanelPane>
+                        <TabPanelPane key="data">
+                         <DataEngine />
+                        </TabPanelPane>
+                        <TabPanelPane key="tool">
+                        <a className="btn btn-info btn-lg" target = "_blank" href = { 'cell-browser' } style= {{'margin-left': '2%', 'margin-top': '2%', 'margin-bottom': '2%'}}>Single Cell Browser</a>
+                        <a className="btn btn-info btn-lg" target = "_blank" href = { 'gene-expression' } style= {{'margin-left': '2%', 'margin-top': '2%', 'margin-bottom': '2%'}}>Gene Expression Browser</a>
+                        </TabPanelPane>
+                        </TabPanel>
+                        </div>                        
                         </div>
                         <div className="row">
                         </div>                     
@@ -146,14 +143,14 @@ class DataEngine extends React.Component {
 	const context = this.props.context;
 	const id = url.parse(this.context.location_href, true);
 	return (
-                <form id="dataset-form"  ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1" action="/matrix/?type=">
+                <form id="dataset-form"  style={{'margin-top':'1em'}} ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1" action="/matrix/?type=">
                 <div>
-		<select value={this.state.dataset} name="type" onChange={this.handleDatasetsSelect}>
+		<select style= {{'font-weight': '500', 'padding':'1% 10%', 'background-color':'white', 'border-radius':'5%'}}value={this.state.dataset} name="type" onChange={this.handleDatasetsSelect}>
 		{Datasets.map(datasetId =>
 			      <option key={datasetId.value} value={datasetId.value}>{datasetId.display}</option>
 				 )}
 	        </select>
-		<input type="submit" value="GO" className="btn btn-search" style={{'margin-left': '30px', 'margin-right': '30px'}} />
+                <input type="submit" value="GO" className="btn btn-search" style={{'margin-left': '25px', 'margin-right': '10px'}} />
 		</div>
                 </form>
 	);
@@ -165,6 +162,60 @@ DataEngine.propTypes = {
 };
 
 DataEngine.contextTypes = {
+    location_href: PropTypes.string,
+};
+
+const Tools = [
+    { value: 'cell-browser', display: 'Single Cell Browser' },
+    { value: 'gene-expression-browser', display: 'Gene Expression Browser' },
+];
+class ToolEngine extends React.Component {
+    constructor() {
+	super();
+	this.state = {
+	    tool: Tools[0].value,
+	};
+	this.handleDiscloseClick = this.handleDiscloseClick.bind(this);
+	this.handleToolsSelect = this.handleToolsSelect.bind(this);
+	}
+    componentDidMount() {
+	// Use timer to limit to one request per second
+	this.timer = setInterval(this.tick, 1000);
+    }
+    componentWillUnmount() {
+	clearInterval(this.timer);
+    }
+    handleDiscloseClick() {
+	this.setState(prevState => ({
+	    disclosed: !prevState.disclosed,
+	}));
+    }
+    handleToolsSelect(event) {
+	this.setState({ tool: event.target.value });
+    }
+    render() {
+	const context = this.props.context;
+	const id = url.parse(this.context.location_href, true);
+	return (
+                <form id="tool-form"  style={{'margin-top':'1em'}} ref="adv-search" role="form" autoComplete="off" aria-labelledby="tab1">
+                <div>
+		<select style= {{'font-weight': '500', 'padding':'1% 10%', 'background-color':'white', 'border-radius':'5px'}} value={this.state.tool} name='cell-browser' onChange={this.handleToolsSelect}>
+		{Tools.map(toolId =>
+			      <option key={toolId.value} value={toolId.value}>{toolId.display}</option>
+				 )}
+	        </select>
+                 <input type="submit" value="GO" className="btn btn-search" style={{'margin-left': '25px', 'margin-right': '10px'}} />
+		</div>
+                </form>
+	);
+    }
+}
+
+ToolEngine.propTypes = {
+    context: PropTypes.object.isRequired,
+};
+
+ToolEngine.contextTypes = {
     location_href: PropTypes.string,
 };
 const regionGenomes = [

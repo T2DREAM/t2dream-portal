@@ -57,6 +57,7 @@
             "enum": [
 		"accessible chromatin",
 		"histone modifications",
+		"variant to gene",
 		"binding footprints",
 		"hQTL",
 		"meQTL",

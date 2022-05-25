@@ -5,7 +5,6 @@ file_upload_bucket = ${file_upload_bucket}
 blob_bucket = ${blob_bucket}
 blob_store_profile_name = encoded-files-upload
 accession_factory = ${accession_factory}
-snp_search.server = ${region_search_instance}
 indexer.processes = ${indexer_processes}
 indexer.chunk_size = ${indexer_chunk_size}
 create_tables = true
@@ -16,9 +15,6 @@ use = config:base.ini#indexer
 
 [composite:visindexer]
 use = config:base.ini#visindexer
-
-[composite:regionindexer]
-use = config:base.ini#regionindexer
 
 [pipeline:main]
 pipeline =

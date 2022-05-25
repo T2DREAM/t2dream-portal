@@ -62,7 +62,7 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
 
 // Navbar search
 #home-search {
-        max-width: 90%;
+        max-width: 60%;
 	padding: 3px 26px 4px 14px;
 	padding-top: 3px;
 	padding-bottom: 4px;
@@ -75,7 +75,21 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
 	&:focus {
 		transition: width 0.3s ease-out;
 	}
-}
+    button {
+        display: flex;
+        padding: 0;
+        align-items: center;
+        margin-left: -25px;
+        background: none;
+        border: none;
+        z-index: 1;
+
+        .svg-icon {
+            width: 15px;
+            fill: #000;
+        }
+    }
+}         
 
 .form-inline,
 .home-form {

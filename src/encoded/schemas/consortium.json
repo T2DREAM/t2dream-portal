@@ -198,9 +198,6 @@
         "Project": {
             "title": "Project"
         },
-        "consortium_tools.consortium_tools_type": {
-            "title": "Available Consortium Tools"
-        },
         "datasets.accession": {
             "type": "exists",
             "title": "Has dataset"
@@ -236,12 +233,6 @@
         },
         "description": {
             "title": "Description"
-        },
-        "consortium_tools.consortium_tool_type": {
-            "title": "Available Tools"
-        },
-        "consortium_tools.url": {
-            "title": "URL"
         },
         "datasets": {
             "title": "Datasets"

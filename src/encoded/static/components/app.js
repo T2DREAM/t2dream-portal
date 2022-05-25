@@ -38,6 +38,7 @@ const portal = {
 		{ id: 'sep-mm-1' },
 		{ id: 'standards', title: 'Data Standards & QC', url: '/data-standards' },
 		{ id: 'pipeline', title: 'Pipelines', url: '/search/?type=Pipeline' },
+		{ id: 'consortia', title: 'Consortia', url: '/search/?type=Consortium' },
                 { id: 'publications', title: 'Publications', url: '/search/?type=Publication' },
             ],
         },
@@ -45,7 +46,6 @@ const portal = {
             id: 'tools',
             title: 'Tools',
             children: [
-                { id: 'region', title: 'Annotate Genetic Regions', url: '/region-search/' },
                 { id: 'umap', title: 'Single Cell Browser', url: '/cell-browser/' },
                 { id: 'expression', title: 'Gene Expression Browser', url: '/gene-expression/' },
             ],
