@@ -109,7 +109,7 @@ runcmd:
 - sudo mv /etc/mailname /etc/mailname.OLD
 - sudo echo "$PUBLIC_DNS_NAME" | sudo tee --append /etc/mailname
 - sudo service postfix restart
-- sudo add-apt-repository -y ppa:fkrull/deadsnakes-python2.7
+- sudo add-apt-repository -y ppa:fkrull/deadsnakes
 - sudo apt-get update
 - sudo apt-get --force-yes -y install python2.7
 - mkdir /opt/cloudwatchmon
