@@ -114,8 +114,8 @@ runcmd:
 - sudo apt-get --force-yes -y install python2.7
 - mkdir /opt/cloudwatchmon
 - chown build:build /opt/cloudwatchmon
-- sudo -u build virtualenv --python=python2.7 /opt/cloudwatchmon
-- sudo -u build /opt/cloudwatchmon/bin/pip install -r cloudwatchmon-requirements.txt
+#- sudo -u build virtualenv --python=python2.7 /opt/cloudwatchmon
+#- sudo -u build /opt/cloudwatchmon/bin/pip install -r cloudwatchmon-requirements.txt
 
 
 users:
