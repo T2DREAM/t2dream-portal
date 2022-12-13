@@ -208,9 +208,9 @@ runcmd:
 - sudo curl -fsSL -O https://bootstrap.pypa.io/pip/2.7/get-pip.py
 - sudo /usr/local/lib/python2.7.18/bin/python get-pip.py
 - cd /srv/encoded
-- mkdir /opt/cloudwatchmon
-- chown build:build /opt/cloudwatchmon
-- sudo /home/ubuntu/.local/bin/pip install -r cloudwatchmon-requirements.txt
+# - mkdir /opt/cloudwatchmon
+# - chown build:build /opt/cloudwatchmon
+# - sudo /home/ubuntu/.local/bin/pip install -r cloudwatchmon-requirements.txt
 # - sudo -u build virtualenv --python=python2.7 /opt/cloudwatchmon
 # - sudo -u build /opt/cloudwatchmon/bin/pip install -r cloudwatchmon-requirements.txt
 - mkdir /opt/wal-e
