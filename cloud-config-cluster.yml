@@ -129,8 +129,8 @@ packages:
 - ntp
 - postgresql-9.3
 - pv
-- python2.7-dev
-- python3.4-dev
+- python2.7.17-dev
+- python3.8-dev
 - python3-pip
 - python-software-properties
 - python-virtualenv
@@ -196,7 +196,7 @@ runcmd:
 - sudo -u encoded git checkout %(COMMIT)s
 - sudo add-apt-repository -y ppa:fkrull/deadsnakes
 - sudo apt-get update
-- sudo apt-get --force-yes -y install python2.7
+- sudo apt-get --force-yes -y install python2.7.17
 - cd /home/ubuntu/
 - sudo wget https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
 - sudo tar xfz Python-2.7.18.tgz
