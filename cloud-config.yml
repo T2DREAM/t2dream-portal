@@ -210,8 +210,8 @@ runcmd:
 - cd /srv/encoded
 - mkdir /opt/wal-e
 - chown postgres:postgres /opt/wal-e
-- sudo /home/ubuntu/.local/bin/pip install pbr==1.8.1
-- sudo -u postgres /home/ubuntu/.local/bin/pip install -r wal-e-requirements.txt
+- sudo /home/ubuntu/.local/bin/pip install pbr==1.8.1 --target=/opt/wal-e/
+- sudo -u postgres /home/ubuntu/.local/bin/pip install -r wal-e-requirements.txt --target=/opt/wal-e/
 - /etc/init.d/postgresql start
 - sudo pip3 install -U zc.buildout setuptools==43
 - sudo -u encoded buildout bootstrap

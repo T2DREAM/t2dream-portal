@@ -209,9 +209,9 @@ runcmd:
 - sudo /usr/local/lib/python2.7.18/bin/python get-pip.py
 - cd /srv/encoded
 - mkdir /opt/wal-e
-- chown postgres:postgres /opt/wal-e
-- sudo /home/ubuntu/.local/bin/pip install pbr==1.8.1
-- sudo -u postgres /home/ubuntu/.local/bin/pip install -r wal-e-requirements.txt
+- sudo chown postgres:postgres /opt/wal-e
+- sudo /usr/local/lib/python2.7.18/bin/pip install pbr==1.8.1 --target=/opt/wal-e/
+- sudo -u postgres /usr/local/lib/python2.7.18/bin/pip install -r wal-e-requirements.txt --target=/opt/wal-e/
 - /etc/init.d/postgresql start
 - sudo pip3 install -U zc.buildout setuptools==43
 - sudo -u encoded buildout bootstrap
