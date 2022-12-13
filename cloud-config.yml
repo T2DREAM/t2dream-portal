@@ -194,21 +194,16 @@ runcmd:
 - cd /srv/encoded
 - sudo -u encoded git clone --no-checkout https://github.com/T2DREAM/t2dream-portal.git .
 - sudo -u encoded git checkout %(COMMIT)s
-#- sudo add-apt-repository -y ppa:fkrull/deadsnakes
+- sudo add-apt-repository -y ppa:fkrull/deadsnakes
 - sudo apt-get update
 - sudo apt-get --force-yes -y install python2.7
-<<<<<<< HEAD
 - cd /home/ubuntu/
-=======
-# manually install python2.7.18, SNI fix
->>>>>>> 1fee26612af28fa5319726e8b96e3ba273eeb2ba
 - sudo wget https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
 - sudo tar xfz Python-2.7.18.tgz
 - cd Python-2.7.18/
 - sudo ./configure --prefix /usr/local/lib/python2.7.18
 - sudo make
 - sudo make install
-<<<<<<< HEAD
 - cd /home/ubuntu/
 - sudo curl -fsSL -O https://bootstrap.pypa.io/pip/2.7/get-pip.py
 - sudo /usr/local/lib/python2.7.18/bin/python get-pip.py
@@ -216,31 +211,15 @@ runcmd:
 - mkdir /opt/cloudwatchmon
 - chown build:build /opt/cloudwatchmon
 - sudo /home/ubuntu/.local/bin/pip install -r cloudwatchmon-requirements.txt
-=======
-- cd /srv/encoded
-- sudo curl -fsSL -O https://bootstrap.pypa.io/pip/2.7/get-pip.py
-- sudo /usr/local/lib/python2.7.18/bin/python get-pip.py
-- mkdir /opt/cloudwatchmon
-- chown build:build /opt/cloudwatchmon
-- sudo /srv/encoded/.local/bin/pip install -r cloudwatchmon-requirements.txt
->>>>>>> 1fee26612af28fa5319726e8b96e3ba273eeb2ba
 # - sudo -u build virtualenv --python=python2.7 /opt/cloudwatchmon
 # - sudo -u build /opt/cloudwatchmon/bin/pip install -r cloudwatchmon-requirements.txt
 - mkdir /opt/wal-e
 - chown postgres:postgres /opt/wal-e
-<<<<<<< HEAD
 - sudo /home/ubuntu/.local/bin/pip install pbr==1.8.1
 - sudo -u postgres /home/ubuntu/.local/bin/pip install -r wal-e-requirements.txt
 # - sudo -u postgres virtualenv --python=python2.7 /opt/wal-e
 # - sudo /opt/wal-e/bin/pip install pbr==1.8.1
 # - sudo -u postgres /opt/wal-e/bin/pip install -r wal-e-requirements.txt
-=======
-- sudo /srv/encoded/.local/bin/pip install pbr==1.8.1
-- sudo -u postgres /srv/encoded/.local/bin/pip install -r wal-e-requirements.txt
-#- sudo -u postgres virtualenv --python=python2.7 /opt/wal-e
-#- sudo /opt/wal-e/bin/pip install pbr==1.8.1
-#- sudo -u postgres /opt/wal-e/bin/pip install -r wal-e-requirements.txt
->>>>>>> 1fee26612af28fa5319726e8b96e3ba273eeb2ba
 # - /etc/init.d/postgresql stop
 # - sudo -u postgres /opt/wal-e/bin/wal-e --aws-instance-profile --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix)" backup-fetch /var/lib/postgresql/9.3/main LATEST
 # - sudo -u postgres ln -s /etc/postgresql/9.3/main/recovery.conf /var/lib/postgresql/9.3/main/
