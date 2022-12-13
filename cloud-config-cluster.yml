@@ -194,7 +194,7 @@ runcmd:
 - cd /srv/encoded
 - sudo -u encoded git clone --no-checkout https://github.com/T2DREAM/t2dream-portal.git .
 - sudo -u encoded git checkout %(COMMIT)s
-- sudo add-apt-repository -y ppa:fkrull/deadsnakes
+#- sudo add-apt-repository -y ppa:fkrull/deadsnakes
 - sudo apt-get update
 # - sudo apt-get --force-yes -y install python2.7.18
 # manually install python2.7.18, SNI fix
@@ -204,7 +204,7 @@ runcmd:
 - sudo ./configure --prefix /usr/local/lib/python2.7.18
 - sudo make
 - sudo make install
-- cd cd /srv/encoded
+- cd /srv/encoded
 - sudo curl -fsSL -O https://bootstrap.pypa.io/pip/2.7/get-pip.py
 - sudo /usr/local/lib/python2.7.18/bin/python get-pip.py 
 - mkdir /opt/cloudwatchmon
