@@ -20,7 +20,6 @@ package_upgrade: true
 - sleep 30
 - sudo apt-get update
 - sudo apt-get -y install awscli
-- sudo apt-get -y install bsdtar
 - sudo apt-get -y install git
 - sudo apt-get -y install build-essential
 - sudo apt-get -y install unattended-upgrades
@@ -46,9 +45,6 @@ package_upgrade: true
 - sudo apt-get -y install libmonitoring-plugin-perl
 - sudo apt-get -y install liblwp-useragent-determined-perl
 - sudo apt-get -y install sysstat
-
-power_state:
-  mode: reboot
 
 output:
   all: '| tee -a /var/log/cloud-init-output.log'
@@ -212,3 +208,6 @@ write_files:
     # generate a heap dump when an allocation from the Java heap fails
     # heap dumps are created in the working directory of the JVM
     -XX:+HeapDumpOnOutOfMemoryError
+
+power_state:
+  mode: reboot

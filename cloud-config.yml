@@ -12,9 +12,6 @@ bootcmd:
 - cloud-init-per once chmod-swapfile chmod 600 /swapfile
 - cloud-init-per once mkswap-swapfile mkswap /swapfile
 
-power_state:
-  mode: reboot
-
 output:
   all: '| tee -a /var/log/cloud-init-output.log'
 
@@ -23,7 +20,6 @@ runcmd:
 - sleep 30
 - sudo apt-get update
 - sudo apt-get -y install awscli
-- sudo apt-get -y install bsdtar
 - sudo apt-get -y install git
 - sudo apt-get -y install build-essential
 - sudo apt-get -y install unattended-upgrades
@@ -315,3 +311,6 @@ write_files:
 
 - path: /etc/postgresql/11/main/wale_s3_prefix
   content: "%(WALE_S3_PREFIX)s"
+
+power_state:
+  mode: reboot
