@@ -59,11 +59,6 @@ runcmd:
 - sudo -u ubuntu rm -r /home/ubuntu/.aws
 - sudo chmod 755 /usr/lib/jvm
 - sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-11.0.3/bin/java 100
-- java_version="$(java --version | head -n1)" && echo $java_version
-- if [ ! "$java_version" == "java 11.0.3 2019-04-16 LTS" ]; then
-- echo -e "ENCD FAILED: Wrong java versions '$java_version'"
-- exit 1
-- fi
 - sudo -u ubuntu mv /home/ubuntu/.ssh/authorized_keys /home/ubuntu/.ssh/authorized_keys2
 # add team public ssh keys
 - sudo -u ubuntu aws s3 cp --region=us-west-2 s3://t2depi-conf-prod/ssh-keys/prod-authorized_keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
