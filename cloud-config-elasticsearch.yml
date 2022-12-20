@@ -78,6 +78,7 @@ runcmd:
 - sudo apt-key add /etc/apt/es_gpg_key
 - echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list
 - sudo apt-get -y install apt-transport-https
+- sudo apt update
 - sudo apt-get -y install elasticsearch
 - fi
 - set -ex

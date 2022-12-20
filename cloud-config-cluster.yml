@@ -84,6 +84,7 @@ runcmd:
 - sudo apt-key add /etc/apt/es_gpg_key
 - echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list
 - sudo apt-get -y install apt-transport-https
+- sudo apt update
 - sudo apt-get -y install elasticsearch
 # install_libmagic_packages
 - wget http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.38-4_amd64.deb && sudo dpkg -i libmagic-mgc_5.38-4_amd64.deb && sudo apt-get install -yf
@@ -121,7 +122,7 @@ runcmd:
 - update-rc.d elasticsearch defaults
 - sudo bash /etc/elasticsearch/cluster.sh %(CLUSTER_NAME)s
 - sudo /usr/share/elasticsearch/bin/elasticsearch-plugin install discovery-ec2
-- service elasticsearch restart
+- sudo service elasticsearch restart
 - chown postgres:postgres /etc/postgresql/11/main/*.conf
 - echo "include 'custom.conf'" >> /etc/postgresql/11/main/postgresql.conf
 - if test "%(ROLE)s" = "demo"
