@@ -85,7 +85,7 @@ runcmd:
 - echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list
 - sudo apt-get -y install apt-transport-https
 - sudo apt update
-- sudo apt-get -y install elasticsearch
+- yes |sudo apt-get -y install elasticsearch
 # install_libmagic_packages
 - wget http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.38-4_amd64.deb && sudo dpkg -i libmagic-mgc_5.38-4_amd64.deb && sudo apt-get install -yf
 - wget http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic1_5.38-4_amd64.deb && sudo dpkg -i libmagic1_5.38-4_amd64.deb && sudo apt-get install -yf
