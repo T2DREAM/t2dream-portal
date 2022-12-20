@@ -4,41 +4,6 @@
 ssh_authorized_keys:
   - %(LOCAL_SSH_KEY)s
 
-apt_sources:
-- source: "ppa:webupd8team/java"
-- source: "deb https://artifacts.elastic.co/packages/5.x/apt stable main"
-  key: |
-    -----BEGIN PGP PUBLIC KEY BLOCK-----
-    Version: GnuPG v2.0.14 (GNU/Linux)
-
-    mQENBFI3HsoBCADXDtbNJnxbPqB1vDNtCsqhe49vFYsZN9IOZsZXgp7aHjh6CJBD
-    A+bGFOwyhbd7at35jQjWAw1O3cfYsKAmFy+Ar3LHCMkV3oZspJACTIgCrwnkic/9
-    CUliQe324qvObU2QRtP4Fl0zWcfb/S8UYzWXWIFuJqMvE9MaRY1bwUBvzoqavLGZ
-    j3SF1SPO+TB5QrHkrQHBsmX+Jda6d4Ylt8/t6CvMwgQNlrlzIO9WT+YN6zS+sqHd
-    1YK/aY5qhoLNhp9G/HxhcSVCkLq8SStj1ZZ1S9juBPoXV1ZWNbxFNGwOh/NYGldD
-    2kmBf3YgCqeLzHahsAEpvAm8TBa7Q9W21C8vABEBAAG0RUVsYXN0aWNzZWFyY2gg
-    KEVsYXN0aWNzZWFyY2ggU2lnbmluZyBLZXkpIDxkZXZfb3BzQGVsYXN0aWNzZWFy
-    Y2gub3JnPokBOAQTAQIAIgUCUjceygIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgEC
-    F4AACgkQ0n1mbNiOQrRzjAgAlTUQ1mgo3nK6BGXbj4XAJvuZDG0HILiUt+pPnz75
-    nsf0NWhqR4yGFlmpuctgCmTD+HzYtV9fp9qW/bwVuJCNtKXk3sdzYABY+Yl0Cez/
-    7C2GuGCOlbn0luCNT9BxJnh4mC9h/cKI3y5jvZ7wavwe41teqG14V+EoFSn3NPKm
-    TxcDTFrV7SmVPxCBcQze00cJhprKxkuZMPPVqpBS+JfDQtzUQD/LSFfhHj9eD+Xe
-    8d7sw+XvxB2aN4gnTlRzjL1nTRp0h2/IOGkqYfIG9rWmSLNlxhB2t+c0RsjdGM4/
-    eRlPWylFbVMc5pmDpItrkWSnzBfkmXL3vO2X3WvwmSFiQbkBDQRSNx7KAQgA5JUl
-    zcMW5/cuyZR8alSacKqhSbvoSqqbzHKcUQZmlzNMKGTABFG1yRx9r+wa/fvqP6OT
-    RzRDvVS/cycws8YX7Ddum7x8uI95b9ye1/Xy5noPEm8cD+hplnpU+PBQZJ5XJ2I+
-    1l9Nixx47wPGXeClLqcdn0ayd+v+Rwf3/XUJrvccG2YZUiQ4jWZkoxsA07xx7Bj+
-    Lt8/FKG7sHRFvePFU0ZS6JFx9GJqjSBbHRRkam+4emW3uWgVfZxuwcUCn1ayNgRt
-    KiFv9jQrg2TIWEvzYx9tywTCxc+FFMWAlbCzi+m4WD+QUWWfDQ009U/WM0ks0Kww
-    EwSk/UDuToxGnKU2dQARAQABiQEfBBgBAgAJBQJSNx7KAhsMAAoJENJ9ZmzYjkK0
-    c3MIAIE9hAR20mqJWLcsxLtrRs6uNF1VrpB+4n/55QU7oxA1iVBO6IFu4qgsF12J
-    TavnJ5MLaETlggXY+zDef9syTPXoQctpzcaNVDmedwo1SiL03uMoblOvWpMR/Y0j
-    6rm7IgrMWUDXDPvoPGjMl2q1iTeyHkMZEyUJ8SKsaHh4jV9wp9KmC8C+9CwMukL7
-    vM5w8cgvJoAwsp3Fn59AxWthN3XJYcnMfStkIuWgR7U2r+a210W6vnUxU4oN0PmM
-    cursYPyeV0NX/KQeUeNMwGTFB6QHS/anRaGQewijkrYYoTNtfllxIu9XYmiBERQ/
-    qPDlGRlOgVTd9xUfHFkzB52c70E=
-    =92oX
-    -----END PGP PUBLIC KEY BLOCK-----
 
 bootcmd:
 - set -ex
@@ -50,20 +15,37 @@ bootcmd:
 
 package_upgrade: true
 
-packages:
-- awscli
-- build-essential
-- elasticsearch
-- libssl-dev
-- python2.7.17-dev
-- python3.8-dev
-- python3-pip
-- python-software-properties
-- python-virtualenv
-- unattended-upgrades
-- bsd-mailx
-
-
+# install_packages_all
+- set -ex
+- sleep 30
+- sudo apt-get update
+- sudo apt-get -y install awscli
+- sudo apt-get -y install bsdtar
+- sudo apt-get -y install git
+- sudo apt-get -y install build-essential
+- sudo apt-get -y install unattended-upgrades
+- sudo apt-get -y install libbz2-dev
+- sudo apt-get -y install libdb-dev
+- sudo apt-get -y install libffi-dev
+- sudo apt-get -y install libgdbm-dev
+- sudo apt-get -y install liblzma-dev
+- sudo apt-get -y install libncurses5-dev
+- sudo apt-get -y install libnss3-dev
+- sudo apt-get -y install libreadline-dev
+- sudo apt-get -y install libssl-dev
+- sudo apt-get -y install libsqlite3-dev
+- sudo apt-get -y install python3-dev
+- sudo apt-get -y install python3-pip
+- sudo apt-get -y install python3-venv
+- sudo apt-get -y install zlib1g-dev
+- sudo apt-get -y install redis-server
+- sudo apt-get -y install nagios-nrpe-plugin
+- sudo apt-get -y install monitoring-plugins
+- sudo apt-get -y install nagios-nrpe-server
+- sudo apt-get -y install libjson-perl
+- sudo apt-get -y install libmonitoring-plugin-perl
+- sudo apt-get -y install liblwp-useragent-determined-perl
+- sudo apt-get -y install sysstat
 
 power_state:
   mode: reboot
@@ -76,8 +58,15 @@ runcmd:
 - sudo -u ubuntu aws s3 cp --region=us-west-2 --recursive s3://t2depi-conf-prod/.aws ~ubuntu/.aws
 - sudo mkdir -p /usr/lib/jvm
 - sudo chmod 777 /usr/lib/jvm
-- sudo tar -xzvf /home/ubuntu/.aws/jdk-8u211-linux-x64.tar.gz --directory /usr/lib/jvm/
-- sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_211/bin/java 100
+- sudo tar -xzvf /home/ubuntu/.aws/jdk-11.0.3_linux-x64_bin.tar.gz --directory /usr/lib/jvm/
+- sudo -u ubuntu rm -r /home/ubuntu/.aws
+- sudo chmod 755 /usr/lib/jvm
+- sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-11.0.3/bin/java 100
+- java_version="$(java --version | head -n1)" && echo $java_version
+- if [ ! "$java_version" == "java 11.0.3 2019-04-16 LTS" ]; then
+- echo -e "ENCD FAILED: Wrong java versions '$java_version'"
+- exit 1
+- fi
 - sudo -u ubuntu mv /home/ubuntu/.ssh/authorized_keys /home/ubuntu/.ssh/authorized_keys2
 - sudo -u ubuntu aws s3 cp --region=us-west-2 s3://t2depi-conf-prod/ssh-keys/prod-authorized_keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
 # Ideally this would build as a different user so encoded only has read
@@ -92,6 +81,13 @@ runcmd:
 -    echo "-Xmx4g" >> /etc/elasticsearch/jvm.options
 -    sysctl "vm.swappiness=1"
 -    swapon /swapfile
+
+# install_and_setup_elasticsearch
+- sudo wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo tee /etc/apt/es_gpg_key
+- sudo apt-key add /etc/apt/es_gpg_key
+- echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list
+- sudo apt-get -y install apt-transport-https
+- sudo apt-get -y install elasticsearch
 - fi
 - set -ex
 - update-rc.d elasticsearch defaults
