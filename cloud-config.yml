@@ -33,9 +33,11 @@ runcmd:
 - sudo apt-get -y install libreadline-dev
 - sudo apt-get -y install libssl-dev
 - sudo apt-get -y install libsqlite3-dev
+- sudo apt-get -y install python2
 - sudo apt-get -y install python3-dev
 - sudo apt-get -y install python3-pip
 - sudo apt-get -y install python3-venv
+- sudo apt-get -y install python3-testresources
 - sudo apt-get -y install zlib1g-dev
 - sudo apt-get -y install redis-server
 - sudo apt-get -y install nagios-nrpe-plugin
@@ -142,9 +144,10 @@ runcmd:
 - sudo -u build /opt/cloudwatchmon/bin/pip install -r cloudwatchmon-requirements.txt
 - mkdir /opt/wal-e
 - chown postgres:postgres /opt/wal-e
-- sudo -u postgres virtualenv --python=python2.7 /opt/wal-e
-- sudo /opt/wal-e/bin/pip install pbr==1.8.1
-- sudo -u postgres /opt/wal-e/bin/pip install -r wal-e-requirements.txt
+# - sudo -u postgres virtualenv --python=python2.7 /opt/wal-e
+- sudo -u postgres python3 -m pip install wal-e --target=/opt/wal-e/ --upgrade
+# - sudo /opt/wal-e/bin/pip install pbr==1.8.1
+# - sudo -u postgres /opt/wal-e/bin/pip install -r wal-e-requirements.txt
 # - /etc/init.d/postgresql stop
 # - sudo -u postgres /opt/wal-e/bin/wal-e --aws-instance-profile --s3-prefix="$(cat /etc/postgresql/11/main/wale_s3_prefix)" backup-fetch /var/lib/postgresql/11/main LATEST
 # - sudo -u postgres ln -s /etc/postgresql/11/main/recovery.conf /var/lib/postgresql/11/main/
