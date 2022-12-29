@@ -107,7 +107,7 @@ runcmd:
 - chown build:build /opt/cloudwatchmon
 #- sudo -u build virtualenv --python=python2.7 /opt/cloudwatchmon
 #- sudo -u build /opt/cloudwatchmon/bin/pip install -r cloudwatchmon-requirements.txt
-
+- sudo pip install --upgrade botocore==1.29.21
 
 users:
 - default
