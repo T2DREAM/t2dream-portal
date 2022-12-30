@@ -47,6 +47,7 @@ package_upgrade: true
 - sudo apt-get -y install libmonitoring-plugin-perl
 - sudo apt-get -y install liblwp-useragent-determined-perl
 - sudo apt-get -y install sysstat
+- sudo apt-get -y install libarchive-tools
 
 output:
   all: '| tee -a /var/log/cloud-init-output.log'

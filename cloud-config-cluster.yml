@@ -48,6 +48,7 @@ runcmd:
 - sudo apt-get -y install libmonitoring-plugin-perl
 - sudo apt-get -y install liblwp-useragent-determined-perl
 - sudo apt-get -y install sysstat
+- sudo apt-get -y install libarchive-tools
 # Manually install java
 - sudo -u ubuntu aws s3 cp --region=us-west-2 --recursive s3://t2depi-conf-prod/.aws ~ubuntu/.aws
 - sudo mkdir -p /usr/lib/jvm
