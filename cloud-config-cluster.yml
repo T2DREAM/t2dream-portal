@@ -150,7 +150,7 @@ runcmd:
 - sudo apt-get -y install gcc
 - sudo apt-get -y install make
 - cd /srv/encoded
-- sudo pip install --upgrade botocore==1.29.21
+- sudo pip install --upgrade botocore==1.12.36
 - mkdir /opt/wal-e
 - sudo chown postgres:postgres /opt/wal-e
 # - sudo pip install pbr==1.8.1 --target=/opt/wal-e/

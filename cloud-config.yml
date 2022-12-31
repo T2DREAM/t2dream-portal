@@ -134,7 +134,7 @@ runcmd:
 - mkdir /srv/encoded
 - chown encoded:encoded /srv/encoded
 - cd /srv/encoded
-- sudo pip install --upgrade botocore==1.29.21
+- sudo pip install --upgrade botocore==1.12.36
 - sudo -u encoded git clone --no-checkout https://github.com/T2DREAM/t2dream-portal.git .
 - sudo -u encoded git checkout %(COMMIT)s
 - yes |sudo apt install software-properties-common
