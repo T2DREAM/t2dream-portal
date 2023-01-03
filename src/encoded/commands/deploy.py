@@ -256,7 +256,7 @@ def get_user_data(commit, config_file, data_insert, profile_name):
         )
     data_insert['LOCAL_SSH_KEY'] = ssh_pub_key
     # aws s3 authorized_keys folder
-    auth_base = 's3://encoded-conf-prod/ssh-keys'
+    auth_base = 's3://t2depi-conf-prod/ssh-keys'
     auth_type = 'prod'
     if profile_name != 'production':
         auth_type = 'demo'
