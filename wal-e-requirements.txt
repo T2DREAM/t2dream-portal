@@ -1,4 +1,4 @@
-PyYAML==5.2
+PyYAML==5.4
 awscli==1.19.8
 boto3==1.17.8
 Babel==2.2.0
