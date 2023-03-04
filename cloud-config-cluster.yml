@@ -154,7 +154,9 @@ runcmd:
 - mkdir /opt/wal-e
 - sudo chown postgres:postgres /opt/wal-e
 # - sudo pip install pbr==1.8.1 --target=/opt/wal-e/
-# - sudo -u postgres pip install -r wal-e-requirements.txt --target=/opt/wal-e/
+- sudo pip install virtualenv
+- sudo -u postgres virtualenv --python=python2.7 /opt/wal-e
+- sudo -u postgres pip install -r wal-e-requirements.txt --target=/opt/wal-e/
 - sudo -u postgres python3 -m pip install wal-e --target=/opt/wal-e/ --upgrade
 - /etc/init.d/postgresql start
 - sudo pip3 install -U zc.buildout setuptools==43
