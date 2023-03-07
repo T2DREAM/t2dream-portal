@@ -82,6 +82,8 @@
 		"Sequencing of sorted samples",
 		"sequencing",
 		"imaging",
+		"Insulin ELISA",
+		"Imaging, biochemical assays",
 		"cellular phenotype",
 		"molecular phenotype"
             ]
@@ -97,6 +99,10 @@
 		"type": "string",
 		"enum" : [
 		    "cell death",
+		    "Insulin content, insulin secretion",
+		    "Insulin secretion",
+		    "Insulin secretion, insulin content",
+		    "Multiple phenotypes",
 		    "Insulin secretion, cell number",
 		    "insulin content",
 		    "ER stress",
@@ -150,6 +156,21 @@
             "description": "For cell partitioning, description of how the cells were partitioned (full details in experimental protocol)",
             "type": "string"
         },
+        "perturbation_target": {
+            "title": "Perturbation Target",
+            "description": "Target of perurbation",
+            "type": "string"
+        },
+        "assay_controls": {
+            "title": "Assay Controls",
+            "description": "Assay Controls",
+            "type": "string"
+        },	
+        "resource_contact": {
+            "title": "Resource Contact",
+            "description": "Contact",
+            "type": "string"
+        },	
         "portal_usage": {
             "title": "KP usage",
             "description": "KP usage",
