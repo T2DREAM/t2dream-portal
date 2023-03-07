@@ -147,6 +147,7 @@ output:
 
 runcmd:
 # Manually install java
+- sudo apt install awscli
 - sudo -u ubuntu aws s3 cp --region=us-west-2 --recursive s3://t2depi-conf-prod/.aws ~ubuntu/.aws
 - sudo mkdir -p /usr/lib/jvm
 - sudo chmod 777 /usr/lib/jvm
