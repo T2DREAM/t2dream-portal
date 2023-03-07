@@ -10,6 +10,12 @@
       "integrity": "sha1-uB3l9ydOxOdW15fNg08wNkJyTl0=",
       "dev": true
     },
+    "@iarna/toml": {
+      "version": "2.2.5",
+      "resolved": "https://registry.npmjs.org/@iarna/toml/-/toml-2.2.5.tgz",
+      "integrity": "sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==",
+      "dev": true	
+    },
     "abbrev": {
       "version": "1.1.0",
       "resolved": "https://registry.npmjs.org/abbrev/-/abbrev-1.1.0.tgz",
