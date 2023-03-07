@@ -404,7 +404,7 @@ def main():
         '--test', action='store_const', default='demo', const='test', dest='role',
         help="Deploy to production AWS")
     parser.add_argument(
-        '--image-id', default='ami-0d1cd67c26f5fca19',
+        '--image-id', default='ami-0b49e924abf22f5a6',
         help="https://us-west-2.console.aws.amazon.com/ec2/home?region=us-west-2#LaunchInstanceWizard:ami=ami-2133bc59")
     parser.add_argument(
         '--instance-type', default='c5.9xlarge',
