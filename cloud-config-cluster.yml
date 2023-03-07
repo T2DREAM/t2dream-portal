@@ -22,7 +22,7 @@ runcmd:
 - sudo apt-get -y install awscli
 - sudo apt-get -y install git
 - sudo apt-get -y install build-essential
-- sudo apt-get -y install unattended-upgrades
+# - sudo apt-get -y install unattended-upgrades
 - sudo apt-get -y install libbz2-dev
 - sudo apt-get -y install libdb-dev
 - sudo apt-get -y install libffi-dev
