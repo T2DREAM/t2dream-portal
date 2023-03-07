@@ -13,13 +13,12 @@ bootcmd:
 
 output:
   all: '| tee -a /var/log/cloud-init-output.log'
-  
-- package_upgrade: true
+
 runcmd:
 # install_packages_all
 - set -ex
 - sleep 30
-- sudo apt-get -y update
+- yes | sudo apt-get update
 - sudo apt-get -y install awscli
 - sudo apt-get -y install git
 - sudo apt-get -y install build-essential
@@ -74,7 +73,7 @@ runcmd:
 - sudo wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt/pg_gpg_key
 - sudo apt-key add /etc/apt/pg_gpg_key
 - echo "deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main" | sudo tee -a /etc/apt/sources.list
-- sudo apt-get -y update
+- yes | sudo apt-get update
 - sudo apt-get -y install lzop
 - sudo apt-get -y install pv
 - sudo apt-get -y install daemontools
@@ -85,7 +84,7 @@ runcmd:
 - sudo apt-key add /etc/apt/es_gpg_key
 - echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list
 - sudo apt-get -y install apt-transport-https
-- sudo apt -y update
+- yes | sudo apt update
 - yes |sudo apt-get -y install elasticsearch
 # install_libmagic_packages
 - wget http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.38-4_amd64.deb && sudo dpkg -i libmagic-mgc_5.38-4_amd64.deb && sudo apt-get install -yf
@@ -129,7 +128,7 @@ runcmd:
 - sudo -u encoded git clone --no-checkout https://github.com/T2DREAM/t2dream-portal.git .
 - sudo -u encoded git checkout %(COMMIT)s
 - sudo add-apt-repository -y ppa:fkrull/deadsnakes
-- sudo apt-get -y update
+- yes | sudo apt-get update
 - sudo apt-get --force-yes -y install python2.7
 - cd /home/ubuntu/
 - sudo wget https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
@@ -142,7 +141,7 @@ runcmd:
 - sudo curl -fsSL -O https://bootstrap.pypa.io/pip/2.7/get-pip.py
 - sudo /usr/local/lib/python2.7.18/bin/python get-pip.py
 - sudo add-apt-repository -y ppa:deadsnakes/ppa
-- sudo apt-get -y update
+- yes | sudo apt-get update
 - sudo apt-get install -y python3.6 python3.6-dev python3.6-venv --force-yes
 - sudo curl -fsSL -O https://bootstrap.pypa.io/pip/3.6/get-pip.py
 - sudo python3.6 get-pip.py
