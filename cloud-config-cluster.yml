@@ -170,6 +170,7 @@ runcmd:
 - /etc/init.d/postgresql start
 - sudo pip3.6 install -U zc.buildout setuptools==57.0.0
 - sudo -u encoded buildout bootstrap
+- sudo pip3.6 uninstall Pillow
 - sudo -u encoded LANG=en_US.UTF-8 bin/buildout -c %(ROLE)s.cfg production-ini:region_search_instance=localhost:9200
 # - sudo apt remove -y python3-botocore
 - sudo pip3.6 install awscli
