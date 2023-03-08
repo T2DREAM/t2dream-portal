@@ -1,4 +1,7 @@
 #cloud-config
+ssh_authorized_keys:
+  - %(LOCAL_SSH_KEY)s
+
 bootcmd:
 - set -ex
 - cloud-init-per once ssh-users-ca echo "TrustedUserCAKeys /etc/ssh/users_ca.pub" >> /etc/ssh/sshd_config
@@ -7,7 +10,11 @@ bootcmd:
 - cloud-init-per once chmod-swapfile chmod 600 /swapfile
 - cloud-init-per once mkswap-swapfile mkswap /swapfile
 
+output:
+  all: '| tee -a /var/log/cloud-init-output.log'
+
 # install_packages_all
+runcmd:
 - set -ex
 - sleep 30
 - sudo apt-get update
@@ -40,11 +47,6 @@ bootcmd:
 - sudo apt-get -y install liblwp-useragent-determined-perl
 - sudo apt-get -y install sysstat
 - sudo apt-get -y install libarchive-tools
-
-output:
-  all: '| tee -a /var/log/cloud-init-output.log'
-
-runcmd:
 # Manually install java
 - sudo -u ubuntu aws s3 cp --region=us-west-2 --recursive s3://t2depi-conf-prod/.aws ~ubuntu/.aws
 - sudo mkdir -p /usr/lib/jvm
