@@ -253,7 +253,7 @@ write_files:
     discovery.type: ec2
     cloud.aws.region: us-west-2
     node.master: true
-    node.data: false
+    node.data: true
     discovery.zen.minimum_master_nodes: 1
 
     discovery.ec2.groups: test-elasticsearch, ssh-http-https
@@ -274,7 +274,7 @@ write_files:
         echo "discovery.type: ec2" >> /etc/elasticsearch/elasticsearch.yml
         echo "cloud.aws.region: us-west-2" >> /etc/elasticsearch/elasticsearch.yml
         echo "node.master: true" >> /etc/elasticsearch/elasticsearch.yml
-        echo "node.data: false" >> /etc/elasticsearch/elasticsearch.yml
+        echo "node.data: true" >> /etc/elasticsearch/elasticsearch.yml
         echo "discovery.zen.minimum_master_nodes: 1" >> /etc/elasticsearch/elasticsearch.yml
         echo "discovery.ec2.groups: test-elasticsearch, ssh-http-https" >> /etc/elasticsearch/elasticsearch.yml
         echo "indices.query.bool.max_clause_count: 8192" >> /etc/elasticsearch/elasticsearch.yml
