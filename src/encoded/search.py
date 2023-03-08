@@ -981,19 +981,19 @@ def matrix(context, request):
         msg = 'No matrix configured for type: {}'.format(item_type)
         raise HTTPBadRequest(explanation=msg)
     schema = type_info.schema
-    if type_info.name is 'Annotation':
+    if type_info.name == 'Annotation':
         result['title'] = 'Annotation'
     else:
         result['title'] = type_info.name + ' Matrix'
-    if type_info.name is 'Embedding':
+    if type_info.name == 'Embedding':
         result['title'] = 'Embedding'
     else:
         result['title'] = type_info.name + ' Matrix'
-    if type_info.name is 'Model':
+    if type_info.name == 'Model':
         result['title'] = 'Model'
     else:
         result['title'] = type_info.name + ' Matrix'
-    if type_info.name is 'Perturbation':
+    if type_info.name == 'Perturbation':
         result['title'] = 'Perturbation'
     else:
         result['title'] = type_info.name + ' Matrix'
@@ -1257,19 +1257,19 @@ def audit(context, request):
         msg = 'No matrix configured for type: {}'.format(item_type)
         raise HTTPBadRequest(explanation=msg)
     schema = type_info.schema
-    if type_info.name is 'Annotation':
+    if type_info.name == 'Annotation':
         result['title'] = 'Annotation'
     else:
         result['title'] = type_info.name + ' Matrix'
-    if type_info.name is 'Embedding':
+    if type_info.name == 'Embedding':
         result['title'] = 'Embedding'
     else:
         result['title'] = type_info.name + ' Matrix'
-    if type_info.name is 'Perturbation':
+    if type_info.name == 'Perturbation':
         result['title'] = 'Perturbation'
     else:
         result['title'] = type_info.name + ' Matrix'
-    if type_info.name is 'Model':
+    if type_info.name == 'Model':
         result['title'] = 'Model'
     else:
         result['title'] = type_info.name + ' Matrix'

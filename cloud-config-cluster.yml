@@ -7,6 +7,7 @@ ssh_authorized_keys:
 bootcmd:
 - set -ex
 - cloud-init-per once ssh-users-ca echo "TrustedUserCAKeys /etc/ssh/users_ca.pub" >> /etc/ssh/sshd_config
+# - cloud-init-per once accepted-oracle-license-v1-1 echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections
 - cloud-init-per once fallocate-swapfile fallocate -l 4G /swapfile
 - cloud-init-per once chmod-swapfile chmod 600 /swapfile
 - cloud-init-per once mkswap-swapfile mkswap /swapfile
@@ -18,11 +19,11 @@ runcmd:
 # install_packages_all
 - set -ex
 - sleep 30
-- yes | sudo apt-get update
+- sudo apt-get update
 - sudo apt-get -y install awscli
 - sudo apt-get -y install git
 - sudo apt-get -y install build-essential
-# - sudo apt-get -y install unattended-upgrades
+- sudo apt-get -y install unattended-upgrades
 - sudo apt-get -y install libbz2-dev
 - sudo apt-get -y install libdb-dev
 - sudo apt-get -y install libffi-dev
@@ -41,21 +42,23 @@ runcmd:
 - sudo apt-get -y install zlib1g-dev
 - sudo apt-get -y install redis-server
 - sudo apt-get -y install nagios-nrpe-plugin
+- sudo apt-get -y install monitoring-plugins
+- sudo apt-get -y install nagios-nrpe-server
 - sudo apt-get -y install libjson-perl
 - sudo apt-get -y install libmonitoring-plugin-perl
 - sudo apt-get -y install liblwp-useragent-determined-perl
 - sudo apt-get -y install sysstat
 - sudo apt-get -y install libarchive-tools
 # Manually install java
-- sudo apt install awscli
 - sudo -u ubuntu aws s3 cp --region=us-west-2 --recursive s3://t2depi-conf-prod/.aws ~ubuntu/.aws
 - sudo mkdir -p /usr/lib/jvm
 - sudo chmod 777 /usr/lib/jvm
-- sudo tar -xzvf /home/ubuntu/.aws/jdk-8u211-linux-x64.tar.gz --directory /usr/lib/jvm/
+- sudo tar -xzvf /home/ubuntu/.aws/jdk-11.0.3_linux-x64_bin.tar.gz --directory /usr/lib/jvm/
 - sudo -u ubuntu rm -r /home/ubuntu/.aws
 - sudo chmod 755 /usr/lib/jvm
-- sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_211/bin/java 100
+- sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-11.0.3/bin/java 100
 - sudo -u ubuntu mv /home/ubuntu/.ssh/authorized_keys /home/ubuntu/.ssh/authorized_keys2
+# add team public ssh keys
 - sudo -u ubuntu aws s3 cp --region=us-west-2 s3://t2depi-conf-prod/ssh-keys/prod-authorized_keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
 # install_packages_encoded_app
 - sudo apt-get -y install apache2
@@ -70,10 +73,10 @@ runcmd:
 - sudo apt-get -y install libpq-dev
 - sudo apt-get -y install graphviz
 # install_and_setup_postgres
-- sudo wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt/pg_gpg_key
+- sudo apt-get -y install daemontools- sudo wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt/pg_gpg_key
 - sudo apt-key add /etc/apt/pg_gpg_key
 - echo "deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main" | sudo tee -a /etc/apt/sources.list
-- yes | sudo apt-get update
+- sudo apt-get update
 - sudo apt-get -y install lzop
 - sudo apt-get -y install pv
 - sudo apt-get -y install daemontools
@@ -84,15 +87,23 @@ runcmd:
 - sudo apt-key add /etc/apt/es_gpg_key
 - echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list
 - sudo apt-get -y install apt-transport-https
-- yes | sudo apt update
+- sudo apt update
 - yes |sudo apt-get -y install elasticsearch
-- sudo systemctl start elasticsearch
-- sudo systemctl enable elasticsearch
 # install_libmagic_packages
 - wget http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.38-4_amd64.deb && sudo dpkg -i libmagic-mgc_5.38-4_amd64.deb && sudo apt-get install -yf
 - wget http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic1_5.38-4_amd64.deb && sudo dpkg -i libmagic1_5.38-4_amd64.deb && sudo apt-get install -yf
 - wget http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-dev_5.38-4_amd64.deb && sudo dpkg -i libmagic-dev_5.38-4_amd64.deb && sudo apt-get install -yf
 - sudo apt --fix-broken -y  install && sudo apt autoremove -y
+# configure_apache2_logrotation
+- sudo mkdir -p /etc/systemd/system/logrotate.timer.d
+
+- echo "[Timer]" >> override.conf
+- echo "OnCalendar=" >> override.conf
+- echo "OnCalendar=*-*-* 14:00:00" >> override.conf
+
+- sudo mv override.conf /etc/systemd/system/logrotate.timer.d/
+
+
 # Ideally this would build as a different user so encoded only has read
 # permissions
 - MEMGIGS=$(awk '/MemTotal/{printf "%%.0f", $2 / 1024**2}' /proc/meminfo)
@@ -111,10 +122,11 @@ runcmd:
 -    swapon /swapfile
 - fi
 - set -ex
-- sudo update-rc.d elasticsearch defaults
+- update-rc.d elasticsearch defaults
 - sudo bash /etc/elasticsearch/cluster.sh %(CLUSTER_NAME)s
-- sudo /usr/share/elasticsearch/bin/elasticsearch-plugin install discovery-ec2 --batch 
-- service elasticsearch restart
+- sudo /usr/share/elasticsearch/bin/elasticsearch-plugin install discovery-ec2
+- sudo /bin/systemctl enable elasticsearch.service
+- sudo systemctl start elasticsearch.service
 - chown postgres:postgres /etc/postgresql/9.3/main/*.conf
 - echo "include 'custom.conf'" >> /etc/postgresql/9.3/main/postgresql.conf
 - if test "%(ROLE)s" = "demo"
@@ -130,38 +142,31 @@ runcmd:
 - sudo -u encoded git clone --no-checkout https://github.com/T2DREAM/t2dream-portal.git .
 - sudo -u encoded git checkout %(COMMIT)s
 - yes |sudo apt install software-properties-common
-- sudo add-apt-repository -y -r ppa:fkrull/deadsnakes
-- yes | sudo apt-get update
-- sudo apt-get --force-yes -y install python2.7
-- cd /home/ubuntu/
-- sudo wget https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
-- sudo tar xfz Python-2.7.18.tgz
-- cd Python-2.7.18/
-- sudo ./configure --prefix /usr/local/lib/python2.7.18
-- sudo make
-- sudo make install
-- cd /home/ubuntu/
-- sudo curl -fsSL -O https://bootstrap.pypa.io/pip/2.7/get-pip.py
-- sudo /usr/local/lib/python2.7.18/bin/python get-pip.py
-# - sudo add-apt-repository -y -r ppa:deadsnakes/ppa
-# - yes | sudo apt-get update
-# - sudo apt-get install -y python3.6 python3.6-dev python3.6-venv --force-yes
-# - sudo curl -fsSL -O https://bootstrap.pypa.io/pip/3.6/get-pip.py
-# - sudo python3.6 get-pip.py
+- sudo add-apt-repository -y ppa:deadsnakes/ppa
+- sudo apt-get update
+- sudo apt-get install -y python3.6 python3.6-dev python3.6-venv
 - curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 - sudo apt-get -y install nodejs
 - sudo apt-get -y install g++
 - sudo apt-get -y install gcc
 - sudo apt-get -y install make
 - cd /srv/encoded
+- sudo pip install --upgrade botocore==1.12.36
 - mkdir /opt/wal-e
 - sudo chown postgres:postgres /opt/wal-e
-- sudo /usr/local/lib/python2.7.18/bin/pip install pbr==1.8.1 --target=/opt/wal-e/
-- sudo -u postgres pip install -r wal-e-requirements.txt --target=/opt/wal-e/
+- sudo -u postgres pip install -r wal-e-requirements.txt --target=/opt/wal-e/ --upgrade
+# - sudo -u postgres pip install -r wal-e-requirements.txt --target=/opt/wal-e/ --upgrade
+# - sudo -u postgres virtualenv --python=python2.7 /opt/wal-e
+# - sudo pip install pbr==1.8.1 --target=/opt/wal-e/
+# - sudo pip install virtualenv
+# - sudo -u postgres virtualenv --python=python2.7 /opt/wal-e
+# - sudo -u postgres pip install -r wal-e-requirements.txt --target=/opt/wal-e/
+# - sudo -u postgres python3 -m pip install wal-e --target=/opt/wal-e/ --upgrade
 - /etc/init.d/postgresql start
-- sudo pip3 install -U zc.buildout setuptools==43
+- sudo pip3 install -U zc.buildout setuptools==57.0.0
 - sudo -u encoded buildout bootstrap
 - sudo -u encoded LANG=en_US.UTF-8 bin/buildout -c %(ROLE)s.cfg production-ini:region_search_instance=localhost:9200
+- sudo apt remove -y python3-botocore
 - sudo -u encoded bin/aws s3 cp --recursive s3://t2depi-conf-prod/.aws .aws
 - until sudo -u postgres psql postgres -c ""; do sleep 10; done
 - sudo -u encoded sh -c 'cat /dev/urandom | head -c 256 | base64 > session-secret.b64'
@@ -185,6 +190,7 @@ runcmd:
 - then
 -   sudo -i -u encoded bin/batchupgrade production.ini --app-name app
 - fi
+- sudo DEBIAN_FRONTEND=noninteractive apt install -y postfix
 - sudo sed -i -e 's/inet_interfaces = all/inet_interfaces = loopback-only/g' /etc/postfix/main.cf
 - PUBLIC_DNS_NAME="$(curl http://169.254.169.254/latest/meta-data/public-hostname)"
 - sudo sed -i "/myhostname/c\myhostname = $PUBLIC_DNS_NAME" /etc/postfix/main.cf
@@ -192,6 +198,8 @@ runcmd:
 - sudo mv /etc/mailname /etc/mailname.OLD
 - sudo echo "$PUBLIC_DNS_NAME" | sudo tee --append /etc/mailname
 - sudo service postfix restart
+- sudo /etc/init.d/apache2 restart
+- sudo /etc/init.d/elasticsearch restart
 # - sleep 10
 # - sudo -u postgres echo "include 'master.conf'" >> /etc/postgresql/9.3/main/postgresql.conf
 # - pg_ctlcluster 9.3 main reload
@@ -239,14 +247,13 @@ write_files:
     network.host: 0.0.0.0
     http.port: 9200
     transport.tcp.port: 9299
+    discovery.type: ec2
+    cloud.aws.region: us-west-2
     node.master: true
     node.data: false
     discovery.zen.minimum_master_nodes: 1
-    discovery.type: ec2
 
-    cloud.aws.region: us-west-2
-
-    discovery.ec2.groups: ES, ssh-http-https
+    discovery.ec2.groups: test-elasticsearch, ssh-http-https
 
     indices.query.bool.max_clause_count: 8192
 
@@ -335,3 +342,7 @@ write_files:
 
 - path: /etc/postgresql/9.3/main/wale_s3_prefix
   content: "%(WALE_S3_PREFIX)s"
+- path: /etc/ssh/users_ca.pub
+  content: ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAv/ymOcnN4LhM4NACc3Or116XXJ6KytuOgB/+1qNkOFBqBosrn7cmJ35rsoNHRgYNrCsRE9ch74RKsN6H72FtSJgBhGh/9oUK7Os6Fqt3/ZZXxgxIx6ubs/MTgrxrAnujiBxUXMXQhLKMriNMpo8mt4nGYVtLk9PBjiyfncaS8H9ZKoNio9dhP8bmTuYvioAI35dqKdSlVLyzr/XkZxia8Ki+pQ0N6uuiEwMR3ToM+LSp8wpFOOAiu4PEAujRW7us/+1hlpKWfn0J7/V3826joHE+I967Vg/+ikcVhF77JjK1nib879VgCWfmn1HPQosIpk4yJfVgGvRVI7I2nfBPVw== snowflakes@demo-l.snowflakescc.org
+power_state:
+  mode: reboot

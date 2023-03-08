@@ -256,11 +256,11 @@ def get_user_data(commit, config_file, data_insert, profile_name):
         )
     data_insert['LOCAL_SSH_KEY'] = ssh_pub_key
     # aws s3 authorized_keys folder
-    auth_base = 's3://encoded-conf-prod/ssh-keys'
-    auth_type = 'prod'
+    auth_base = 's3://t2depi-conf-prod/ssh-keys/prod-authorized_keys'
+    auth_type = 'authorized_keys'
     if profile_name != 'production':
         auth_type = 'demo'
-    auth_keys_dir = '{auth_base}/{auth_type}-authorized_keys'.format(
+    auth_keys_dir = '{auth_base}/{auth_type}'.format(
         auth_base=auth_base,
         auth_type=auth_type,
     )
@@ -328,7 +328,7 @@ def run(
             'CLUSTER_NAME': cluster_name,
         }
         user_data = get_user_data(commit, config_file, data_insert, profile_name)
-        security_groups = ['ES']
+        security_groups = ['test-elasticsearch']
         iam_role = 'elasticsearch-instance'
         count = int(cluster_size)
 
@@ -405,7 +405,7 @@ def main():
         help="Deploy to production AWS")
     parser.add_argument(
         '--image-id', default='ami-0b49e924abf22f5a6',
-        help="https://us-west-2.console.aws.amazon.com/ec2/home?region=us-west-2#LaunchInstanceWizard:ami=ami-2133bc59")
+        help="https://us-west-2.console.aws.amazon.com/ec2/home?region=us-west-2#LaunchInstanceWizard:ami=ami-0d1cd67c26f5fca19")
     parser.add_argument(
         '--instance-type', default='c5.9xlarge',
         help="(defualts to c5.9xlarge for indexing) Switch to a smaller instance afterwards"
