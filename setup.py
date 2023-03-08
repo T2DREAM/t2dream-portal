@@ -3,8 +3,8 @@ import sys
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.md')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
+#README = open(os.path.join(here, 'README.md')).read()
+#CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
 requires = [
     'snovault',
@@ -61,7 +61,7 @@ setup(
     name='encoded',
     version='66.0',
     description='Metadata database for ENCODE',
-    long_description=README + '\n\n' + CHANGES,
+    #long_description=README + '\n\n' + CHANGES,
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
