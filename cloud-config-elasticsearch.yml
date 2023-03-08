@@ -1,9 +1,4 @@
 #cloud-config
-# Instance
-ssh_authorized_keys:
-  - %(LOCAL_SSH_KEY)s
-
-
 bootcmd:
 - set -ex
 - cloud-init-per once ssh-users-ca echo "TrustedUserCAKeys /etc/ssh/users_ca.pub" >> /etc/ssh/sshd_config
@@ -11,8 +6,6 @@ bootcmd:
 - cloud-init-per once fallocate-swapfile fallocate -l 4G /swapfile
 - cloud-init-per once chmod-swapfile chmod 600 /swapfile
 - cloud-init-per once mkswap-swapfile mkswap /swapfile
-
-package_upgrade: true
 
 # install_packages_all
 - set -ex
