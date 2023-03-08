@@ -269,6 +269,15 @@ write_files:
     if [[ -n "$name" ]]; then
         echo "cluster.name: $name" >> /etc/elasticsearch/elasticsearch.yml
         echo "network.host: 0.0.0.0" >> /etc/elasticsearch/elasticsearch.yml
+        echo "http.port: 9200" >> /etc/elasticsearch/elasticsearch.yml
+        echo "transport.tcp.port: 9299" >> /etc/elasticsearch/elasticsearch.yml
+        echo "discovery.type: ec2" >> /etc/elasticsearch/elasticsearch.yml
+        echo "cloud.aws.region: us-west-2" >> /etc/elasticsearch/elasticsearch.yml
+        echo "node.master: true" >> /etc/elasticsearch/elasticsearch.yml
+        echo "node.data: false" >> /etc/elasticsearch/elasticsearch.yml
+        echo "discovery.zen.minimum_master_nodes: 1" >> /etc/elasticsearch/elasticsearch.yml
+        echo "discovery.ec2.groups: test-elasticsearch, ssh-http-https" >> /etc/elasticsearch/elasticsearch.yml
+        echo "indices.query.bool.max_clause_count: 8192" >> /etc/elasticsearch/elasticsearch.yml
     else
         echo "argument error"
     fi
