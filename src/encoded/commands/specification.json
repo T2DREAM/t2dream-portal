@@ -1,5 +1,5 @@
 {
-  "ImageId": "ami-0e8aab9a7a911cdc0",
+  "ImageId": "ami-0bd636798c3c20d7b",
   "KeyName": "cherry-lab-power-users",
   "SecurityGroupIds": [ "sg-022ea667" ],
   "InstanceType": "c4.4xlarge",
