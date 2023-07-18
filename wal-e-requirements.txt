@@ -27,7 +27,7 @@ python-dateutil==2.4.2
 python-keystoneclient==3.0.0.0
 python-swiftclient==3.0.0
 pytz==2015.7
-requests==2.25.1
+requests==2.31.0
 six==1.10.0
 stevedore==1.12.0
 wal-e==v1.0.0a1
