@@ -47,7 +47,6 @@ const portal = {
             title: 'Tools',
             children: [
                 { id: 'umap', title: 'Single Cell Browser', url: '/cell-browser/' },
-                { id: 'expression', title: 'Gene Expression Browser', url: '/gene-expression/' },
             ],
         },
         {
@@ -56,6 +55,7 @@ const portal = {
             children: [
                 { id: 'gettingstarted', title: 'Getting started', url: '/help/getting-started/' },
 		{ id: 'profiles', title: 'Schema', url: '/profiles/' },
+		{ id: 'citing', title: 'Citing CMDGA', url: '/help/citing-cmdga' },
             ],
         },
     ],

@@ -64,7 +64,7 @@
                 "description": "A lab specific identifier to reference an object.",
                 "comment": "Current convention is colon separated lab name and lab identifier. (e.g. john-doe:42).",
                 "type":  "string",
-                "pattern": "^(?:kyle-gaulton|ines-cebola|struan-grant|patrick-ellinor|bing-ren|katalin-susztak|rohit-kulkarni|karen-mohlke|jesse-engreitz|klaus-kaestner|mark-mccarthy|anna-gloyn|stephen-parker|karen-mohlke|maike-sander|kelly-frazer|amp-t2d|amp-t2d-consortium|t1d|rich-lab|lungmap|hpap|npod|encode|gtex):[a-zA-Z\\d_$.+!*,()'-]+(?:\\s[a-zA-Z\\d_$.+!*,()'-]+)*$"
+                "pattern": "^(?:kyle-gaulton|ines-cebola|struan-grant|patrick-ellinor|bing-ren|katalin-susztak|rohit-kulkarni|karen-mohlke|jesse-engreitz|klaus-kaestner|mark-mccarthy|eleftheria-zeggini|anna-gloyn|stephen-parker|karen-mohlke|maike-sander|kelly-frazer|amp-t2d|amp-t2d-consortium|t1d|rich-lab|lungmap|hpap|npod|igt|encode|gtex):[a-zA-Z\\d_$.+!*,()'-]+(?:\\s[a-zA-Z\\d_$.+!*,()'-]+)*$"
             }
         }
     },

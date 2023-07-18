@@ -141,6 +141,7 @@
             "comment": "We use http://bioportal.bioontology.org/ontologies/SNOMED-Ethnic-Group as a template for the enum list of ethnicities.",
             "type": "string",
             "enum": [
+		"African",
                 "African American",
                 "Arab",
                 "Arab Indian",
@@ -151,12 +152,15 @@
                 "Caucasian",
                 "Caucasian Hispanic",
                 "Chinese",
+		"European",
                 "Eskimo",
                 "Han Chinese",
                 "Hawaiian",
                 "Hispanic",
                 "Indian",
 		"Unknown",
+		"Pacific Islander",
+		"Mixed",
                 "Japanese",
                 "Yoruba"
             ]

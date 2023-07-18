@@ -393,6 +393,9 @@
         "replicates.library.biosample.treatments.treatment_term_name": {
             "title": "Biosample treatment"
         },
+        "replicates.library.biosample.donor.health_status": {
+            "title": "Health Status"
+        },
         "files.file_type": {
             "title": "Available data"
         },

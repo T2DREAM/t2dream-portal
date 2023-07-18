@@ -329,6 +329,7 @@
                 "type":  "string",
                 "enum" : [
                     "HPAP",
+		    "IGT",
                     "LungMap",
                     "UCSD",
                     "nPOD"
