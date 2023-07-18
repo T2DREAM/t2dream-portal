@@ -82,7 +82,7 @@ runcmd:
 - sudo apt-get -y install pv
 - sudo apt-get -y install daemontools
 - sudo apt-get -y install libicu66
-- sudo apt-get -y install postgresql-9.3
+- sudo apt-get -qq -y install postgresql-9.3
 # install_and_setup_elasticsearch
 - sudo wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo tee /etc/apt/es_gpg_key
 - sudo apt-key add /etc/apt/es_gpg_key
