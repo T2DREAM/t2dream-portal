@@ -42,6 +42,7 @@
     float: left;
     max-width: 85%;
     margin-left: 50px;
+    margin-bottom: 80px;
 }
     h1 {
         margin: 0;
@@ -112,7 +113,7 @@
                     white-space:nowrap;
                     vertical-align: middle;
                     height: 230px;
-		    margin-bottom: 30px;
+		    margin-bottom: 80px;
 }
 .site-search {
                     display:inline-block;
@@ -184,7 +185,7 @@
 .site-banner-intro {
     padding: 10px 20px;
     line-height: 1.8;
-    font-size: 1.2rem;
+    font-size: 1.6rem;
     line-height: 1.8;
 
     @media screen and (min-width: $screen-md-min) {
@@ -196,7 +197,7 @@
 
     @media screen and (min-width: $screen-lg-min) {
         flex: 0 1 50%;
-        font-size: 1.2rem;
+        font-size: 1.6rem;
         line-height: 1.8;
     }
 }

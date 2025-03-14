@@ -55,40 +55,40 @@
             "description": "The category that best describes the annotation set.",
             "type": "string",
             "enum": [
-		"accessible chromatin",
-		"histone modifications",
-		"variant to gene",
-		"Fine-mapped variants",
-		"binding footprints",
-		"hQTL",
-		"meQTL",
-		"sQTL",
-		"pQTL",
+                "accessible chromatin",
+                "histone modifications",
+                "variant to gene",
+                "Fine-mapped variants",
+                "binding footprints",
+                "hQTL",
+                "meQTL",
+                "sQTL",
+                "pQTL",
                 "binding sites",
                 "blacklist",
-		"MeRIP-seq",
-		"candidate regulatory regions",
+                "MeRIP-seq",
+                "candidate regulatory regions",
                 "candidate regulatory elements",
                 "chromatin state",
                 "enhancer predictions",
-		"enhancer-like regions",
+                "enhancer-like regions",
                 "gene expression",
                 "in vivo enhancer evaluations",
                 "long-range chromatin interactions",
                 "methylation summary",
-		"promoter-like regions",
-		"eQTL",
+                "promoter-like regions",
+                "eQTL",
                 "other",
                 "overlap",
                 "representative DNase hypersensitivity sites",
                 "transcript expression",
                 "transcription factor motifs",
                 "validated enhancers",
-		"target gene predictions",
-		"caQTL",
-		"Chromatin interaction target genes",
-		"Coaccessible target genes",
-		"variant allelic effects",
+                "target gene predictions",
+                "caQTL",
+                "Chromatin interaction target genes",
+                "Coaccessible target genes",
+                "variant allelic effects",
                 "variant calls"
             ]
         },
@@ -97,27 +97,27 @@
             "description": "Meta-data field in annotation record with type",
             "type": "string",
             "enum": [
-		"cis-regulatory elements",
-		"Gene expression levels",
-		"Genetic variant effects",
-		"Target gene links",
-		"Others"
+                "cis-regulatory elements",
+                "Gene expression levels",
+                "Genetic variant effects",
+                "Target gene links",
+                "Others"
             ]
         },
         "secondary_awards": {
             "title": "Secondary Award",
             "description": "Multiple Awards.",
             "type": "string",
-	    "linkTo": "Award"
+            "linkTo": "Award"
         },
         "portal_usage": {
             "title": "KP usage",
             "description": "Meta-data field in annotation record with type",
             "type": "string",
             "enum": [
-		"facet",
-		"no-facet",
-		"None"
+                "facet",
+                "no-facet",
+                "None"
             ]
         },
         "consortium_cohort": {
@@ -322,7 +322,19 @@
                 "young adult"
             ]
         },
-        "targets": {
+        "disease_term_id": {
+            "@type": "@id",
+            "title": "Disease Ontology ID",
+            "description": "Ontology identifier describing disease.",
+            "type": "string",
+            "pattern": "^(UBERON|BTO|EFO|OMIT|CL|NTR|GO|FBbt|WBbt|CLO|MONDO|NCIT|PLANA):[C]?[0-9]{2,8}$"
+        },
+        "disease_term_name": {
+            "title": "Disease Ontology Term",
+            "description": "Ontology term describing disease.",
+            "type":  "string"
+        },
+	"targets": {
             "title": "Targets",
             "description": "For predictions of particular features (e.g. distribution of a histone mark), specify the predicted feature(s).",
             "comment": "See target.json for available identifiers.",
@@ -369,16 +381,16 @@
         },
         "annotation_category": {
             "title": "Annotation Category"
-        },	
+        },
         "consortium_cohort": {
             "title": "Cohort"
-        },	
+        },
         "consortium": {
             "title": "Consortium"
-        },	
-	"annotation_type_category": {
-	    "title": "Annotation type Category"
-        },	
+        },
+        "annotation_type_category": {
+            "title": "Annotation type Category"
+        },
         "files.replicate.experiment.assay_term_name": {
             "title": "Assay"
         },
@@ -460,7 +472,7 @@
         "annotation_type_category": {
             "title": "Category",
             "type": "string"
-        },	
+        },
         "files.replicate.experiment.assay_term_name": {
             "title": "Assay Type",
             "type": "string"

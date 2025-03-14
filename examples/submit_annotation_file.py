@@ -10,17 +10,17 @@ import subprocess
 import sys
 import time
 
-host = ''
-encoded_access_key = ''
-encoded_secret_access_key = ''
+host = 'https://cmdga.org'
+encoded_access_key = 'XJ2RKK4D'
+encoded_secret_access_key = '6aclkqkssveqba4s'
 
-path = ''
-my_lab = ''
-my_award = ''
+path = '/home/ubuntu/CHON_sQTL_FNF_summarystats.csv'
+my_lab = '/labs/doug-phanstiel/'
+my_award = '/awards/1R01AR079538/'
 
 # From http://hgwdev.cse.ucsc.edu/~galt/encode3/validatePackage/validateEncode3-latest.tgz
 encValData = 'encValData'
-assembly = 'hg19'
+assembly = 'GRCh38'
 
 # ~2s/GB
 print("Calculating md5sum.")
@@ -30,10 +30,10 @@ with open(path, 'rb') as f:
         md5sum.update(chunk)
 
 data = {
-    "dataset": "",
+    "dataset": "/annotations/DSR020DGY/",
     #"replicate": "/replicates/6e85c807-684a-46e3-b4b9-1f7990e85720/",
-    "file_format": "bigWig",
-    "assembly": "hg19",
+    "file_format": "csv",
+    "assembly": "GRCh38",
     #"file_format_type": "bigWig",
     "file_size": os.path.getsize(path),
     "md5sum": md5sum.hexdigest(),

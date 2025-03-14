@@ -45,7 +45,6 @@ export default class Home extends React.Component {
                         </TabPanelPane>
                         <TabPanelPane key="tool">
                         <a className="btn btn-info btn-lg" target = "_blank" href = { 'cell-browser' } style= {{'margin-left': '2%', 'margin-top': '2%', 'margin-bottom': '2%'}}>Single Cell Browser</a>
-                        <a className="btn btn-info btn-lg" target = "_blank" href = { 'gene-expression' } style= {{'margin-left': '2%', 'margin-top': '2%', 'margin-bottom': '2%'}}>Gene Expression Browser</a>
                         </TabPanelPane>
                         </TabPanel>
                         </div>                        

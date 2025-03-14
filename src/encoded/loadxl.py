@@ -44,6 +44,7 @@ ORDER = [
     'ucsc_browser_composite',
     'matched_set',
     'treatment_time_series',
+    'multiomics_series',
     'treatment_concentration_series',
     'organism_development_series',
     'replication_timing_series',

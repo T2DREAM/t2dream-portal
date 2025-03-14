@@ -47,7 +47,6 @@ const portal = {
             title: 'Tools',
             children: [
                 { id: 'umap', title: 'Single Cell Browser', url: '/cell-browser/' },
-                { id: 'expression', title: 'Gene Expression Browser', url: '/gene-expression/' },
             ],
         },
         {
