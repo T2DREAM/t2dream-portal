@@ -124,6 +124,7 @@
                     "10X snRNA-seq",
 		    "sciATAC-seq",
 		    "10X snATAC-seq",
+		    "10X scATAC-seq",
 		    "10X multiome",
 		    "other"
 		]

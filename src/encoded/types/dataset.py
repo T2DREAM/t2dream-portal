@@ -700,6 +700,59 @@ class Series(Dataset, CalculatedSeriesAssay, CalculatedSeriesBiosample, Calculat
         'files.quality_metrics.step_run',
         'files.quality_metrics.step_run.analysis_step_version.analysis_step',
     ]
+@abstract_collection(
+    name='multiomics-series',
+    unique_key='accession',
+    properties={
+        'title': "Multiomics Series",
+        'description': 'Listing of all types of multiomics series datasets.',
+    })
+class MultiomicsSeries(Dataset, CalculatedSeriesAssay, CalculatedSeriesBiosample, CalculatedBiosampleSlims, CalculatedBiosampleSynonyms, CalculatedSeriesTarget, CalculatedSeriesTreatment, CalculatedAssaySynonyms):
+    item_type = 'multiomics-series'
+    base_types = ['MultiomicsSeries'] + Dataset.base_types
+    schema = load_schema('encoded:schemas/multiomics-series.json')
+    embedded = Dataset.embedded + [
+        'organism',
+        'target',
+        'target.organism',
+        'references',
+        'related_datasets.files',
+        'related_datasets.files.analysis_step_version',
+        'related_datasets.files.analysis_step_version.analysis_step',
+        'related_datasets.files.analysis_step_version.analysis_step.pipelines',
+        'related_datasets.lab',
+        'related_datasets.submitted_by',
+        'related_datasets.award.pi.lab',
+        'related_datasets.replicates.antibody',
+        'related_datasets.replicates.antibody.targets',
+        'related_datasets.replicates.library',
+        'related_datasets.replicates.library.biosample.submitted_by',
+        'related_datasets.replicates.library.biosample.source',
+        'related_datasets.replicates.library.biosample.organism',
+        'related_datasets.replicates.library.biosample.donor.organism',
+        'related_datasets.replicates.library.biosample.treatments',
+        'related_datasets.replicates.library.spikeins_used',
+        'related_datasets.replicates.library.treatments',
+        'related_datasets.possible_controls',
+        'related_datasets.possible_controls.target',
+        'related_datasets.possible_controls.lab',
+        'related_datasets.target.organism',
+        'related_datasets.references',
+        'files.lab',
+        'files.platform',
+        'files.lab',
+        'files.analysis_step_version.analysis_step',
+        'files.analysis_step_version.analysis_step.pipelines',
+        'files.analysis_step_version.analysis_step.versions',
+        'files.analysis_step_version.analysis_step.versions.software_versions',
+        'files.analysis_step_version.analysis_step.versions.software_versions.software',
+        'files.analysis_step_version.software_versions',
+        'files.analysis_step_version.software_versions.software',
+        'files.replicate.library.biosample',
+        'files.quality_metrics',
+        'files.quality_metrics.step_run',
+        'files.quality_metrics.step_run.analysis_step_version.analysis_step',
+    ]
 
     @calculated_property(schema={
         "title": "Revoked datasets",
